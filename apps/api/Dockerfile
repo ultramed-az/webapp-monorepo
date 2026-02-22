@@ -1,6 +1,6 @@
 FROM node:20-alpine AS builder
 
-RUN npm install -g pnpm
+RUN npm install -g pnpm && apk add --no-cache openssl libc6-compat
 
 WORKDIR /app
 
@@ -17,7 +17,7 @@ RUN pnpm --filter @ultramed/api build
 
 FROM node:20-alpine
 
-RUN npm install -g pnpm
+RUN npm install -g pnpm && apk add --no-cache openssl libc6-compat
 
 WORKDIR /app
 
