@@ -10,6 +10,11 @@ const inter = Inter({ subsets: ['latin'] });
 export const metadata: Metadata = {
     title: 'Admin Panel | Ultramed',
     description: 'Ultramed admin panel',
+    icons: {
+        icon: '/favicon.ico',
+        shortcut: '/favicon.ico',
+        apple: '/favicon.ico',
+    },
     robots: {
         index: false,
         follow: false,
@@ -28,7 +33,7 @@ export default async function AdminLayout({
 
     return (
         <html lang={locale}>
-            <body className={`${inter.className} bg-slate-50 overflow-hidden`}>
+            <body className={`${inter.className} bg-brand-cream overflow-hidden`}>
                 <NextIntlClientProvider messages={messages}>
                     <AdminShell>{children}</AdminShell>
                 </NextIntlClientProvider>

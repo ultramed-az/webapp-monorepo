@@ -20,8 +20,8 @@ export default function AdminPrivacyPolicyPage() {
                         defaultValue={`1. Toplanan melumatlar\n2. Emal meqsedleri\n3. Tehlukesizlik tedbirleri\n\nBu metn admin terefden redakte oluna biler.`}
                     />
                     <div className="flex items-center gap-3">
-                        <Button className="bg-blue-600 hover:bg-blue-700 text-white">Deyisiklikleri Yadda Saxla</Button>
-                        <Button variant="outline">Onbaxis</Button>
+                        <Button className="bg-brand-orange hover:bg-brand-orange-dark text-white">Deyisiklikleri Yadda Saxla</Button>
+                        <Button variant="outline" className="border-brand-blue text-brand-blue hover:bg-brand-blue-soft">Onbaxis</Button>
                     </div>
                 </CardContent>
             </Card>

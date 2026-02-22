@@ -77,10 +77,10 @@ export default function BlogPage() {
     return (
         <div className="flex flex-col min-h-screen">
             {/* Header */}
-            <section className="bg-slate-50 py-16 lg:py-24 relative overflow-hidden">
-                <div className="absolute inset-0 z-0 opacity-10 bg-[radial-gradient(circle_at_bottom_left,_var(--tw-gradient-stops))] from-blue-700 via-transparent to-transparent"></div>
+            <section className="bg-brand-cream py-16 lg:py-24 relative overflow-hidden">
+                <div className="absolute inset-0 z-0 opacity-10 bg-[radial-gradient(circle_at_bottom_left,_var(--tw-gradient-stops))] from-brand-blue via-transparent to-transparent"></div>
                 <div className="container mx-auto px-6 relative z-10 text-center">
-                    <div className="inline-flex items-center space-x-2 bg-white/80 backdrop-blur border border-blue-100 text-blue-700 font-medium px-4 py-2 rounded-full text-sm mb-6 shadow-sm">
+                    <div className="inline-flex items-center space-x-2 bg-brand-blue-soft/80 backdrop-blur border border-brand-blue-soft text-brand-blue font-medium px-4 py-2 rounded-full text-sm mb-6 shadow-sm">
                         <BookOpen className="h-4 w-4" />
                         <span>Tibbi Bloq</span>
                     </div>
@@ -102,7 +102,7 @@ export default function BlogPage() {
                                 key={idx}
                                 onClick={() => setSelectedCategory(cat)}
                                 className={`px-5 py-2.5 rounded-full text-sm font-medium transition-all duration-300 ${selectedCategory === cat
-                                        ? 'bg-blue-600 text-white shadow-md shadow-blue-200'
+                                        ? 'bg-brand-blue text-white shadow-md shadow-brand-blue/20'
                                         : 'bg-slate-50 text-slate-600 hover:bg-slate-100 border border-slate-200'
                                     }`}
                             >
@@ -119,7 +119,7 @@ export default function BlogPage() {
                     {filteredPosts.length === 0 ? (
                         <div className="text-center py-20 bg-slate-50 rounded-2xl border border-slate-100">
                             <h3 className="text-xl font-semibold text-slate-900 mb-2">Bu kateqoriyaya uyğun məqalə tapılmadı</h3>
-                            <button onClick={() => setSelectedCategory('Bütün Kateqoriyalar')} className="text-blue-600 font-medium mt-4">
+                            <button onClick={() => setSelectedCategory('Bütün Kateqoriyalar')} className="text-brand-blue font-medium mt-4">
                                 Bütün məqalələrə qayıt
                             </button>
                         </div>
@@ -136,7 +136,7 @@ export default function BlogPage() {
                                                 fill
                                                 className="object-cover group-hover:scale-105 transition-transform duration-700"
                                             />
-                                            <div className="absolute top-4 left-4 bg-white/90 backdrop-blur text-blue-700 font-bold text-xs px-3 py-1.5 rounded-full shadow-sm">
+                                            <div className="absolute top-4 left-4 bg-white/90 backdrop-blur text-brand-blue font-bold text-xs px-3 py-1.5 rounded-full shadow-sm">
                                                 GÜNÜN MƏQALƏSİ
                                             </div>
                                         </div>
@@ -145,7 +145,7 @@ export default function BlogPage() {
                                                 <span className="flex items-center"><Tag className="w-4 h-4 mr-1.5" />{featuredPost.category}</span>
                                                 <span className="flex items-center"><Calendar className="w-4 h-4 mr-1.5" />{featuredPost.date}</span>
                                             </div>
-                                            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-6 group-hover:text-blue-700 transition-colors leading-tight">
+                                            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-6 group-hover:text-brand-blue transition-colors leading-tight">
                                                 {featuredPost.title}
                                             </h2>
                                             <p className="text-lg text-slate-600 leading-relaxed mb-8">
@@ -153,12 +153,12 @@ export default function BlogPage() {
                                             </p>
                                             <div className="flex items-center justify-between">
                                                 <div className="flex items-center text-slate-900 font-medium">
-                                                    <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3 text-blue-600">
+                                                    <div className="w-10 h-10 bg-brand-blue-soft rounded-full flex items-center justify-center mr-3 text-brand-blue">
                                                         <User className="w-5 h-5" />
                                                     </div>
                                                     {featuredPost.author}
                                                 </div>
-                                                <div className="inline-flex items-center text-blue-600 font-bold group-hover:translate-x-2 transition-transform">
+                                                <div className="inline-flex items-center text-brand-orange font-bold group-hover:translate-x-2 transition-transform">
                                                     Oxu <ArrowRight className="ml-2 w-5 h-5" />
                                                 </div>
                                             </div>
@@ -179,7 +179,7 @@ export default function BlogPage() {
                                                     fill
                                                     className="object-cover group-hover:scale-110 transition-transform duration-700"
                                                 />
-                                                <div className="absolute top-4 left-4 bg-blue-600 text-white font-semibold text-xs px-3 py-1.5 rounded-full shadow-md">
+                                                <div className="absolute top-4 left-4 bg-brand-blue text-white font-semibold text-xs px-3 py-1.5 rounded-full shadow-md">
                                                     {post.category}
                                                 </div>
                                             </div>
@@ -188,13 +188,13 @@ export default function BlogPage() {
                                                     <span className="flex items-center"><Calendar className="w-3.5 h-3.5 mr-1" />{post.date}</span>
                                                     <span className="flex items-center"><User className="w-3.5 h-3.5 mr-1" />{post.author}</span>
                                                 </div>
-                                                <h3 className="text-xl font-bold text-slate-900 mb-3 group-hover:text-blue-700 transition-colors line-clamp-2">
+                                                <h3 className="text-xl font-bold text-slate-900 mb-3 group-hover:text-brand-blue transition-colors line-clamp-2">
                                                     {post.title}
                                                 </h3>
                                                 <p className="text-slate-600 text-sm leading-relaxed mb-6 line-clamp-3">
                                                     {post.excerpt}
                                                 </p>
-                                                <div className="mt-auto pt-4 border-t border-slate-50 flex items-center text-blue-600 font-semibold text-sm group-hover:translate-x-1 transition-transform">
+                                                <div className="mt-auto pt-4 border-t border-slate-50 flex items-center text-brand-orange font-semibold text-sm group-hover:translate-x-1 transition-transform">
                                                     Ətraflı <ArrowRight className="ml-1 w-4 h-4" />
                                                 </div>
                                             </CardContent>

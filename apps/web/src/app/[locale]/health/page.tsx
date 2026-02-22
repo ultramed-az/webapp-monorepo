@@ -21,7 +21,7 @@ export default function HealthPage() {
                             <p><strong>checkedAt:</strong> {now}</p>
                         </div>
                         <p>
-                            JSON endpoint: <Link href="/health" className="text-blue-600 hover:underline">/health</Link>
+                            JSON endpoint: <Link href="/health" className="text-brand-blue hover:underline">/health</Link>
                         </p>
                     </CardContent>
                 </Card>

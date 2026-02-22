@@ -7,7 +7,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { HeartPulse, Loader2 } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
+import Image from 'next/image';
 
 export default function AdminLoginPage() {
     const t = useTranslations('Admin');
@@ -35,9 +36,14 @@ export default function AdminLoginPage() {
             <Card className="w-full max-w-md shadow-lg border-slate-200">
                 <CardHeader className="space-y-3 pb-6 text-center">
                     <div className="flex justify-center mb-4">
-                        <div className="bg-blue-600 p-3 rounded-xl shadow-sm">
-                            <HeartPulse className="w-8 h-8 text-white" />
-                        </div>
+                        <Image
+                            src="/logo.png"
+                            alt="Ultramed"
+                            width={200}
+                            height={58}
+                            priority
+                            className="h-14 w-auto"
+                        />
                     </div>
                     <CardTitle className="text-2xl font-bold tracking-tight text-slate-900">
                         Ultramed Admin
@@ -57,13 +63,13 @@ export default function AdminLoginPage() {
                                 required
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
-                                className="h-11 border-slate-200 focus-visible:ring-blue-500"
+                                className="h-11 border-slate-200 focus-visible:ring-brand-blue"
                             />
                         </div>
                         <div className="space-y-2">
                             <div className="flex items-center justify-between">
                                 <Label htmlFor="password" className="text-sm font-medium text-slate-700">Şifrə</Label>
-                                <a href="#" className="text-sm font-medium text-blue-600 hover:underline">Şifrəni unutmusunuz?</a>
+                                <a href="#" className="text-sm font-medium text-brand-blue hover:underline">Şifrəni unutmusunuz?</a>
                             </div>
                             <Input
                                 id="password"
@@ -72,12 +78,12 @@ export default function AdminLoginPage() {
                                 required
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
-                                className="h-11 border-slate-200 focus-visible:ring-blue-500"
+                                className="h-11 border-slate-200 focus-visible:ring-brand-blue"
                             />
                         </div>
                         <Button
                             type="submit"
-                            className="w-full h-11 bg-blue-600 hover:bg-blue-700 text-white mt-6 rounded-lg text-sm font-medium transition-colors"
+                            className="w-full h-11 bg-brand-orange hover:bg-brand-orange-dark text-white mt-6 rounded-lg text-sm font-medium transition-colors"
                             disabled={isLoading}
                         >
                             {isLoading ? (

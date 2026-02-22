@@ -10,22 +10,22 @@ export default function HomePage() {
 
     const features = [
         {
-            icon: <Stethoscope className="h-8 w-8 text-blue-600" />,
+            icon: <Stethoscope className="h-8 w-8 text-brand-blue" />,
             title: t('featureExpert', { default: 'Peşəkar Həkimlər' }),
             description: t('featureExpertDesc', { default: 'Öz sahəsində uzman və beynəlxalq təcrübəli mütəxəssislər.' })
         },
         {
-            icon: <Activity className="h-8 w-8 text-blue-600" />,
+            icon: <Activity className="h-8 w-8 text-brand-orange" />,
             title: t('featureModern', { default: 'Müasir Avadanlıq' }),
             description: t('featureModernDesc', { default: 'Ən son texnologiya ilə təchiz olunmuş laboratoriya və diaqnostika.' })
         },
         {
-            icon: <Clock className="h-8 w-8 text-blue-600" />,
+            icon: <Clock className="h-8 w-8 text-brand-blue" />,
             title: t('feature247', { default: '7/24 Xidmət' }),
             description: t('feature247Desc', { default: 'Təcili hallarda günün hər saatı xidmətinizdəyik.' })
         },
         {
-            icon: <ShieldCheck className="h-8 w-8 text-blue-600" />,
+            icon: <ShieldCheck className="h-8 w-8 text-brand-orange" />,
             title: t('featureReliable', { default: 'Etibarlı Diaqnoz' }),
             description: t('featureReliableDesc', { default: 'Dəqiq nəticələr və doğru müalicə metodları.' })
         }
@@ -41,12 +41,12 @@ export default function HomePage() {
     return (
         <div className="flex flex-col min-h-screen">
             {/* Hero Section */}
-            <section className="relative bg-blue-50 py-20 lg:py-32 overflow-hidden">
-                <div className="absolute inset-0 z-0 opacity-10 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-blue-400 via-transparent to-transparent"></div>
+            <section className="relative bg-brand-cream py-20 lg:py-32 overflow-hidden">
+                <div className="absolute inset-0 z-0 opacity-10 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-brand-blue via-transparent to-transparent"></div>
                 <div className="container mx-auto px-6 relative z-10">
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
                         <div className="space-y-8">
-                            <div className="inline-flex items-center space-x-2 bg-blue-100 text-blue-700 font-medium px-4 py-2 rounded-full text-sm">
+                            <div className="inline-flex items-center space-x-2 bg-brand-blue-soft text-brand-blue font-medium px-4 py-2 rounded-full text-sm">
                                 <HeartPulse className="h-4 w-4" />
                                 <span>{t('heroBadge', { default: 'Sizin Sağlamlığınız Bizim Üçün Dəyərlidir' })}</span>
                             </div>
@@ -57,17 +57,17 @@ export default function HomePage() {
                                 {t('heroDescription', { default: 'Ultramed klinikası olaraq sağlamlığınız üçün ən qabaqcıl texnologiyalar və peşəkar komandamızla xidmətinizdəyik.' })}
                             </p>
                             <div className="flex flex-col sm:flex-row gap-4">
-                                <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-white px-8 h-14 text-lg rounded-full">
+                                <Button size="lg" className="bg-brand-orange hover:bg-brand-orange-dark text-white px-8 h-14 text-lg rounded-full">
                                     {t('bookAppointment', { default: 'Onlayn Qəbul' })}
                                 </Button>
-                                <Button size="lg" variant="outline" className="border-blue-200 text-blue-700 hover:bg-blue-50 px-8 h-14 text-lg rounded-full">
+                                <Button size="lg" variant="outline" className="border-brand-blue text-brand-blue hover:bg-brand-blue-soft px-8 h-14 text-lg rounded-full">
                                     {t('ourServices', { default: 'Xidmətlərimiz' })} <ArrowRight className="ml-2 h-5 w-5" />
                                 </Button>
                             </div>
                         </div>
                         <div className="relative h-[400px] lg:h-[600px] rounded-3xl overflow-hidden shadow-2xl">
                             {/* Placeholder for actual hero image. Since we don't have images yet, using a colored div placeholder */}
-                            <div className="absolute inset-0 bg-gradient-to-tr from-blue-800 to-cyan-500 flex items-center justify-center">
+                            <div className="absolute inset-0 bg-gradient-to-tr from-brand-blue-dark to-brand-blue flex items-center justify-center">
                                 <HeartPulse className="h-32 w-32 text-white/20" />
                                 <div className="absolute inset-0 bg-black/10"></div>
                             </div>
@@ -90,7 +90,7 @@ export default function HomePage() {
                         {features.map((feature, idx) => (
                             <Card key={idx} className="border-slate-100 shadow-sm hover:shadow-md transition-shadow">
                                 <CardHeader className="pb-4">
-                                    <div className="bg-blue-50 w-16 h-16 rounded-2xl flex items-center justify-center mb-4">
+                                    <div className="bg-brand-blue-soft w-16 h-16 rounded-2xl flex items-center justify-center mb-4">
                                         {feature.icon}
                                     </div>
                                     <CardTitle className="text-xl">{feature.title}</CardTitle>
@@ -105,16 +105,16 @@ export default function HomePage() {
             </section>
 
             {/* Statistics Section */}
-            <section className="py-16 bg-blue-600">
+            <section className="py-16 bg-brand-blue">
                 <div className="container mx-auto px-6">
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center divide-x divide-blue-500/50">
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center divide-x divide-white/20">
                         {stats.map((stat, idx) => (
                             <div key={idx} className="flex flex-col items-center justify-center space-y-2 text-white px-4">
-                                <div className="bg-blue-500/50 p-3 rounded-full mb-2">
+                                <div className="bg-brand-orange/25 p-3 rounded-full mb-2">
                                     {stat.icon}
                                 </div>
                                 <div className="text-4xl font-extrabold">{stat.value}</div>
-                                <div className="text-blue-100 font-medium">{stat.label}</div>
+                                <div className="text-white/90 font-medium">{stat.label}</div>
                             </div>
                         ))}
                     </div>
@@ -122,9 +122,9 @@ export default function HomePage() {
             </section>
 
             {/* CTA Section */}
-            <section className="py-24 bg-slate-50">
+            <section className="py-24 bg-brand-cream">
                 <div className="container mx-auto px-6">
-                    <div className="bg-white rounded-3xl shadow-xl p-10 md:p-16 text-center max-w-4xl mx-auto border border-blue-50">
+                    <div className="bg-white rounded-3xl shadow-xl p-10 md:p-16 text-center max-w-4xl mx-auto border border-brand-orange/20">
                         <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-6">
                             {t('ctaTitle', { default: 'Sağlamlığınıza Bu Gün Qayğı Göstərin' })}
                         </h2>
@@ -132,10 +132,10 @@ export default function HomePage() {
                             {t('ctaDesc', { default: 'Vaxt itirmədən həkim qəbuluna yazılın və peşəkar komandamızın xidmətindən yararlanın.' })}
                         </p>
                         <div className="flex flex-col sm:flex-row justify-center gap-4">
-                            <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-white px-8 h-14 text-lg rounded-full">
+                            <Button size="lg" className="bg-brand-orange hover:bg-brand-orange-dark text-white px-8 h-14 text-lg rounded-full">
                                 {t('bookAppointment', { default: 'Qəbul yazılmaq' })}
                             </Button>
-                            <Button size="lg" variant="outline" className="border-slate-200 text-slate-700 hover:bg-slate-50 px-8 h-14 text-lg rounded-full">
+                            <Button size="lg" variant="outline" className="border-brand-blue text-brand-blue hover:bg-brand-blue-soft px-8 h-14 text-lg rounded-full">
                                 {t('contactUs', { default: 'Bizimlə Əlaqə' })}
                             </Button>
                         </div>

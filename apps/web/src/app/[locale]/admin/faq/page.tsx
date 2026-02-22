@@ -15,7 +15,7 @@ export default function AdminFaqPage() {
                     <h2 className="text-2xl font-bold tracking-tight text-slate-900">FAQ Idareetmesi</h2>
                     <p className="text-slate-500">Tez-tez sorusulan suallari redakte edin ve prioritetlesdirin.</p>
                 </div>
-                <Button className="bg-blue-600 hover:bg-blue-700 text-white">Yeni Sual Elave Et</Button>
+                <Button className="bg-brand-orange hover:bg-brand-orange-dark text-white">Yeni Sual Elave Et</Button>
             </div>
 
             <Card className="border-slate-200 shadow-sm">
@@ -30,7 +30,7 @@ export default function AdminFaqPage() {
                                 <p className="text-sm text-slate-500">Kateqoriya: {item.category}</p>
                             </div>
                             <div className="flex items-center gap-2">
-                                <span className={`text-xs px-2 py-1 rounded-full ${item.status === 'active' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}`}>
+                                <span className={`text-xs px-2 py-1 rounded-full ${item.status === 'active' ? 'bg-brand-blue-soft text-brand-blue' : 'bg-brand-orange/15 text-brand-orange-dark'}`}>
                                     {item.status === 'active' ? 'Aktiv' : 'Qaralama'}
                                 </span>
                                 <Button size="sm" variant="outline">Redakte et</Button>

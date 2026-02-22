@@ -21,7 +21,7 @@ export default function Header({ onMenuClick }: HeaderProps) {
     const t = useTranslations('Admin');
 
     return (
-        <header className="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-4 lg:px-6 z-10">
+        <header className="h-16 bg-white border-b border-brand-blue-soft flex items-center justify-between px-4 lg:px-6 z-10">
             <div className="flex items-center gap-4">
                 <Button
                     variant="ghost"
@@ -38,7 +38,7 @@ export default function Header({ onMenuClick }: HeaderProps) {
                     <Input
                         type="search"
                         placeholder={t('search', { default: 'Search...' })}
-                        className="w-full bg-slate-50 border-slate-200 pl-9 rounded-full h-9 focus-visible:ring-blue-500"
+                        className="w-full bg-slate-50 border-slate-200 pl-9 rounded-full h-9 focus-visible:ring-brand-blue"
                     />
                 </div>
             </div>
@@ -46,13 +46,13 @@ export default function Header({ onMenuClick }: HeaderProps) {
             <div className="flex items-center gap-2">
                 <Button variant="ghost" size="icon" className="text-slate-500 hover:text-slate-700 relative">
                     <Bell className="w-5 h-5" />
-                    <span className="absolute top-2 right-2.5 w-2 h-2 bg-red-500 rounded-full border border-white" />
+                    <span className="absolute top-2 right-2.5 w-2 h-2 bg-brand-orange rounded-full border border-white" />
                 </Button>
 
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                         <Button variant="ghost" className="relative flex items-center gap-2 h-9 pl-2 pr-4 rounded-full border border-slate-200 ml-2 hover:bg-slate-50">
-                            <div className="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-semibold text-xs">
+                            <div className="w-6 h-6 rounded-full bg-brand-blue-soft flex items-center justify-center text-brand-blue font-semibold text-xs">
                                 A
                             </div>
                             <span className="text-sm font-medium text-slate-700 hidden sm:block">Admin</span>
@@ -71,7 +71,7 @@ export default function Header({ onMenuClick }: HeaderProps) {
                             <span>{t('profile', { default: 'Profile' })}</span>
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem className="cursor-pointer text-red-600 focus:text-red-600 focus:bg-red-50">
+                        <DropdownMenuItem className="cursor-pointer text-brand-orange focus:text-brand-orange-dark focus:bg-brand-orange/10">
                             {t('logout', { default: 'Logout' })}
                         </DropdownMenuItem>
                     </DropdownMenuContent>

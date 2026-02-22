@@ -4,7 +4,8 @@ import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { Link, useRouter, usePathname } from '@/i18n/routing';
 import { useParams } from 'next/navigation';
-import { Menu, Phone, HeartPulse, Search, MapPin } from 'lucide-react';
+import { Menu, Phone, Search, MapPin } from 'lucide-react';
+import Image from 'next/image';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -72,7 +73,7 @@ export default function Navbar() {
     return (
         <header className="fixed top-0 w-full z-50">
             {/* Top Bar - Hidden on Mobile */}
-            <div className="hidden lg:flex justify-between items-center bg-blue-900 text-white/90 text-sm py-2 px-8">
+            <div className="hidden lg:flex justify-between items-center bg-brand-blue-dark text-white/90 text-sm py-2 px-8">
                 <div className="flex items-center space-x-6">
                     <div className="flex items-center">
                         <Phone className="w-4 h-4 mr-2" />
@@ -88,7 +89,7 @@ export default function Navbar() {
 
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" className="h-6 px-2 text-white/90 hover:text-white hover:bg-blue-800 transition-colors focus-visible:ring-0">
+                            <Button variant="ghost" className="h-6 px-2 text-white/90 hover:text-white hover:bg-brand-blue transition-colors focus-visible:ring-0">
                                 {currentLanguage.label}
                             </Button>
                         </DropdownMenuTrigger>
@@ -108,17 +109,19 @@ export default function Navbar() {
             </div>
 
             {/* Main Navigation */}
-            <nav className={`transition-all duration-300 ${isScrolled ? 'bg-white shadow-md py-3' : 'bg-white/95 backdrop-blur-sm py-5'} px-4 md:px-8 border-b`}>
+            <nav className={`transition-all duration-300 ${isScrolled ? 'bg-white shadow-md py-3' : 'bg-white/95 backdrop-blur-sm py-5'} px-4 md:px-8 border-b border-brand-blue-soft`}>
                 <div className="max-w-7xl mx-auto flex justify-between items-center">
 
                     {/* Logo */}
-                    <Link href="/" className="flex items-center space-x-2 group">
-                        <div className="bg-blue-600 p-2 rounded-lg group-hover:bg-blue-700 transition-colors">
-                            <HeartPulse className="w-6 h-6 text-white" />
-                        </div>
-                        <span className="text-2xl font-bold text-slate-800 tracking-tight">
-                            Ultra<span className="text-blue-600">med</span>
-                        </span>
+                    <Link href="/" className="group">
+                        <Image
+                            src="/logo.png"
+                            alt="Ultramed"
+                            width={180}
+                            height={52}
+                            priority
+                            className="h-10 w-auto md:h-11 transition-opacity group-hover:opacity-90"
+                        />
                     </Link>
 
                     {/* Desktop Links */}
@@ -127,7 +130,7 @@ export default function Navbar() {
                             <Link
                                 key={link.href}
                                 href={link.href}
-                                className={`text-[15px] font-medium transition-colors hover:text-blue-600 ${isActive(link.href) ? 'text-blue-600' : 'text-slate-600'}`}
+                                className={`text-[15px] font-medium transition-colors hover:text-brand-orange ${isActive(link.href) ? 'text-brand-orange' : 'text-slate-700'}`}
                             >
                                 {link.label}
                             </Link>
@@ -136,10 +139,10 @@ export default function Navbar() {
 
                     {/* Desktop Actions */}
                     <div className="hidden lg:flex items-center space-x-4">
-                        <Button variant="ghost" size="icon" className="text-slate-600 hover:text-blue-600">
+                        <Button variant="ghost" size="icon" className="text-slate-600 hover:text-brand-orange">
                             <Search className="w-5 h-5" />
                         </Button>
-                        <Button className="bg-blue-600 hover:bg-blue-700 text-white rounded-full px-6">
+                        <Button className="bg-brand-orange hover:bg-brand-orange-dark text-white rounded-full px-6">
                             {t('bookAppointment', { default: 'Qəbul yazılmaq' })}
                         </Button>
                     </div>
@@ -159,7 +162,7 @@ export default function Navbar() {
                                             <Link
                                                 key={link.href}
                                                 href={link.href}
-                                                className={`text-lg font-medium transition-colors hover:text-blue-600 ${isActive(link.href) ? 'text-blue-600' : 'text-slate-600'}`}
+                                                className={`text-lg font-medium transition-colors hover:text-brand-orange ${isActive(link.href) ? 'text-brand-orange' : 'text-slate-700'}`}
                                             >
                                                 {link.label}
                                             </Link>
@@ -178,7 +181,7 @@ export default function Navbar() {
                                                 </Button>
                                             ))}
                                         </div>
-                                        <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white">
+                                        <Button className="w-full bg-brand-orange hover:bg-brand-orange-dark text-white">
                                             {t('bookAppointment', { default: 'Qəbul yazılmaq' })}
                                         </Button>
                                     </div>

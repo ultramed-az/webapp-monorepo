@@ -5,6 +5,12 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
+  --color-brand-blue: var(--brand-blue);
+  --color-brand-blue-dark: var(--brand-blue-dark);
+  --color-brand-blue-soft: var(--brand-blue-soft);
+  --color-brand-orange: var(--brand-orange);
+  --color-brand-orange-dark: var(--brand-orange-dark);
+  --color-brand-cream: var(--brand-cream);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
@@ -48,25 +54,31 @@
 }
 
 :root {
+  --brand-blue: #15489e;
+  --brand-blue-dark: #103772;
+  --brand-blue-soft: #e8eefb;
+  --brand-orange: #f28c2f;
+  --brand-orange-dark: #dc7721;
+  --brand-cream: #f7f8fc;
   --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
+  --background: #f7f8fc;
+  --foreground: #10233f;
+  --card: #ffffff;
+  --card-foreground: #10233f;
+  --popover: #ffffff;
+  --popover-foreground: #10233f;
+  --primary: #15489e;
+  --primary-foreground: #ffffff;
+  --secondary: #e8eefb;
+  --secondary-foreground: #15489e;
+  --muted: #edf2fb;
+  --muted-foreground: #4a5d7f;
+  --accent: #fef0e4;
+  --accent-foreground: #8b4d13;
   --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
+  --border: #dbe5f5;
+  --input: #dbe5f5;
+  --ring: #f28c2f;
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.398 0.07 227.392);
@@ -122,5 +134,8 @@
   }
   body {
     @apply bg-background text-foreground;
+    background-image:
+      radial-gradient(circle at 8% 0%, rgba(21, 72, 158, 0.06), transparent 28%),
+      radial-gradient(circle at 100% 40%, rgba(242, 140, 47, 0.08), transparent 22%);
   }
 }

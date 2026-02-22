@@ -16,15 +16,15 @@ export default function AdminError({
     }, [error]);
 
     return (
-        <div className="min-h-[70vh] flex items-center justify-center px-4">
+        <div className="min-h-[70vh] flex items-center justify-center px-4 bg-brand-cream">
             <div className="text-center max-w-lg">
-                <p className="text-red-600 font-semibold mb-2">500</p>
+                <p className="text-brand-orange font-semibold mb-2">500</p>
                 <h1 className="text-3xl font-bold text-slate-900 mb-3">Admin xetasi</h1>
                 <p className="text-slate-600 mb-6">
                     Gozlenilmez xeta yarandi. Yeniden cehd ede ve ya dashboarda qayida bilersiniz.
                 </p>
                 <div className="flex items-center justify-center gap-3">
-                    <Button onClick={reset} className="bg-blue-600 hover:bg-blue-700 text-white">
+                    <Button onClick={reset} className="bg-brand-orange hover:bg-brand-orange-dark text-white">
                         Yeniden cehd et
                     </Button>
                     <Button asChild variant="outline">

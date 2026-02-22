@@ -16,7 +16,7 @@ export default function AdminTestimonialsPage() {
                     <h2 className="text-2xl font-bold tracking-tight text-slate-900">Reyler Idareetmesi</h2>
                     <p className="text-slate-500">Pasiyent reylerini moderasiya edin ve saytda gosterisini idare edin.</p>
                 </div>
-                <Button className="bg-blue-600 hover:bg-blue-700 text-white">Yeni Rey Elave Et</Button>
+                <Button className="bg-brand-orange hover:bg-brand-orange-dark text-white">Yeni Rey Elave Et</Button>
             </div>
 
             <Card className="border-slate-200 shadow-sm">
@@ -28,7 +28,7 @@ export default function AdminTestimonialsPage() {
                         <div key={item.id} className="rounded-xl border border-slate-200 p-4 bg-white">
                             <div className="flex items-center justify-between gap-3 mb-2">
                                 <h3 className="font-semibold text-slate-900">{item.author}</h3>
-                                <Badge variant="secondary" className={item.status === 'published' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}>
+                                <Badge variant="secondary" className={item.status === 'published' ? 'bg-brand-blue-soft text-brand-blue' : 'bg-brand-orange/15 text-brand-orange-dark'}>
                                     {item.status === 'published' ? 'Yayimlanib' : 'Qaralama'}
                                 </Badge>
                             </div>

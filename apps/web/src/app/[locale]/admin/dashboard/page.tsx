@@ -20,11 +20,11 @@ export default function AdminDashboard() {
                 <Card className="hover:shadow-md transition-shadow">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-sm font-medium text-slate-500">Ümumi Pasiyent</CardTitle>
-                        <Users className="h-4 w-4 text-blue-600" />
+                        <Users className="h-4 w-4 text-brand-blue" />
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold text-slate-900">14,231</div>
-                        <p className="text-xs text-green-600 flex items-center mt-1 font-medium">
+                        <p className="text-xs text-brand-blue flex items-center mt-1 font-medium">
                             <TrendingUp className="h-3 w-3 mr-1" />
                             +20.1% ötən aydan
                         </p>
@@ -33,11 +33,11 @@ export default function AdminDashboard() {
                 <Card className="hover:shadow-md transition-shadow">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-sm font-medium text-slate-500">Bugünkü Qəbullar</CardTitle>
-                        <Calendar className="h-4 w-4 text-orange-500" />
+                        <Calendar className="h-4 w-4 text-brand-orange" />
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold text-slate-900">+42</div>
-                        <p className="text-xs text-green-600 flex items-center mt-1 font-medium">
+                        <p className="text-xs text-brand-blue flex items-center mt-1 font-medium">
                             <TrendingUp className="h-3 w-3 mr-1" />
                             +5% ötən gündən
                         </p>
@@ -46,11 +46,11 @@ export default function AdminDashboard() {
                 <Card className="hover:shadow-md transition-shadow">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-sm font-medium text-slate-500">Gəlir (Bu Ay)</CardTitle>
-                        <DollarSign className="h-4 w-4 text-emerald-500" />
+                        <DollarSign className="h-4 w-4 text-brand-blue" />
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold text-slate-900">₼45,231.89</div>
-                        <p className="text-xs text-green-600 flex items-center mt-1 font-medium">
+                        <p className="text-xs text-brand-blue flex items-center mt-1 font-medium">
                             <TrendingUp className="h-3 w-3 mr-1" />
                             +19% ötən aydan
                         </p>
@@ -59,7 +59,7 @@ export default function AdminDashboard() {
                 <Card className="hover:shadow-md transition-shadow">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-sm font-medium text-slate-500">Aktiv Həkimlər</CardTitle>
-                        <Activity className="h-4 w-4 text-rose-500" />
+                        <Activity className="h-4 w-4 text-brand-orange" />
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold text-slate-900">24</div>
@@ -91,7 +91,7 @@ export default function AdminDashboard() {
                                     </div>
                                     <div className="text-right">
                                         <p className="text-sm font-medium text-slate-900">14:{i}0</p>
-                                        <p className="text-xs text-amber-600 font-medium bg-amber-50 px-2 py-0.5 rounded border border-amber-100 mt-1">Gözləyir</p>
+                                        <p className="text-xs text-brand-orange-dark font-medium bg-brand-orange/10 px-2 py-0.5 rounded border border-brand-orange/20 mt-1">Gözləyir</p>
                                     </div>
                                 </div>
                             ))}
@@ -106,7 +106,7 @@ export default function AdminDashboard() {
                     <CardContent className="grid gap-4">
                         <div className="flex items-center justify-between p-4 rounded-xl border border-slate-100 bg-slate-50/50 hover:bg-slate-50 cursor-pointer transition-colors group">
                             <div className="flex items-center gap-4">
-                                <div className="p-2 bg-blue-100 text-blue-600 rounded-lg group-hover:bg-blue-600 group-hover:text-white transition-colors">
+                                <div className="p-2 bg-brand-blue-soft text-brand-blue rounded-lg group-hover:bg-brand-blue group-hover:text-white transition-colors">
                                     <Calendar className="h-5 w-5" />
                                 </div>
                                 <div className="font-medium text-sm text-slate-900">Yeni Qəbul Yarat</div>
@@ -114,7 +114,7 @@ export default function AdminDashboard() {
                         </div>
                         <div className="flex items-center justify-between p-4 rounded-xl border border-slate-100 bg-slate-50/50 hover:bg-slate-50 cursor-pointer transition-colors group">
                             <div className="flex items-center gap-4">
-                                <div className="p-2 bg-emerald-100 text-emerald-600 rounded-lg group-hover:bg-emerald-600 group-hover:text-white transition-colors">
+                                <div className="p-2 bg-brand-orange/20 text-brand-orange rounded-lg group-hover:bg-brand-orange group-hover:text-white transition-colors">
                                     <Users className="h-5 w-5" />
                                 </div>
                                 <div className="font-medium text-sm text-slate-900">Pasiyent Əlavə Et</div>
@@ -122,7 +122,7 @@ export default function AdminDashboard() {
                         </div>
                         <div className="flex items-center justify-between p-4 rounded-xl border border-slate-100 bg-slate-50/50 hover:bg-slate-50 cursor-pointer transition-colors group">
                             <div className="flex items-center gap-4">
-                                <div className="p-2 bg-purple-100 text-purple-600 rounded-lg group-hover:bg-purple-600 group-hover:text-white transition-colors">
+                                <div className="p-2 bg-brand-blue-soft text-brand-blue rounded-lg group-hover:bg-brand-blue group-hover:text-white transition-colors">
                                     <FileText className="h-5 w-5" />
                                 </div>
                                 <div className="font-medium text-sm text-slate-900">Hesabat Çıxart</div>

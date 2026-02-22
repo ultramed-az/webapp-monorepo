@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -7,23 +8,22 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { MapPin, Phone, Mail, Clock, Send, MessageSquare } from 'lucide-react';
-import { toast } from 'sonner';
 
 export default function ContactPage() {
     const t = useTranslations('Contact');
+    const [isSubmitted, setIsSubmitted] = useState(false);
 
-    const handleFormSubmit = (e: React.FormEvent) => {
+    const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        toast.success('Mesajınız uğurla göndərildi!', {
-            description: 'Ən qısa zamanda sizinlə əlaqə saxlayacağıq.',
-        });
+        setIsSubmitted(true);
+        e.currentTarget.reset();
     };
 
     return (
         <div className="flex flex-col min-h-screen">
             {/* Header */}
-            <section className="bg-slate-50 py-16 lg:py-24 relative overflow-hidden">
-                <div className="absolute inset-0 z-0 opacity-10 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-700 via-slate-100 to-transparent"></div>
+            <section className="bg-brand-cream py-16 lg:py-24 relative overflow-hidden">
+                <div className="absolute inset-0 z-0 opacity-10 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-brand-blue via-brand-blue-soft to-transparent"></div>
                 <div className="container mx-auto px-6 relative z-10 text-center">
                     <h1 className="text-4xl md:text-5xl font-extrabold text-slate-900 mb-6 tracking-tight">
                         Bizimlə Əlaqə
@@ -43,9 +43,9 @@ export default function ContactPage() {
                         <div className="lg:col-span-5 space-y-6">
                             <h2 className="text-2xl font-bold text-slate-900 mb-6">Əlaqə Vasitələri</h2>
 
-                            <Card className="border-slate-100 shadow-sm hover:shadow-md transition-shadow bg-blue-50/50">
+                            <Card className="border-slate-100 shadow-sm hover:shadow-md transition-shadow bg-brand-blue-soft/60">
                                 <CardContent className="p-6 flex items-start">
-                                    <div className="bg-blue-100 p-3 rounded-full mr-4 text-blue-600 shrink-0">
+                                    <div className="bg-brand-blue-soft p-3 rounded-full mr-4 text-brand-blue shrink-0">
                                         <MapPin className="h-6 w-6" />
                                     </div>
                                     <div>
@@ -60,13 +60,13 @@ export default function ContactPage() {
 
                             <Card className="border-slate-100 shadow-sm hover:shadow-md transition-shadow">
                                 <CardContent className="p-6 flex items-start">
-                                    <div className="bg-emerald-100 p-3 rounded-full mr-4 text-emerald-600 shrink-0">
+                                    <div className="bg-brand-orange/20 p-3 rounded-full mr-4 text-brand-orange shrink-0">
                                         <Phone className="h-6 w-6" />
                                     </div>
                                     <div>
                                         <h3 className="font-semibold text-slate-900 mb-1">Telefon</h3>
                                         <p className="text-slate-600 text-sm mb-1">Mərkəzi Çağrı Mərkəzi</p>
-                                        <p className="font-bold text-lg text-emerald-700">*4444</p>
+                                        <p className="font-bold text-lg text-brand-orange-dark">*4444</p>
                                         <p className="text-slate-500 text-sm mt-1">+994 12 555 44 44</p>
                                     </div>
                                 </CardContent>
@@ -75,7 +75,7 @@ export default function ContactPage() {
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                                 <Card className="border-slate-100 shadow-sm hover:shadow-md transition-shadow">
                                     <CardContent className="p-6 flex flex-col items-center text-center">
-                                        <div className="bg-amber-100 p-3 rounded-full mb-4 text-amber-600">
+                                        <div className="bg-brand-orange/20 p-3 rounded-full mb-4 text-brand-orange">
                                             <Clock className="h-6 w-6" />
                                         </div>
                                         <h3 className="font-semibold text-slate-900 mb-1">İş Saatları</h3>
@@ -86,7 +86,7 @@ export default function ContactPage() {
 
                                 <Card className="border-slate-100 shadow-sm hover:shadow-md transition-shadow">
                                     <CardContent className="p-6 flex flex-col items-center text-center">
-                                        <div className="bg-rose-100 p-3 rounded-full mb-4 text-rose-600">
+                                        <div className="bg-brand-blue-soft p-3 rounded-full mb-4 text-brand-blue">
                                             <Mail className="h-6 w-6" />
                                         </div>
                                         <h3 className="font-semibold text-slate-900 mb-1">E-poçt</h3>
@@ -102,38 +102,44 @@ export default function ContactPage() {
                             <Card className="border-slate-200 shadow-xl h-full bg-white">
                                 <CardContent className="p-8 sm:p-10">
                                     <div className="flex items-center space-x-3 mb-8">
-                                        <div className="bg-blue-600 p-2 rounded-lg text-white">
+                                        <div className="bg-brand-blue p-2 rounded-lg text-white">
                                             <MessageSquare className="w-5 h-5" />
                                         </div>
                                         <h2 className="text-2xl font-bold text-slate-900">Bizə Yazın</h2>
                                     </div>
 
+                                    {isSubmitted && (
+                                        <div className="mb-6 rounded-lg border border-brand-blue/20 bg-brand-blue-soft px-4 py-3 text-brand-blue">
+                                            Mesajiniz ugurla gonderildi. En qisa zamanda sizinle elaqe saxlayacagiq.
+                                        </div>
+                                    )}
+
                                     <form onSubmit={handleFormSubmit} className="space-y-6">
                                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                                             <div className="space-y-2">
                                                 <Label htmlFor="firstName" className="text-slate-700">Adınız</Label>
-                                                <Input id="firstName" placeholder="Adınızı daxil edin" required className="h-12 bg-slate-50 border-slate-200 focus-visible:ring-blue-500" />
+                                                <Input id="firstName" placeholder="Adınızı daxil edin" required className="h-12 bg-slate-50 border-slate-200 focus-visible:ring-brand-blue" />
                                             </div>
                                             <div className="space-y-2">
                                                 <Label htmlFor="lastName" className="text-slate-700">Soyadınız</Label>
-                                                <Input id="lastName" placeholder="Soyadınızı daxil edin" required className="h-12 bg-slate-50 border-slate-200 focus-visible:ring-blue-500" />
+                                                <Input id="lastName" placeholder="Soyadınızı daxil edin" required className="h-12 bg-slate-50 border-slate-200 focus-visible:ring-brand-blue" />
                                             </div>
                                         </div>
 
                                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                                             <div className="space-y-2">
                                                 <Label htmlFor="email" className="text-slate-700">E-poçt Ünvanı</Label>
-                                                <Input id="email" type="email" placeholder="E-poçtunuzu daxil edin" required className="h-12 bg-slate-50 border-slate-200 focus-visible:ring-blue-500" />
+                                                <Input id="email" type="email" placeholder="E-poçtunuzu daxil edin" required className="h-12 bg-slate-50 border-slate-200 focus-visible:ring-brand-blue" />
                                             </div>
                                             <div className="space-y-2">
                                                 <Label htmlFor="phone" className="text-slate-700">Əlaqə Nömrəsi</Label>
-                                                <Input id="phone" type="tel" placeholder="+994" className="h-12 bg-slate-50 border-slate-200 focus-visible:ring-blue-500" />
+                                                <Input id="phone" type="tel" placeholder="+994" className="h-12 bg-slate-50 border-slate-200 focus-visible:ring-brand-blue" />
                                             </div>
                                         </div>
 
                                         <div className="space-y-2">
                                             <Label htmlFor="subject" className="text-slate-700">Mövzu</Label>
-                                            <Input id="subject" placeholder="Müraciətinizin mövzusu" required className="h-12 bg-slate-50 border-slate-200 focus-visible:ring-blue-500" />
+                                            <Input id="subject" placeholder="Müraciətinizin mövzusu" required className="h-12 bg-slate-50 border-slate-200 focus-visible:ring-brand-blue" />
                                         </div>
 
                                         <div className="space-y-2">
@@ -143,11 +149,11 @@ export default function ContactPage() {
                                                 placeholder="Bizə nə demək istəyirsiniz?"
                                                 rows={5}
                                                 required
-                                                className="bg-slate-50 border-slate-200 focus-visible:ring-blue-500 resize-none"
+                                                className="bg-slate-50 border-slate-200 focus-visible:ring-brand-blue resize-none"
                                             />
                                         </div>
 
-                                        <Button type="submit" className="w-full h-14 bg-blue-600 hover:bg-blue-700 text-white font-medium text-lg rounded-xl">
+                                        <Button type="submit" className="w-full h-14 bg-brand-orange hover:bg-brand-orange-dark text-white font-medium text-lg rounded-xl">
                                             Müraciəti Göndər <Send className="ml-2 w-5 h-5" />
                                         </Button>
                                     </form>

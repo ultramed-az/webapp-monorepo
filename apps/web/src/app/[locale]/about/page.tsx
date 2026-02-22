@@ -8,22 +8,22 @@ export default function AboutPage() {
 
     const coreValues = [
         {
-            icon: <Heart className="h-6 w-6 text-rose-500" />,
+            icon: <Heart className="h-6 w-6 text-brand-orange" />,
             title: 'Mərhəmət və Qayğı',
             desc: 'Hər bir pasiyentə şəfqətlə yanaşıb onların narahatlığını minimuma endiririk.',
-            color: 'bg-rose-50 border-rose-100'
+            color: 'bg-brand-orange/10 border-brand-orange/20'
         },
         {
-            icon: <ShieldCheck className="h-6 w-6 text-emerald-500" />,
+            icon: <ShieldCheck className="h-6 w-6 text-brand-blue" />,
             title: 'Dəqiqlik və Etibarlılıq',
             desc: 'Tibbi diaqnozlarımızda dürüstlüyə və ən yüksək standartlara riayət edirik.',
-            color: 'bg-emerald-50 border-emerald-100'
+            color: 'bg-brand-blue-soft border-brand-blue/20'
         },
         {
-            icon: <Award className="h-6 w-6 text-amber-500" />,
+            icon: <Award className="h-6 w-6 text-brand-orange" />,
             title: 'Peşəkarlıq',
             desc: 'Həkimlərimizin davamlı inkişafı və təkmilləşməsi bizim əsas öhdəliyimizdir.',
-            color: 'bg-amber-50 border-amber-100'
+            color: 'bg-brand-orange/10 border-brand-orange/20'
         }
     ];
 
@@ -37,8 +37,8 @@ export default function AboutPage() {
     return (
         <div className="flex flex-col min-h-screen">
             {/* Hero Section */}
-            <section className="bg-slate-50 py-16 lg:py-24 relative overflow-hidden">
-                <div className="absolute inset-0 z-0 opacity-10 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-blue-700 via-transparent to-transparent"></div>
+            <section className="bg-brand-cream py-16 lg:py-24 relative overflow-hidden">
+                <div className="absolute inset-0 z-0 opacity-10 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-brand-blue via-transparent to-transparent"></div>
                 <div className="container mx-auto px-6 relative z-10 text-center">
                     <h1 className="text-4xl md:text-5xl font-extrabold text-slate-900 mb-6 tracking-tight">
                         Biz Kimik?
@@ -63,7 +63,7 @@ export default function AboutPage() {
                         </div>
                         <div className="space-y-8 order-1 lg:order-2">
                             <div>
-                                <div className="inline-flex items-center space-x-2 bg-blue-50 text-blue-700 font-medium px-4 py-2 rounded-full text-sm mb-4">
+                                <div className="inline-flex items-center space-x-2 bg-brand-blue-soft text-brand-blue font-medium px-4 py-2 rounded-full text-sm mb-4">
                                     <Target className="h-4 w-4" />
                                     <span>Missiyamız</span>
                                 </div>
@@ -80,7 +80,7 @@ export default function AboutPage() {
                                     'Erqonomik və stress-free klinika mühiti'
                                 ].map((item, i) => (
                                     <li key={i} className="flex items-start">
-                                        <CheckCircle2 className="h-6 w-6 text-emerald-500 mr-3 shrink-0" />
+                                        <CheckCircle2 className="h-6 w-6 text-brand-orange mr-3 shrink-0" />
                                         <span className="text-slate-700">{item}</span>
                                     </li>
                                 ))}
@@ -128,21 +128,21 @@ export default function AboutPage() {
 
                     <div className="max-w-4xl mx-auto relative">
                         {/* Vertical line connecting events */}
-                        <div className="absolute left-[15px] sm:left-1/2 top-0 bottom-0 w-0.5 bg-blue-100 sm:-translate-x-1/2"></div>
+                        <div className="absolute left-[15px] sm:left-1/2 top-0 bottom-0 w-0.5 bg-brand-blue-soft sm:-translate-x-1/2"></div>
 
                         <div className="space-y-12">
                             {timeline.map((item, idx) => (
                                 <div key={idx} className={`relative flex flex-col sm:flex-row items-center ${idx % 2 === 0 ? 'sm:flex-row-reverse' : ''}`}>
 
                                     {/* Timeline Dot */}
-                                    <div className="absolute left-0 sm:left-1/2 w-8 h-8 rounded-full bg-blue-600 border-4 border-white shadow-sm sm:-translate-x-1/2 flex items-center justify-center z-10">
+                                    <div className="absolute left-0 sm:left-1/2 w-8 h-8 rounded-full bg-brand-blue border-4 border-white shadow-sm sm:-translate-x-1/2 flex items-center justify-center z-10">
                                         <div className="w-2 h-2 rounded-full bg-white"></div>
                                     </div>
 
                                     {/* Content Card */}
                                     <div className="w-full sm:w-1/2 pl-12 sm:pl-0 sm:px-12">
                                         <div className={`bg-slate-50 p-6 rounded-2xl border border-slate-100 ${idx % 2 === 0 ? 'sm:text-left' : 'sm:text-right'}`}>
-                                            <span className="text-blue-600 font-bold text-xl mb-2 block">{item.year}</span>
+                                            <span className="text-brand-blue font-bold text-xl mb-2 block">{item.year}</span>
                                             <h3 className="text-lg font-bold text-slate-900 mb-2">{item.title}</h3>
                                             <p className="text-slate-600">{item.desc}</p>
                                         </div>
@@ -155,24 +155,24 @@ export default function AboutPage() {
             </section>
 
             {/* Stats */}
-            <section className="py-16 bg-blue-900 text-white">
+            <section className="py-16 bg-brand-blue-dark text-white">
                 <div className="container mx-auto px-6">
-                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 text-center divide-x divide-blue-800">
+                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 text-center divide-x divide-white/20">
                         <div className="px-4">
-                            <div className="text-4xl md:text-5xl font-extrabold mb-2 text-blue-300">14+</div>
-                            <div className="text-blue-100 font-medium">İl Təcrübə</div>
+                            <div className="text-4xl md:text-5xl font-extrabold mb-2 text-brand-orange">14+</div>
+                            <div className="text-white/85 font-medium">İl Təcrübə</div>
                         </div>
                         <div className="px-4">
-                            <div className="text-4xl md:text-5xl font-extrabold mb-2 text-emerald-400">15K+</div>
-                            <div className="text-blue-100 font-medium">Sağalmış Pasiyent</div>
+                            <div className="text-4xl md:text-5xl font-extrabold mb-2 text-brand-orange">15K+</div>
+                            <div className="text-white/85 font-medium">Sağalmış Pasiyent</div>
                         </div>
                         <div className="px-4">
-                            <div className="text-4xl md:text-5xl font-extrabold mb-2 text-rose-400">50+</div>
-                            <div className="text-blue-100 font-medium">Peşəkar Həkim</div>
+                            <div className="text-4xl md:text-5xl font-extrabold mb-2 text-brand-orange">50+</div>
+                            <div className="text-white/85 font-medium">Peşəkar Həkim</div>
                         </div>
                         <div className="px-4">
-                            <div className="text-4xl md:text-5xl font-extrabold mb-2 text-amber-400">20+</div>
-                            <div className="text-blue-100 font-medium">İxtisaslaşmış Şöbə</div>
+                            <div className="text-4xl md:text-5xl font-extrabold mb-2 text-brand-orange">20+</div>
+                            <div className="text-white/85 font-medium">İxtisaslaşmış Şöbə</div>
                         </div>
                     </div>
                 </div>

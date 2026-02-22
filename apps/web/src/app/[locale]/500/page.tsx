@@ -3,15 +3,15 @@ import { Button } from '@/components/ui/button';
 
 export default function InternalServerErrorPage() {
     return (
-        <div className="min-h-[70vh] flex items-center justify-center bg-slate-50 px-6">
+        <div className="min-h-[70vh] flex items-center justify-center bg-brand-cream px-6">
             <div className="text-center max-w-xl">
-                <p className="text-red-600 font-semibold mb-3">500</p>
+                <p className="text-brand-orange font-semibold mb-3">500</p>
                 <h1 className="text-4xl font-bold text-slate-900 mb-4">Daxili xeta bas verdi</h1>
                 <p className="text-slate-600 mb-8">
                     Sistemde gozlenilmez problem yarandi. Zehmet olmasa bir nece deqiqeden sonra yeniden cehd edin.
                 </p>
                 <div className="flex flex-wrap items-center justify-center gap-3">
-                    <Button asChild className="bg-blue-600 hover:bg-blue-700 text-white">
+                    <Button asChild className="bg-brand-orange hover:bg-brand-orange-dark text-white">
                         <Link href="/">Ana sehifeye qayit</Link>
                     </Button>
                     <Button asChild variant="outline">

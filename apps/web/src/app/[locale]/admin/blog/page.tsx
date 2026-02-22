@@ -76,7 +76,7 @@ export default function BlogPage() {
                     <h2 className="text-2xl font-bold tracking-tight text-slate-900">Bloq İdarəetməsi</h2>
                     <p className="text-slate-500">Məqalələr, məsləhətlər və xəbərləri buradan idarə edin.</p>
                 </div>
-                <Button className="bg-blue-600 hover:bg-blue-700 text-white shadow-sm flex items-center gap-2">
+                <Button className="bg-brand-orange hover:bg-brand-orange-dark text-white shadow-sm flex items-center gap-2">
                     <Plus className="w-4 h-4" />
                     Yeni Məqalə Yaz
                 </Button>
@@ -138,7 +138,7 @@ export default function BlogPage() {
                                         <TableCell>
                                             <div className="flex flex-col space-y-1">
                                                 <div className="flex items-center text-sm font-medium text-slate-700">
-                                                    <User className="w-3.5 h-3.5 mr-1.5 text-blue-500" />
+                                                    <User className="w-3.5 h-3.5 mr-1.5 text-brand-blue" />
                                                     {post.author}
                                                 </div>
                                                 <div className="flex items-center text-xs text-slate-500">
@@ -154,15 +154,15 @@ export default function BlogPage() {
                                             </div>
                                         </TableCell>
                                         <TableCell>
-                                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${post.status === 'published' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' :
-                                                    'bg-amber-50 text-amber-700 border-amber-200'
+                                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${post.status === 'published' ? 'bg-brand-blue-soft text-brand-blue border-brand-blue/20' :
+                                                    'bg-brand-orange/15 text-brand-orange-dark border-brand-orange/25'
                                                 }`}>
                                                 {post.status === 'published' ? 'Paylaşılıb' : 'Qaralama'}
                                             </span>
                                         </TableCell>
                                         <TableCell className="text-right">
                                             <div className="flex items-center justify-end gap-2 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
-                                                <Button variant="ghost" size="icon" className="h-8 w-8 text-blue-600 hover:text-blue-700 hover:bg-blue-50">
+                                                <Button variant="ghost" size="icon" className="h-8 w-8 text-brand-blue hover:text-brand-blue hover:bg-brand-blue-soft">
                                                     <FileEdit className="h-4 w-4" />
                                                 </Button>
                                                 <Button variant="ghost" size="icon" className="h-8 w-8 text-red-600 hover:text-red-700 hover:bg-red-50">

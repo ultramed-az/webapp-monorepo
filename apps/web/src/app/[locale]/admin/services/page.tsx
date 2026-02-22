@@ -40,7 +40,7 @@ export default function ServicesPage() {
                     <h2 className="text-2xl font-bold tracking-tight text-slate-900">Xidmətlər (Şöbələr)</h2>
                     <p className="text-slate-500">Klinika daxili bütün tibbi xidmətləri idarə edin.</p>
                 </div>
-                <Button className="bg-blue-600 hover:bg-blue-700 text-white shadow-sm flex items-center gap-2">
+                <Button className="bg-brand-orange hover:bg-brand-orange-dark text-white shadow-sm flex items-center gap-2">
                     <Plus className="w-4 h-4" />
                     Yeni Xidmət Əlavə Et
                 </Button>
@@ -90,7 +90,7 @@ export default function ServicesPage() {
                                         </TableCell>
                                         <TableCell>
                                             <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${service.status === 'active'
-                                                    ? 'bg-emerald-100 text-emerald-800 border border-emerald-200'
+                                                    ? 'bg-brand-blue-soft text-brand-blue border border-brand-blue/20'
                                                     : 'bg-slate-100 text-slate-800 border border-slate-200'
                                                 }`}>
                                                 {service.status === 'active' ? 'Aktiv' : 'Passiv'}

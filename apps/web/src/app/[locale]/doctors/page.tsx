@@ -78,9 +78,9 @@ export default function DoctorsPage() {
     return (
         <div className="flex flex-col min-h-screen">
             {/* Header */}
-            <section className="bg-slate-50 py-16 lg:py-24 relative overflow-hidden">
+            <section className="bg-brand-cream py-16 lg:py-24 relative overflow-hidden">
                 <div className="container mx-auto px-6 relative z-10 text-center">
-                    <div className="inline-flex items-center space-x-2 bg-white/80 backdrop-blur border border-blue-100 text-blue-700 font-medium px-4 py-2 rounded-full text-sm mb-6 shadow-sm">
+                    <div className="inline-flex items-center space-x-2 bg-brand-blue-soft/80 backdrop-blur border border-brand-blue-soft text-brand-blue font-medium px-4 py-2 rounded-full text-sm mb-6 shadow-sm">
                         <HeartPulse className="h-4 w-4" />
                         <span>Ultramed Komandası</span>
                     </div>
@@ -94,12 +94,12 @@ export default function DoctorsPage() {
                     {/* Search Field */}
                     <div className="mt-10 max-w-md mx-auto relative group">
                         <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                            <Search className="h-5 w-5 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
+                            <Search className="h-5 w-5 text-slate-400 group-focus-within:text-brand-blue transition-colors" />
                         </div>
                         <Input
                             type="text"
                             placeholder="Həkimin adı, şöbəsi və ya xəstəlik üzrə axtarış..."
-                            className="pl-12 pr-4 py-6 w-full rounded-2xl border-slate-200 shadow-sm focus-visible:ring-blue-500 focus-visible:ring-offset-2 text-[15px] transition-shadow"
+                            className="pl-12 pr-4 py-6 w-full rounded-2xl border-slate-200 shadow-sm focus-visible:ring-brand-blue focus-visible:ring-offset-2 text-[15px] transition-shadow"
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                         />
@@ -138,7 +138,7 @@ export default function DoctorsPage() {
                                         />
                                         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
                                         <div className="absolute max-w-full bottom-0 left-0 p-6 w-full">
-                                            <div className="inline-block bg-blue-600 text-white text-xs font-semibold px-2 py-1 rounded mb-2">
+                                            <div className="inline-block bg-brand-blue text-white text-xs font-semibold px-2 py-1 rounded mb-2">
                                                 {doctor.specialty}
                                             </div>
                                             <h3 className="text-xl font-bold text-white truncate max-w-full block" title={doctor.name}>{doctor.name}</h3>
@@ -147,11 +147,11 @@ export default function DoctorsPage() {
                                     <CardContent className="pt-6 pb-2 px-6 flex-grow">
                                         <ul className="space-y-3">
                                             <li className="flex items-start">
-                                                <MapPin className="w-5 h-5 text-blue-500 mr-3 mt-0.5 shrink-0" />
+                                                <MapPin className="w-5 h-5 text-brand-blue mr-3 mt-0.5 shrink-0" />
                                                 <span className="text-sm text-slate-700 leading-relaxed font-medium">{doctor.education}</span>
                                             </li>
                                             <li className="flex items-start">
-                                                <Calendar className="w-5 h-5 text-amber-500 mr-3 mt-0.5 shrink-0" />
+                                                <Calendar className="w-5 h-5 text-brand-orange mr-3 mt-0.5 shrink-0" />
                                                 <span className="text-sm text-slate-600">İş təcrübəsi: <span className="font-semibold text-slate-900">{doctor.experience}</span></span>
                                             </li>
                                         </ul>
@@ -168,7 +168,7 @@ export default function DoctorsPage() {
                                             <Button variant="outline" className="w-full border-slate-200 text-slate-700 bg-white hover:bg-slate-50 hover:text-slate-900">
                                                 Profili
                                             </Button>
-                                            <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white shadow-sm">
+                                            <Button className="w-full bg-brand-orange hover:bg-brand-orange-dark text-white shadow-sm">
                                                 Qəbul
                                             </Button>
                                         </div>

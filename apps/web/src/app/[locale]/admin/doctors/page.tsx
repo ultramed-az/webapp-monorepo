@@ -42,7 +42,7 @@ export default function DoctorsPage() {
                     <h2 className="text-2xl font-bold tracking-tight text-slate-900">Həkimlər</h2>
                     <p className="text-slate-500">Klinika həkimlərinin siyahısı və məlumatlarının idarə edilməsi.</p>
                 </div>
-                <Button className="bg-blue-600 hover:bg-blue-700 text-white shadow-sm flex items-center gap-2">
+                <Button className="bg-brand-orange hover:bg-brand-orange-dark text-white shadow-sm flex items-center gap-2">
                     <Plus className="w-4 h-4" />
                     Yeni Həkim Əlavə Et
                 </Button>
@@ -89,7 +89,7 @@ export default function DoctorsPage() {
                                     <TableRow key={doctor.id}>
                                         <TableCell>
                                             <div className="flex items-center gap-3">
-                                                <div className="h-10 w-10 shrink-0 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-bold overflow-hidden border border-blue-200">
+                                                <div className="h-10 w-10 shrink-0 rounded-full bg-brand-blue-soft flex items-center justify-center text-brand-blue font-bold overflow-hidden border border-brand-blue/20">
                                                     {doctor.name.split(' ')[1]?.[0] || 'D'}{doctor.name.split(' ')[2]?.[0] || ''}
                                                 </div>
                                                 <div className="flex flex-col whitespace-nowrap">
@@ -111,9 +111,9 @@ export default function DoctorsPage() {
                                         </TableCell>
                                         <TableCell>
                                             <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${doctor.status === 'active'
-                                                    ? 'bg-emerald-100 text-emerald-800 border border-emerald-200'
+                                                    ? 'bg-brand-blue-soft text-brand-blue border border-brand-blue/20'
                                                     : doctor.status === 'on_leave'
-                                                        ? 'bg-amber-100 text-amber-800 border border-amber-200'
+                                                        ? 'bg-brand-orange/15 text-brand-orange-dark border border-brand-orange/25'
                                                         : 'bg-slate-100 text-slate-800 border border-slate-200'
                                                 }`}>
                                                 {doctor.status === 'active' ? 'Aktiv' : doctor.status === 'on_leave' ? 'Məzuniyyət' : 'İşdən ayrılıb'}

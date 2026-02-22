@@ -41,6 +41,11 @@ export async function generateMetadata({
             template: `%s | ${title}`,
         },
         description,
+        icons: {
+            icon: '/favicon.ico',
+            shortcut: '/favicon.ico',
+            apple: '/favicon.ico',
+        },
         alternates: {
             canonical: canonicalPath,
             languages: {
@@ -55,6 +60,14 @@ export async function generateMetadata({
             type: 'website',
             locale,
             url: canonicalPath,
+            images: [
+                {
+                    url: '/logo.png',
+                    width: 1024,
+                    height: 1024,
+                    alt: 'Ultramed',
+                },
+            ],
         },
     };
 }
