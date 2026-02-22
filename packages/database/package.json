@@ -1,0 +1,12 @@
+{
+    "name": "@ultramed/database",
+    "version": "1.0.0",
+    "private": true,
+    "main": "./index.js",
+    "dependencies": {
+        "@prisma/client": "^5.x"
+    },
+    "devDependencies": {
+        "prisma": "^5.x"
+    }
+}

@@ -1,0 +1,94 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Admin {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Service {
+  id          String   @id @default(uuid())
+  titleAz    String
+  titleEn    String
+  titleRu    String
+  contentAz  String   @db.Text
+  contentEn  String   @db.Text
+  contentRu  String   @db.Text
+  image      String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model Doctor {
+  id          String   @id @default(uuid())
+  name        String
+  titleAz    String
+  titleEn    String
+  titleRu    String
+  bioAz      String   @db.Text
+  bioEn      String   @db.Text
+  bioRu      String   @db.Text
+  image      String?
+  specialty  String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model BlogPost {
+  id          String   @id @default(uuid())
+  titleAz    String
+  titleEn    String
+  titleRu    String
+  contentAz  String   @db.Text
+  contentEn  String   @db.Text
+  contentRu  String   @db.Text
+  image      String?
+  published  Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model Testimonial {
+  id        String   @id @default(uuid())
+  name      String
+  roleAz    String?
+  roleEn    String?
+  roleRu    String?
+  commentAz String   @db.Text
+  commentEn String   @db.Text
+  commentRu String   @db.Text
+  rating    Int      @default(5)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Faq {
+  id         String   @id @default(uuid())
+  questionAz String
+  questionEn String
+  questionRu String
+  answerAz   String   @db.Text
+  answerEn   String   @db.Text
+  answerRu   String   @db.Text
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model Gallery {
+  id          String   @id @default(uuid())
+  imageUrl    String
+  captionAz   String?
+  captionEn   String?
+  captionRu   String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
