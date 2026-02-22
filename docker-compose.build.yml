@@ -3,8 +3,8 @@ services:
     image: mysql:8.0
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: password
-      MYSQL_DATABASE: ultramed
+      MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD}"
+      MYSQL_DATABASE: "${MYSQL_DATABASE}"
     volumes:
       - mysql_data_prod:/var/lib/mysql
 
@@ -12,10 +12,13 @@ services:
     build:
       context: .
       dockerfile: apps/api/Dockerfile
+      args:
+        BACKEND_PORT: ${BACKEND_PORT}
     ports:
-      - "3001:3001"
+      - "${BACKEND_PORT}:${BACKEND_PORT}"
     environment:
-      DATABASE_URL: "mysql://root:password@db:3306/ultramed"
+      DATABASE_URL: "${DATABASE_URL}"
+      BACKEND_PORT: "${BACKEND_PORT}"
     depends_on:
       - db
     restart: always
@@ -24,10 +27,14 @@ services:
     build:
       context: .
       dockerfile: apps/web/Dockerfile
+      args:
+        FRONTEND_PORT: ${FRONTEND_PORT}
+        BACKEND_PORT: ${BACKEND_PORT}
     ports:
-      - "3000:3000"
+      - "${FRONTEND_PORT}:${FRONTEND_PORT}"
     environment:
       NEXT_PUBLIC_API_URL: "https://api.ultramed.az" # Change to actual domain
+      FRONTEND_PORT: "${FRONTEND_PORT}"
     restart: always
 
 volumes:
