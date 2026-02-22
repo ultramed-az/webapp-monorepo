@@ -1,17 +1,77 @@
 'use client';
 
-import { useState } from 'react';
-import { useTranslations } from 'next-intl';
+import { useEffect, useState } from 'react';
+import { useParams } from 'next/navigation';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { MapPin, Phone, Mail, Clock, Send, MessageSquare } from 'lucide-react';
+import { getContactInfo, type ContactInfoResponse } from '@/lib/api';
+
+const defaultContact: ContactInfoResponse = {
+    address: 'Bakı şəhəri, Nəsimi rayonu, Səməd Vurğun küçəsi 14A',
+    map: {
+        latitude: 40.3771901,
+        longitude: 49.8394444,
+        embedUrl:
+            'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3039.4286745147575!2d49.83944441539243!3d40.37719007936952!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x40307dabacc0eb35%3A0xad52d0fa31b143ec!2sBaku%2C%20Azerbaijan!5e0!3m2!1sen!2s!4v1620000000000!5m2!1sen!2s',
+    },
+    phones: [
+        { label: 'Mərkəzi Çağrı Mərkəzi', value: '*4444' },
+        { label: 'Əlaqə nömrəsi', value: '+994 12 555 44 44' },
+    ],
+    emails: [
+        { label: 'Ümumi', value: 'info@ultramed.az' },
+        { label: 'Dəstək', value: 'support@ultramed.az' },
+    ],
+    workingHours: [
+        { label: 'B.E - Ş', value: '08:00 - 20:00' },
+        { label: 'Şənbə', value: '09:00 - 15:00' },
+    ],
+};
 
 export default function ContactPage() {
-    const t = useTranslations('Contact');
+    const params = useParams<{ locale: string }>();
+    const locale = params?.locale ?? 'az';
+
     const [isSubmitted, setIsSubmitted] = useState(false);
+    const [refreshKey, setRefreshKey] = useState(0);
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+    const [contactInfo, setContactInfo] = useState<ContactInfoResponse>(defaultContact);
+
+    useEffect(() => {
+        let isCancelled = false;
+
+        async function loadContactInfo() {
+            setIsLoading(true);
+            setError(null);
+
+            try {
+                const data = await getContactInfo(locale);
+                if (!isCancelled) {
+                    setContactInfo(data);
+                }
+            } catch (fetchError) {
+                if (!isCancelled) {
+                    const message = fetchError instanceof Error ? fetchError.message : 'Əlaqə məlumatları yüklənmədi.';
+                    setError(message);
+                }
+            } finally {
+                if (!isCancelled) {
+                    setIsLoading(false);
+                }
+            }
+        }
+
+        void loadContactInfo();
+
+        return () => {
+            isCancelled = true;
+        };
+    }, [locale, refreshKey]);
 
     const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -37,6 +97,19 @@ export default function ContactPage() {
             {/* Main Content */}
             <section className="py-20 bg-white">
                 <div className="container mx-auto px-6">
+                    {error && (
+                        <div className="mb-8 rounded-lg border border-brand-orange/25 bg-brand-orange/10 px-4 py-3 text-brand-orange-dark flex items-center justify-between gap-4">
+                            <span>Məlumatlar serverdən yüklənmədi. Hazırda son mövcud məlumat göstərilir.</span>
+                            <Button
+                                variant="outline"
+                                className="border-brand-blue text-brand-blue hover:bg-brand-blue-soft"
+                                onClick={() => setRefreshKey((key) => key + 1)}
+                            >
+                                Yenidən yoxla
+                            </Button>
+                        </div>
+                    )}
+
                     <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
 
                         {/* Contact Information Cards */}
@@ -51,8 +124,10 @@ export default function ContactPage() {
                                     <div>
                                         <h3 className="font-semibold text-slate-900 mb-1">Ünvanımız</h3>
                                         <p className="text-slate-600 text-sm leading-relaxed">
-                                            Bakı şəhəri, Nəsimi rayonu<br />
-                                            Səməd Vurğun küçəsi 14A
+                                            {contactInfo.address}
+                                        </p>
+                                        <p className="text-xs text-slate-500 mt-2">
+                                            Koordinatlar: {contactInfo.map.latitude.toFixed(6)}, {contactInfo.map.longitude.toFixed(6)}
                                         </p>
                                     </div>
                                 </CardContent>
@@ -64,10 +139,15 @@ export default function ContactPage() {
                                         <Phone className="h-6 w-6" />
                                     </div>
                                     <div>
-                                        <h3 className="font-semibold text-slate-900 mb-1">Telefon</h3>
-                                        <p className="text-slate-600 text-sm mb-1">Mərkəzi Çağrı Mərkəzi</p>
-                                        <p className="font-bold text-lg text-brand-orange-dark">*4444</p>
-                                        <p className="text-slate-500 text-sm mt-1">+994 12 555 44 44</p>
+                                        <h3 className="font-semibold text-slate-900 mb-3">Telefon</h3>
+                                        <div className="space-y-2">
+                                            {contactInfo.phones.map((phone) => (
+                                                <div key={`${phone.label}-${phone.value}`}>
+                                                    <p className="text-slate-600 text-sm mb-1">{phone.label}</p>
+                                                    <p className="font-semibold text-base text-brand-orange-dark">{phone.value}</p>
+                                                </div>
+                                            ))}
+                                        </div>
                                     </div>
                                 </CardContent>
                             </Card>
@@ -78,9 +158,14 @@ export default function ContactPage() {
                                         <div className="bg-brand-orange/20 p-3 rounded-full mb-4 text-brand-orange">
                                             <Clock className="h-6 w-6" />
                                         </div>
-                                        <h3 className="font-semibold text-slate-900 mb-1">İş Saatları</h3>
-                                        <p className="text-slate-600 text-sm">B.E - Ş: 08:00 - 20:00</p>
-                                        <p className="text-slate-600 text-sm">B: 09:00 - 15:00</p>
+                                        <h3 className="font-semibold text-slate-900 mb-2">İş Saatları</h3>
+                                        <div className="space-y-1">
+                                            {contactInfo.workingHours.map((hour) => (
+                                                <p key={`${hour.label}-${hour.value}`} className="text-slate-600 text-sm">
+                                                    {hour.label}: {hour.value}
+                                                </p>
+                                            ))}
+                                        </div>
                                     </CardContent>
                                 </Card>
 
@@ -89,12 +174,21 @@ export default function ContactPage() {
                                         <div className="bg-brand-blue-soft p-3 rounded-full mb-4 text-brand-blue">
                                             <Mail className="h-6 w-6" />
                                         </div>
-                                        <h3 className="font-semibold text-slate-900 mb-1">E-poçt</h3>
-                                        <p className="text-slate-600 text-sm">info@ultramed.az</p>
-                                        <p className="text-slate-600 text-sm">support@ultramed.az</p>
+                                        <h3 className="font-semibold text-slate-900 mb-2">E-poçt</h3>
+                                        <div className="space-y-1">
+                                            {contactInfo.emails.map((email) => (
+                                                <p key={`${email.label}-${email.value}`} className="text-slate-600 text-sm">
+                                                    {email.value}
+                                                </p>
+                                            ))}
+                                        </div>
                                     </CardContent>
                                 </Card>
                             </div>
+
+                            {isLoading && (
+                                <p className="text-sm text-slate-500">Serverdən əlaqə məlumatları yenilənir...</p>
+                            )}
                         </div>
 
                         {/* Contact Form */}
@@ -166,9 +260,8 @@ export default function ContactPage() {
 
             {/* Map Section */}
             <section className="h-[400px] md:h-[500px] w-full bg-slate-100 relative grayscale hover:grayscale-0 transition-all duration-1000">
-                {/* Embedded Google Maps Placeholder - Use an actual embed URL in production */}
                 <iframe
-                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3039.4286745147575!2d49.83944441539243!3d40.37719007936952!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x40307dabacc0eb35%3A0xad52d0fa31b143ec!2sBaku%2C%20Azerbaijan!5e0!3m2!1sen!2s!4v1620000000000!5m2!1sen!2s"
+                    src={contactInfo.map.embedUrl}
                     width="100%"
                     height="100%"
                     style={{ border: 0 }}
@@ -181,3 +274,4 @@ export default function ContactPage() {
         </div>
     );
 }
+

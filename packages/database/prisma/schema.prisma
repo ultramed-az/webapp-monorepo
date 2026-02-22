@@ -40,6 +40,15 @@ model Doctor {
   bioRu      String   @db.Text
   image      String?
   specialty  String
+  experience String?
+  educationAz String?
+  educationEn String?
+  educationRu String?
+  tagsAz     Json?
+  tagsEn     Json?
+  tagsRu     Json?
+  sortOrder  Int      @default(0)
+  isPublished Boolean @default(true)
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 }
@@ -52,8 +61,19 @@ model BlogPost {
   contentAz  String   @db.Text
   contentEn  String   @db.Text
   contentRu  String   @db.Text
+  excerptAz  String?  @db.Text
+  excerptEn  String?  @db.Text
+  excerptRu  String?  @db.Text
+  authorName String?
+  categoryAz String?
+  categoryEn String?
+  categoryRu String?
   image      String?
   published  Boolean  @default(false)
+  featured   Boolean  @default(false)
+  views      Int      @default(0)
+  publishedAt DateTime?
+  sortOrder  Int      @default(0)
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 }
@@ -92,4 +112,28 @@ model Gallery {
   captionRu   String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+}
+
+model ContactInfo {
+  id           String   @id @default(cuid())
+  slug         String   @unique @default("main")
+  addressAz    String
+  addressEn    String
+  addressRu    String
+  mapLatitude  Float
+  mapLongitude Float
+  mapEmbedUrl  String   @db.Text
+  phones       Json
+  emails       Json
+  workingHours Json
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model HomeStat {
+  id        String   @id
+  value     String
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

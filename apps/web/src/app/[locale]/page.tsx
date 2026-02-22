@@ -1,9 +1,11 @@
+'use client';
+
+import { useEffect, useMemo, useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { Link } from '@/i18n/routing';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { HeartPulse, Stethoscope, Clock, ShieldCheck, ArrowRight, Activity, Users } from 'lucide-react';
-import Image from 'next/image';
+import { getHomeStats } from '@/lib/api';
 
 export default function HomePage() {
     const t = useTranslations('HomePage');
@@ -31,12 +33,57 @@ export default function HomePage() {
         }
     ];
 
-    const stats = [
-        { icon: <Users className="h-6 w-6" />, value: '15,000+', label: t('statPatients', { default: 'Məmnun Pasiyent' }) },
-        { icon: <Stethoscope className="h-6 w-6" />, value: '50+', label: t('statDoctors', { default: 'Uzman Həkim' }) },
-        { icon: <Activity className="h-6 w-6" />, value: '20+', label: t('statDepartments', { default: 'Tibbi Şöbə' }) },
-        { icon: <HeartPulse className="h-6 w-6" />, value: '15+', label: t('statYears', { default: 'İllik Təcrübə' }) },
+    const statsTemplate = [
+        { id: 'patients', icon: <Users className="h-6 w-6" />, defaultValue: '15,000+', label: t('statPatients', { default: 'Məmnun Pasiyent' }) },
+        { id: 'doctors', icon: <Stethoscope className="h-6 w-6" />, defaultValue: '50+', label: t('statDoctors', { default: 'Uzman Həkim' }) },
+        { id: 'departments', icon: <Activity className="h-6 w-6" />, defaultValue: '20+', label: t('statDepartments', { default: 'Tibbi Şöbə' }) },
+        { id: 'years', icon: <HeartPulse className="h-6 w-6" />, defaultValue: '15+', label: t('statYears', { default: 'İllik Təcrübə' }) },
     ];
+
+    const [statValues, setStatValues] = useState<Record<string, string>>({
+        patients: '15,000+',
+        doctors: '50+',
+        departments: '20+',
+        years: '15+',
+    });
+
+    useEffect(() => {
+        let isCancelled = false;
+
+        async function loadStats() {
+            try {
+                const response = await getHomeStats();
+                if (isCancelled) return;
+
+                const nextValues = response.reduce<Record<string, string>>((acc, stat) => {
+                    acc[stat.id] = stat.value;
+                    return acc;
+                }, {});
+
+                setStatValues((currentValues) => ({
+                    ...currentValues,
+                    ...nextValues,
+                }));
+            } catch {
+                // Keep static defaults when API is not reachable.
+            }
+        }
+
+        void loadStats();
+
+        return () => {
+            isCancelled = true;
+        };
+    }, []);
+
+    const stats = useMemo(
+        () => statsTemplate.map((stat) => ({
+            icon: stat.icon,
+            label: stat.label,
+            value: statValues[stat.id] ?? stat.defaultValue,
+        })),
+        [statsTemplate, statValues],
+    );
 
     return (
         <div className="flex flex-col min-h-screen">

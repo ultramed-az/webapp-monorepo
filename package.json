@@ -3,7 +3,10 @@
     "version": "1.0.0",
     "private": true,
     "scripts": {
+        "db:push": "npx prisma db push --schema=packages/database/prisma/schema.prisma",
         "db:generate": "npx prisma generate --schema=packages/database/prisma/schema.prisma",
+        "db:seed": "node packages/database/prisma/seed.js",
+        "db:setup": "pnpm db:push && pnpm db:generate && pnpm db:seed",
         "dev": "pnpm db:generate && pnpm -r dev",
         "build": "pnpm -r build",
         "lint": "pnpm -r lint",

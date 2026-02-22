@@ -1,79 +1,71 @@
 'use client';
 
-import { useState } from 'react';
-import { useTranslations } from 'next-intl';
+import { useEffect, useMemo, useState } from 'react';
+import { useParams } from 'next/navigation';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Search, MapPin, Calendar, HeartPulse } from 'lucide-react';
 import Image from 'next/image';
-
-const doctorsList = [
-    {
-        id: 1,
-        name: 'Dr. Əli Vəliyev',
-        specialty: 'Kardiologiya üzrə Uzman',
-        image: 'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?q=80&w=3400&auto=format&fit=crop',
-        experience: '15 il',
-        education: 'Ege Universiteti, Tibb Fakültəsi',
-        tags: ['Aritmiya', 'Ürək Çatışmazlığı', 'EKQ']
-    },
-    {
-        id: 2,
-        name: 'Dr. Aysel Məmmədova',
-        specialty: 'Uzman Nevroloq',
-        image: 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?q=80&w=3400&auto=format&fit=crop',
-        experience: '8 il',
-        education: 'Azərbaycan Tibb Universiteti',
-        tags: ['Miqren', 'Epilepsiya', 'Yuxu Pozuntuları']
-    },
-    {
-        id: 3,
-        name: 'Dr. Rəşad Hüseynov',
-        specialty: 'Cərrah Stomatoloq',
-        image: 'https://images.unsplash.com/photo-1622253692010-333f2da6031d?q=80&w=3400&auto=format&fit=crop',
-        experience: '12 il',
-        education: 'Hacettepe Universiteti, Diş Həkimliyi',
-        tags: ['İmplantologiya', 'Ağız Tiktərəhi Cərrahiyyə', 'Estetik']
-    },
-    {
-        id: 4,
-        name: 'Dr. Leyla Quliyeva',
-        specialty: 'Pediatr',
-        image: 'https://images.unsplash.com/photo-1594824436998-dd1bd3eb073d?q=80&w=3400&auto=format&fit=crop',
-        experience: '5 il',
-        education: 'İstanbul Universiteti, Cərrahpaşa Tibb Fakültəsi',
-        tags: ['Yenidoğulmuşların İzlənməsi', 'Peyvənd Təqvimi', 'Uşaq Qidalanması']
-    },
-    {
-        id: 5,
-        name: 'Dr. Rəhman Qasımlı',
-        specialty: 'Oftalmoloq Cərrah',
-        image: 'https://images.unsplash.com/photo-1537368910025-702800a4bd8f?q=80&w=3400&auto=format&fit=crop',
-        experience: '20 il',
-        education: 'Milli Oftalmologiya Mərkəzi',
-        tags: ['Katarakta', 'Qlaukoma Xirurgiyası', 'Lazer Korreksiyası']
-    },
-    {
-        id: 6,
-        name: 'Dr. Nərmin Abbasova',
-        specialty: 'Ginekoloq - Cərrah',
-        image: 'https://images.unsplash.com/photo-1527613426441-4da17471b66d?q=80&w=3400&auto=format&fit=crop',
-        experience: '10 il',
-        education: 'Ankara Universiteti, Tibb Fakültəsi',
-        tags: ['Hamiləlik Təqibi', 'Laparoskopik Cərrahiyyə', 'Sonsuzluq']
-    }
-];
+import { getDoctors, type DoctorListItem } from '@/lib/api';
 
 export default function DoctorsPage() {
-    const t = useTranslations('Doctors');
-    const [searchQuery, setSearchQuery] = useState('');
+    const params = useParams<{ locale: string }>();
+    const locale = params?.locale ?? 'az';
 
-    const filteredDoctors = doctorsList.filter(doc =>
-        doc.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        doc.specialty.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        doc.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()))
-    );
+    const [searchQuery, setSearchQuery] = useState('');
+    const [refreshKey, setRefreshKey] = useState(0);
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+    const [doctors, setDoctors] = useState<DoctorListItem[]>([]);
+
+    useEffect(() => {
+        let isCancelled = false;
+
+        async function loadDoctors() {
+            setIsLoading(true);
+            setError(null);
+
+            try {
+                const data = await getDoctors(locale);
+                if (!isCancelled) {
+                    setDoctors(data);
+                }
+            } catch (fetchError) {
+                if (!isCancelled) {
+                    const message = fetchError instanceof Error ? fetchError.message : 'Həkimlər yüklənmədi.';
+                    setError(message);
+                }
+            } finally {
+                if (!isCancelled) {
+                    setIsLoading(false);
+                }
+            }
+        }
+
+        void loadDoctors();
+
+        return () => {
+            isCancelled = true;
+        };
+    }, [locale, refreshKey]);
+
+    const filteredDoctors = useMemo(() => {
+        const needle = searchQuery.trim().toLowerCase();
+        if (!needle) {
+            return doctors;
+        }
+
+        return doctors.filter((doctor) => {
+            const tagMatch = doctor.tags.some((tag) => tag.toLowerCase().includes(needle));
+            return (
+                doctor.name.toLowerCase().includes(needle) ||
+                doctor.specialty.toLowerCase().includes(needle) ||
+                doctor.education.toLowerCase().includes(needle) ||
+                tagMatch
+            );
+        });
+    }, [doctors, searchQuery]);
 
     return (
         <div className="flex flex-col min-h-screen">
@@ -110,7 +102,23 @@ export default function DoctorsPage() {
             {/* Doctors Grid */}
             <section className="py-20 bg-white flex-grow border-t border-slate-100">
                 <div className="container mx-auto px-6">
-                    {filteredDoctors.length === 0 ? (
+                    {isLoading && doctors.length === 0 ? (
+                        <div className="text-center py-20 bg-slate-50 rounded-3xl border border-slate-100">
+                            <h3 className="text-xl font-semibold text-slate-900 mb-2">Həkimlər yüklənir...</h3>
+                        </div>
+                    ) : error && doctors.length === 0 ? (
+                        <div className="text-center py-20 bg-slate-50 rounded-3xl border border-slate-100">
+                            <h3 className="text-xl font-semibold text-slate-900 mb-2">Məlumat yüklənmədi</h3>
+                            <p className="text-slate-500 mb-6">Zəhmət olmasa bir daha cəhd edin.</p>
+                            <Button
+                                variant="outline"
+                                className="border-brand-blue text-brand-blue hover:bg-brand-blue-soft"
+                                onClick={() => setRefreshKey((key) => key + 1)}
+                            >
+                                Yenidən yoxla
+                            </Button>
+                        </div>
+                    ) : filteredDoctors.length === 0 ? (
                         <div className="text-center py-20 bg-slate-50 rounded-3xl border border-slate-100">
                             <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-4 text-slate-400 shadow-sm">
                                 <Search className="w-8 h-8" />
@@ -127,11 +135,11 @@ export default function DoctorsPage() {
                         </div>
                     ) : (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                            {filteredDoctors.map(doctor => (
+                            {filteredDoctors.map((doctor) => (
                                 <Card key={doctor.id} className="overflow-hidden border-slate-100 hover:shadow-xl transition-all duration-300 group flex flex-col bg-white rounded-2xl">
                                     <div className="aspect-[4/3] bg-slate-100 relative overflow-hidden">
                                         <Image
-                                            src={doctor.image}
+                                            src={doctor.image || '/logo.png'}
                                             alt={doctor.name}
                                             fill
                                             className="object-cover object-top group-hover:scale-105 transition-transform duration-500"
@@ -156,7 +164,7 @@ export default function DoctorsPage() {
                                             </li>
                                         </ul>
                                         <div className="mt-5 flex flex-wrap gap-2">
-                                            {doctor.tags.map(tag => (
+                                            {doctor.tags.map((tag) => (
                                                 <span key={tag} className="bg-slate-50 border border-slate-100 text-slate-600 px-2.5 py-1 text-xs font-medium rounded-md whitespace-nowrap">
                                                     {tag}
                                                 </span>
@@ -182,3 +190,4 @@ export default function DoctorsPage() {
         </div>
     );
 }
+

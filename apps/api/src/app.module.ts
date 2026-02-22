@@ -6,9 +6,11 @@ import { AdminModule } from './modules/admin/admin.module';
 import { ServicesModule } from './modules/services/services.module';
 import { DoctorsModule } from './modules/doctors/doctors.module';
 import { BlogModule } from './modules/blog/blog.module';
+import { ContactModule } from './modules/contact/contact.module';
+import { HomeModule } from './modules/home/home.module';
 
 @Module({
-  imports: [PrismaModule, AdminModule, ServicesModule, DoctorsModule, BlogModule],
+  imports: [PrismaModule, AdminModule, ServicesModule, DoctorsModule, BlogModule, ContactModule, HomeModule],
   controllers: [AppController],
   providers: [AppService],
 })

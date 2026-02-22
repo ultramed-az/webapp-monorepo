@@ -1,78 +1,83 @@
 'use client';
 
-import { useState } from 'react';
-import { useTranslations } from 'next-intl';
+import { useEffect, useMemo, useState } from 'react';
+import { useParams } from 'next/navigation';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Link } from '@/i18n/routing';
 import { Calendar, User, Tag, ArrowRight, BookOpen } from 'lucide-react';
 import Image from 'next/image';
+import { getBlogPosts, type BlogListItem } from '@/lib/api';
 
-const blogPosts = [
-    {
-        id: 1,
-        title: 'Ürək sağlamlığı üçün 5 qızıl qayda',
-        excerpt: 'Kardioloqlarımızın məsləhətləri ilə gündəlik həyatınızda edəcəyiniz kiçik dəyişikliklərlə ürəyinizi qoruya bilərsiniz.',
-        author: 'Dr. Əli Vəliyev',
-        category: 'Kardiologiya',
-        date: '14 Mart, 2024',
-        image: 'https://images.unsplash.com/photo-1505576399279-565b52d4ac71?q=80&w=600&auto=format&fit=crop',
-        featured: true
-    },
-    {
-        id: 2,
-        title: 'Bahar aylarında allergiyadan necə qorunmalı?',
-        excerpt: 'Mövsümi allergiyaların qarşısını almaq və simptomları yüngülləşdirmək üçün mütəxəssis tövsiyələri.',
-        author: 'Dr. Famil Abbasov',
-        category: 'Terapiya',
-        date: '10 Mart, 2024',
-        image: 'https://images.unsplash.com/photo-1512069772995-ec65ed45afd6?q=80&w=600&auto=format&fit=crop',
-        featured: false
-    },
-    {
-        id: 4,
-        title: 'Sağlam qidalanmanın əsasları nədir?',
-        excerpt: 'Düzgün və balanslı qidalanma rejimi ilə immun sisteminizi necə gücləndirə biləcəyiniz haqqında vacib məlumatlar.',
-        author: 'Dr. Leyla Quliyeva',
-        category: 'Dietologiya',
-        date: '28 Fevral, 2024',
-        image: 'https://images.unsplash.com/photo-1490645935967-10de6ba17061?q=80&w=600&auto=format&fit=crop',
-        featured: false
-    },
-    {
-        id: 5,
-        title: 'Göz sağlamlığını qorumağın qızıl qaydaları',
-        excerpt: 'Rəqəmsal cihazlardan istifadə zamanı göz yorğunluğunun və digər problemlərin qarşısını necə almalı?',
-        author: 'Dr. Rəhman Qasımlı',
-        category: 'Oftalmologiya',
-        date: '20 Fevral, 2024',
-        image: 'https://images.unsplash.com/photo-1516069632884-6997cf29f4b9?q=80&w=600&auto=format&fit=crop',
-        featured: false
-    },
-    {
-        id: 6,
-        title: 'Uşaqlarda düzgün qamət vərdişləri',
-        excerpt: 'Onurğa sütununun inkişafı və məktəb yaşlı uşaqlarda skoliozun qarşısının alınması üçün ən yaxşı üsullar.',
-        author: 'Dr. Leyla Quliyeva',
-        category: 'Pediatriya',
-        date: '15 Fevral, 2024',
-        image: 'https://images.unsplash.com/photo-1473215284483-e18d6e3860bb?q=80&w=600&auto=format&fit=crop',
-        featured: false
-    }
-];
+const ALL_CATEGORIES = '__all__';
 
 export default function BlogPage() {
-    const t = useTranslations('Blog');
-    const [selectedCategory, setSelectedCategory] = useState<string>('Bütün Kateqoriyalar');
+    const params = useParams<{ locale: string }>();
+    const locale = params?.locale ?? 'az';
 
-    const categories = ['Bütün Kateqoriyalar', ...Array.from(new Set(blogPosts.map(p => p.category)))];
+    const [refreshKey, setRefreshKey] = useState(0);
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+    const [posts, setPosts] = useState<BlogListItem[]>([]);
+    const [selectedCategory, setSelectedCategory] = useState<string>(ALL_CATEGORIES);
 
-    const filteredPosts = selectedCategory === 'Bütün Kateqoriyalar'
-        ? blogPosts
-        : blogPosts.filter(p => p.category === selectedCategory);
+    useEffect(() => {
+        let isCancelled = false;
 
-    const featuredPost = filteredPosts.find(p => p.featured) || filteredPosts[0];
-    const normalPosts = filteredPosts.filter(p => p.id !== featuredPost?.id);
+        async function loadPosts() {
+            setIsLoading(true);
+            setError(null);
+
+            try {
+                const data = await getBlogPosts(locale);
+                if (!isCancelled) {
+                    setPosts(data);
+                }
+            } catch (fetchError) {
+                if (!isCancelled) {
+                    const message = fetchError instanceof Error ? fetchError.message : 'Bloq məqalələri yüklənmədi.';
+                    setError(message);
+                }
+            } finally {
+                if (!isCancelled) {
+                    setIsLoading(false);
+                }
+            }
+        }
+
+        void loadPosts();
+
+        return () => {
+            isCancelled = true;
+        };
+    }, [locale, refreshKey]);
+
+    const allLabel =
+        locale === 'en' ? 'All Categories' : locale === 'ru' ? 'Все категории' : 'Bütün Kateqoriyalar';
+
+    const categories = useMemo(
+        () => [ALL_CATEGORIES, ...Array.from(new Set(posts.map((post) => post.category).filter(Boolean)))],
+        [posts],
+    );
+
+    const filteredPosts = useMemo(() => {
+        if (selectedCategory === ALL_CATEGORIES) {
+            return posts;
+        }
+        return posts.filter((post) => post.category === selectedCategory);
+    }, [posts, selectedCategory]);
+
+    const featuredPost = filteredPosts.find((post) => post.featured) || filteredPosts[0];
+    const normalPosts = filteredPosts.filter((post) => post.id !== featuredPost?.id);
+
+    const formattedDate = (isoDate: string) => {
+        const dateLocale = locale === 'en' ? 'en-US' : locale === 'ru' ? 'ru-RU' : 'az-AZ';
+        return new Intl.DateTimeFormat(dateLocale, {
+            day: '2-digit',
+            month: 'long',
+            year: 'numeric',
+        }).format(new Date(isoDate));
+    };
 
     return (
         <div className="flex flex-col min-h-screen">
@@ -97,18 +102,21 @@ export default function BlogPage() {
             <section className="py-8 bg-white border-b border-slate-100 sticky top-[72px] z-40">
                 <div className="container mx-auto px-6 overflow-x-auto pb-4 sm:pb-0 scrollbar-hide">
                     <div className="flex items-center gap-3 w-max mx-auto">
-                        {categories.map((cat, idx) => (
-                            <button
-                                key={idx}
-                                onClick={() => setSelectedCategory(cat)}
-                                className={`px-5 py-2.5 rounded-full text-sm font-medium transition-all duration-300 ${selectedCategory === cat
+                        {categories.map((category) => {
+                            const isSelected = selectedCategory === category;
+                            return (
+                                <button
+                                    key={category}
+                                    onClick={() => setSelectedCategory(category)}
+                                    className={`px-5 py-2.5 rounded-full text-sm font-medium transition-all duration-300 ${isSelected
                                         ? 'bg-brand-blue text-white shadow-md shadow-brand-blue/20'
                                         : 'bg-slate-50 text-slate-600 hover:bg-slate-100 border border-slate-200'
-                                    }`}
-                            >
-                                {cat}
-                            </button>
-                        ))}
+                                        }`}
+                                >
+                                    {category === ALL_CATEGORIES ? allLabel : category}
+                                </button>
+                            );
+                        })}
                     </div>
                 </div>
             </section>
@@ -116,22 +124,37 @@ export default function BlogPage() {
             {/* Main Content Area */}
             <section className="py-16 bg-white flex-grow">
                 <div className="container mx-auto px-6">
-                    {filteredPosts.length === 0 ? (
+                    {isLoading && posts.length === 0 ? (
+                        <div className="text-center py-20 bg-slate-50 rounded-2xl border border-slate-100">
+                            <h3 className="text-xl font-semibold text-slate-900 mb-2">Məqalələr yüklənir...</h3>
+                        </div>
+                    ) : error && posts.length === 0 ? (
+                        <div className="text-center py-20 bg-slate-50 rounded-2xl border border-slate-100">
+                            <h3 className="text-xl font-semibold text-slate-900 mb-2">Məqalələr yüklənmədi</h3>
+                            <p className="text-slate-500 mb-6">Zəhmət olmasa bir daha cəhd edin.</p>
+                            <Button
+                                variant="outline"
+                                className="border-brand-blue text-brand-blue hover:bg-brand-blue-soft"
+                                onClick={() => setRefreshKey((key) => key + 1)}
+                            >
+                                Yenidən yoxla
+                            </Button>
+                        </div>
+                    ) : filteredPosts.length === 0 ? (
                         <div className="text-center py-20 bg-slate-50 rounded-2xl border border-slate-100">
                             <h3 className="text-xl font-semibold text-slate-900 mb-2">Bu kateqoriyaya uyğun məqalə tapılmadı</h3>
-                            <button onClick={() => setSelectedCategory('Bütün Kateqoriyalar')} className="text-brand-blue font-medium mt-4">
-                                Bütün məqalələrə qayıt
+                            <button onClick={() => setSelectedCategory(ALL_CATEGORIES)} className="text-brand-blue font-medium mt-4">
+                                {allLabel}
                             </button>
                         </div>
                     ) : (
                         <div className="space-y-16">
-                            {/* Featured Post (if doing "Bütün Kateqoriyalar" or if a featured post exists) */}
                             {featuredPost && (
                                 <Link href={`/blog/${featuredPost.id}`} className="block group">
                                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center bg-slate-50 rounded-[2rem] p-6 sm:p-8 lg:p-12 transition-all hover:shadow-xl border border-slate-100">
                                         <div className="relative h-[300px] lg:h-[400px] rounded-3xl overflow-hidden order-2 lg:order-1 shadow-md">
                                             <Image
-                                                src={featuredPost.image}
+                                                src={featuredPost.image || '/logo.png'}
                                                 alt={featuredPost.title}
                                                 fill
                                                 className="object-cover group-hover:scale-105 transition-transform duration-700"
@@ -143,7 +166,7 @@ export default function BlogPage() {
                                         <div className="order-1 lg:order-2 lg:pl-6">
                                             <div className="flex items-center gap-4 text-sm font-medium text-slate-500 mb-4">
                                                 <span className="flex items-center"><Tag className="w-4 h-4 mr-1.5" />{featuredPost.category}</span>
-                                                <span className="flex items-center"><Calendar className="w-4 h-4 mr-1.5" />{featuredPost.date}</span>
+                                                <span className="flex items-center"><Calendar className="w-4 h-4 mr-1.5" />{formattedDate(featuredPost.date)}</span>
                                             </div>
                                             <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-6 group-hover:text-brand-blue transition-colors leading-tight">
                                                 {featuredPost.title}
@@ -169,12 +192,12 @@ export default function BlogPage() {
 
                             {/* Normal Posts Grid */}
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                                {normalPosts.map(post => (
+                                {normalPosts.map((post) => (
                                     <Link href={`/blog/${post.id}`} key={post.id} className="group flex flex-col h-full">
                                         <Card className="flex flex-col h-full bg-white border-slate-100 hover:shadow-xl transition-all duration-300 rounded-2xl overflow-hidden group-hover:-translate-y-1">
                                             <div className="relative h-56 w-full overflow-hidden bg-slate-100">
                                                 <Image
-                                                    src={post.image}
+                                                    src={post.image || '/logo.png'}
                                                     alt={post.title}
                                                     fill
                                                     className="object-cover group-hover:scale-110 transition-transform duration-700"
@@ -185,7 +208,7 @@ export default function BlogPage() {
                                             </div>
                                             <CardContent className="flex flex-col flex-grow p-6">
                                                 <div className="flex items-center text-xs font-medium text-slate-500 mb-4 space-x-4">
-                                                    <span className="flex items-center"><Calendar className="w-3.5 h-3.5 mr-1" />{post.date}</span>
+                                                    <span className="flex items-center"><Calendar className="w-3.5 h-3.5 mr-1" />{formattedDate(post.date)}</span>
                                                     <span className="flex items-center"><User className="w-3.5 h-3.5 mr-1" />{post.author}</span>
                                                 </div>
                                                 <h3 className="text-xl font-bold text-slate-900 mb-3 group-hover:text-brand-blue transition-colors line-clamp-2">
@@ -203,7 +226,6 @@ export default function BlogPage() {
                                 ))}
                             </div>
 
-                            {/* Pagination/Load More Placeholder */}
                             {filteredPosts.length > 0 && (
                                 <div className="text-center pt-8">
                                     <Button variant="outline" className="border-slate-300 text-slate-700 px-8 rounded-full h-12">
@@ -218,3 +240,4 @@ export default function BlogPage() {
         </div>
     );
 }
+
