@@ -1,7 +1,29 @@
 {
     "HomePage": {
         "title": "Welcome to Ultramed Clinic",
-        "description": "Modern medical services and professional medical staff."
+        "description": "Modern medical services and professional medical staff.",
+        "heroBadge": "Your health matters to us",
+        "heroTitle": "Modern medicine with human care",
+        "heroDescription": "At Ultramed Clinic, we combine advanced technologies with an experienced team to protect your health.",
+        "featureExpert": "Expert doctors",
+        "featureExpertDesc": "Experienced specialists with strong international practice.",
+        "featureModern": "Modern equipment",
+        "featureModernDesc": "State-of-the-art diagnostics and laboratory technologies.",
+        "feature247": "24/7 service",
+        "feature247Desc": "We are available around the clock for urgent situations.",
+        "featureReliable": "Reliable diagnosis",
+        "featureReliableDesc": "Accurate results and the right treatment plans.",
+        "statPatients": "Satisfied patients",
+        "statDoctors": "Expert doctors",
+        "statDepartments": "Medical departments",
+        "statYears": "Years of experience",
+        "bookAppointment": "Book appointment",
+        "ourServices": "Our services",
+        "whyChooseUs": "Why choose us?",
+        "whyChooseUsDesc": "We focus on patient comfort and deliver high-quality medical care.",
+        "ctaTitle": "Take care of your health today",
+        "ctaDesc": "Book a doctor appointment now and benefit from our professional team.",
+        "contactUs": "Contact us"
     },
     "Navigation": {
         "home": "Home",

@@ -1,7 +1,29 @@
 {
     "HomePage": {
         "title": "Ultramed Klinikasina xos gelmisiniz",
-        "description": "Muasir tibbi xidmetler ve pesekar hekim heyeti."
+        "description": "Muasir tibbi xidmetler ve pesekar hekim heyeti.",
+        "heroBadge": "Sizin saglamliginiz bizim ucun deyerlidir",
+        "heroTitle": "Muasir tibb ve insani yanasma",
+        "heroDescription": "Ultramed klinikasi olaraq saglamliginiz ucun qabaqcil texnologiyalar ve pesekar komanda ile xidmetinizdeyik.",
+        "featureExpert": "Pesekar hekimler",
+        "featureExpertDesc": "Oz sahesinde uzman ve beynelxalq tecrubeli mutexessisler.",
+        "featureModern": "Muasir avadanliq",
+        "featureModernDesc": "En son texnologiya ile techiz olunmus laboratoriya ve diaqnostika.",
+        "feature247": "7/24 xidmet",
+        "feature247Desc": "Tecili hallarda gunun her saati xidmetinizdeyik.",
+        "featureReliable": "Etibarli diaqnoz",
+        "featureReliableDesc": "Deqiq neticeler ve dogru mualice metodlari.",
+        "statPatients": "Memnun pasiyent",
+        "statDoctors": "Uzman hekim",
+        "statDepartments": "Tibbi sobe",
+        "statYears": "Illik tecrube",
+        "bookAppointment": "Qebul yazilmaq",
+        "ourServices": "Xidmetlerimiz",
+        "whyChooseUs": "Niye bizi secmelisiniz?",
+        "whyChooseUsDesc": "Pasiyent memnuniyyeti ve rahatligi ucun en keyfiyyetli xidmeti teqdim etmeye calisiriq.",
+        "ctaTitle": "Saglamliginiza bu gun qaygi gosterin",
+        "ctaDesc": "Vaxt itirmeden hekim qebuluna yazilin ve pesekar komandamizdan destek alin.",
+        "contactUs": "Bizimle elaqe"
     },
     "Navigation": {
         "home": "Ana Sehife",
