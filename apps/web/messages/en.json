@@ -1,0 +1,60 @@
+{
+    "HomePage": {
+        "title": "Welcome to Ultramed Clinic",
+        "description": "Modern medical services and professional medical staff."
+    },
+    "Navigation": {
+        "home": "Home",
+        "about": "About",
+        "services": "Services",
+        "doctors": "Doctors",
+        "blog": "Blog",
+        "gallery": "Gallery",
+        "testimonials": "Testimonials",
+        "faq": "FAQ",
+        "contact": "Contact",
+        "callUs": "Call us:",
+        "addressLine": "Baku city, Heydar Aliyev ave. 125",
+        "emergency": "Emergency: 103",
+        "bookAppointment": "Book appointment"
+    },
+    "Footer": {
+        "description": "Your health is our priority. Modern equipment and a professional team of doctors.",
+        "quickLinks": "Quick Links",
+        "home": "Home",
+        "about": "About",
+        "services": "Services",
+        "doctors": "Doctors",
+        "blog": "Blog",
+        "gallery": "Gallery",
+        "testimonials": "Testimonials",
+        "faq": "Frequently asked questions",
+        "ourServices": "Our Services",
+        "serviceKardiologiya": "Cardiology",
+        "serviceNevrologiya": "Neurology",
+        "serviceStomatologiya": "Dentistry",
+        "serviceLaboratoriya": "Laboratory",
+        "viewAll": "View all services",
+        "contactInfo": "Contact",
+        "address": "Baku city, Heydar Aliyev ave. 125",
+        "allRightsReserved": "All rights reserved.",
+        "privacyPolicy": "Privacy Policy",
+        "terms": "Terms of Service"
+    },
+    "Admin": {
+        "menu": "Menu",
+        "dashboard": "Dashboard",
+        "services": "Services",
+        "doctors": "Doctors",
+        "blog": "Blog",
+        "gallery": "Gallery",
+        "testimonials": "Testimonials",
+        "faq": "FAQ",
+        "privacyPolicy": "Privacy Policy",
+        "terms": "Terms of Service",
+        "logout": "Logout",
+        "search": "Search...",
+        "openMenu": "Open menu",
+        "profile": "Profile"
+    }
+}

@@ -1,0 +1,60 @@
+{
+    "HomePage": {
+        "title": "Ultramed Klinikasina xos gelmisiniz",
+        "description": "Muasir tibbi xidmetler ve pesekar hekim heyeti."
+    },
+    "Navigation": {
+        "home": "Ana Sehife",
+        "about": "Haqqimizda",
+        "services": "Xidmetler",
+        "doctors": "Hekimler",
+        "blog": "Bloq",
+        "gallery": "Qalereya",
+        "testimonials": "Reyler",
+        "faq": "FAQ",
+        "contact": "Elaqe",
+        "callUs": "Bize zeng edin:",
+        "addressLine": "Baki seheri, Heyder Eliyev pr. 125",
+        "emergency": "Tecili Yardim: 103",
+        "bookAppointment": "Qebul yazilmaq"
+    },
+    "Footer": {
+        "description": "Sizin saglamliginiz bizim prioritetimizdir. Muasir avadanliqlar ve pesekar hekim kollektivi.",
+        "quickLinks": "Celd Kecid",
+        "home": "Ana Sehife",
+        "about": "Haqqimizda",
+        "services": "Xidmetlerimiz",
+        "doctors": "Hekimlerimiz",
+        "blog": "Bloq",
+        "gallery": "Qalereya",
+        "testimonials": "Reyler",
+        "faq": "Tez-tez sorusulan suallar",
+        "ourServices": "Xidmetlerimiz",
+        "serviceKardiologiya": "Kardiologiya",
+        "serviceNevrologiya": "Nevrologiya",
+        "serviceStomatologiya": "Stomatologiya",
+        "serviceLaboratoriya": "Laboratoriya",
+        "viewAll": "Butun xidmetlere bax",
+        "contactInfo": "Elaqe",
+        "address": "Baki seheri, Heyder Eliyev pr. 125",
+        "allRightsReserved": "Butun huquqlar qorunur.",
+        "privacyPolicy": "Mexfilik Siyaseti",
+        "terms": "Istifade Sertleri"
+    },
+    "Admin": {
+        "menu": "Menu",
+        "dashboard": "Dashboard",
+        "services": "Xidmetler",
+        "doctors": "Hekimler",
+        "blog": "Bloq",
+        "gallery": "Qalereya",
+        "testimonials": "Reyler",
+        "faq": "FAQ",
+        "privacyPolicy": "Mexfilik Siyaseti",
+        "terms": "Istifade Sertleri",
+        "logout": "Cixis",
+        "search": "Axtaris...",
+        "openMenu": "Menyunu ac",
+        "profile": "Profil"
+    }
+}

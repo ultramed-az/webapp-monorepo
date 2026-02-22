@@ -1,0 +1,60 @@
+{
+    "HomePage": {
+        "title": "Добро пожаловать в клинику Ultramed",
+        "description": "Современные медицинские услуги и профессиональный медицинский персонал."
+    },
+    "Navigation": {
+        "home": "Главная",
+        "about": "О нас",
+        "services": "Услуги",
+        "doctors": "Врачи",
+        "blog": "Блог",
+        "gallery": "Галерея",
+        "testimonials": "Отзывы",
+        "faq": "FAQ",
+        "contact": "Контакты",
+        "callUs": "Позвоните нам:",
+        "addressLine": "г. Баку, пр. Гейдара Алиева, 125",
+        "emergency": "Скорая помощь: 103",
+        "bookAppointment": "Записаться на прием"
+    },
+    "Footer": {
+        "description": "Ваше здоровье - наш приоритет. Современное оборудование и профессиональная команда врачей.",
+        "quickLinks": "Быстрые ссылки",
+        "home": "Главная",
+        "about": "О нас",
+        "services": "Услуги",
+        "doctors": "Врачи",
+        "blog": "Блог",
+        "gallery": "Галерея",
+        "testimonials": "Отзывы",
+        "faq": "Часто задаваемые вопросы",
+        "ourServices": "Наши услуги",
+        "serviceKardiologiya": "Кардиология",
+        "serviceNevrologiya": "Неврология",
+        "serviceStomatologiya": "Стоматология",
+        "serviceLaboratoriya": "Лаборатория",
+        "viewAll": "Посмотреть все услуги",
+        "contactInfo": "Контакты",
+        "address": "г. Баку, пр. Гейдара Алиева, 125",
+        "allRightsReserved": "Все права защищены.",
+        "privacyPolicy": "Политика конфиденциальности",
+        "terms": "Условия использования"
+    },
+    "Admin": {
+        "menu": "Меню",
+        "dashboard": "Панель",
+        "services": "Услуги",
+        "doctors": "Врачи",
+        "blog": "Блог",
+        "gallery": "Галерея",
+        "testimonials": "Отзывы",
+        "faq": "FAQ",
+        "privacyPolicy": "Политика конфиденциальности",
+        "terms": "Условия использования",
+        "logout": "Выход",
+        "search": "Поиск...",
+        "openMenu": "Открыть меню",
+        "profile": "Профиль"
+    }
+}
