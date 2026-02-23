@@ -1,11 +1,5 @@
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
-import { NextIntlClientProvider } from 'next-intl';
-import { getMessages } from 'next-intl/server';
-import '../../globals.css';
-import AdminShell from '@/components/admin/AdminShell';
-
-const inter = Inter({ subsets: ['latin'] });
+import AdminRouteFrame from '@/components/admin/AdminRouteFrame';
 
 export const metadata: Metadata = {
     title: 'Admin Panel | Ultramed',
@@ -21,23 +15,6 @@ export const metadata: Metadata = {
     },
 };
 
-export default async function AdminLayout({
-    children,
-    params
-}: {
-    children: React.ReactNode;
-    params: Promise<{ locale: string }>;
-}) {
-    const { locale } = await params;
-    const messages = await getMessages();
-
-    return (
-        <html lang={locale}>
-            <body className={`${inter.className} bg-brand-cream overflow-hidden`}>
-                <NextIntlClientProvider messages={messages}>
-                    <AdminShell>{children}</AdminShell>
-                </NextIntlClientProvider>
-            </body>
-        </html>
-    );
+export default function AdminLayout({ children }: { children: React.ReactNode }) {
+    return <AdminRouteFrame>{children}</AdminRouteFrame>;
 }
