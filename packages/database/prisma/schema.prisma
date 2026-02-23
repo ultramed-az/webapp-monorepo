@@ -47,12 +47,29 @@ model Doctor {
   bioAz      String   @db.Text
   bioEn      String   @db.Text
   bioRu      String   @db.Text
+  profileAz  String?  @db.Text
+  profileEn  String?  @db.Text
+  profileRu  String?  @db.Text
   image      String?
   specialty  String
   experience String?
   educationAz String?
   educationEn String?
   educationRu String?
+  roomAz     String?
+  roomEn     String?
+  roomRu     String?
+  scheduleAz Json?
+  scheduleEn Json?
+  scheduleRu Json?
+  languagesAz Json?
+  languagesEn Json?
+  languagesRu Json?
+  proceduresAz Json?
+  proceduresEn Json?
+  proceduresRu Json?
+  phone      String?
+  email      String?
   tagsAz     Json?
   tagsEn     Json?
   tagsRu     Json?

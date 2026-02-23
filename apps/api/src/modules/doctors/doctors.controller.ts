@@ -1,4 +1,4 @@
-import { Controller, Get, Query } from '@nestjs/common';
+import { Controller, Get, Param, Query } from '@nestjs/common';
 import { DoctorsService } from './doctors.service';
 
 @Controller('doctors')
@@ -8,5 +8,10 @@ export class DoctorsController {
     @Get()
     findAll(@Query('locale') locale = 'az') {
         return this.doctorsService.findAll(locale);
+    }
+
+    @Get(':id')
+    findOne(@Param('id') id: string, @Query('locale') locale = 'az') {
+        return this.doctorsService.findOne(id, locale);
     }
 }

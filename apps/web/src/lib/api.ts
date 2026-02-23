@@ -11,6 +11,24 @@ export type DoctorListItem = {
     image: string | null;
 };
 
+export type DoctorDetailItem = {
+    id: string;
+    name: string;
+    specialty: string;
+    bio: string;
+    profile: string;
+    experience: string;
+    education: string;
+    room: string;
+    schedule: string[];
+    languages: string[];
+    procedures: string[];
+    tags: string[];
+    phone: string;
+    email: string;
+    image: string | null;
+};
+
 export type BlogListItem = {
     id: string;
     title: string;
@@ -96,6 +114,10 @@ async function request<T>(path: string, query?: Record<string, string | undefine
 
 export async function getDoctors(locale: string | undefined): Promise<DoctorListItem[]> {
     return request<DoctorListItem[]>('/doctors', { locale: toLocale(locale) });
+}
+
+export async function getDoctorById(id: string, locale: string | undefined): Promise<DoctorDetailItem | null> {
+    return request<DoctorDetailItem | null>(`/doctors/${id}`, { locale: toLocale(locale) });
 }
 
 export async function getBlogPosts(locale: string | undefined): Promise<BlogListItem[]> {
