@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -10,141 +11,6 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Calendar, HeartPulse, Languages, Mail, MapPin, Phone, Search, Stethoscope, UserRound } from 'lucide-react';
 import Image from 'next/image';
 import { getDoctorById, getDoctors, type DoctorDetailItem, type DoctorListItem } from '@/lib/api';
-
-type UiCopy = {
-    badge: string;
-    heading: string;
-    intro: string;
-    searchPlaceholder: string;
-    loadingTitle: string;
-    loadingDescription: string;
-    fetchFailedTitle: string;
-    fetchFailedDescription: string;
-    retry: string;
-    noResultsTitle: string;
-    noResultsDescription: string;
-    clearSearch: string;
-    experienceLabel: string;
-    profileButton: string;
-    appointmentButton: string;
-    modalTitle: string;
-    modalFallback: string;
-    roomLabel: string;
-    educationLabel: string;
-    contactLabel: string;
-    scheduleLabel: string;
-    proceduresLabel: string;
-    languagesLabel: string;
-    expertiseLabel: string;
-    notSpecified: string;
-    callButton: string;
-    detailMissing: string;
-    detailLoadFailed: string;
-    detailRetry: string;
-    detailUnavailable: string;
-};
-
-const UI_COPY: Record<'az' | 'en' | 'ru', UiCopy> = {
-    az: {
-        badge: 'Ultramed Komandası',
-        heading: 'Peşəkar Həkimlərimiz',
-        intro:
-            'Tibb sahəsində aparıcı təhsil ocaqlarında ixtisaslaşmış, uzun illərin təcrübəsinə malik həkimlərimiz sizin sağlamlığınız üçün ən düzgün diaqnoz və müalicəni təklif edir.',
-        searchPlaceholder: 'Həkimin adı, şöbəsi və ya xəstəlik üzrə axtarış...',
-        loadingTitle: 'Həkimlər yüklənir...',
-        loadingDescription: 'Məlumatlar bir neçə saniyə ərzində hazır olacaq.',
-        fetchFailedTitle: 'Məlumat yüklənmədi',
-        fetchFailedDescription: 'Zəhmət olmasa bir daha cəhd edin.',
-        retry: 'Yenidən yoxla',
-        noResultsTitle: 'Axtarışa uyğun nəticə tapılmadı',
-        noResultsDescription: 'Zəhmət olmasa digər açar sözlərdən istifadə edərək yenidən yoxlayın.',
-        clearSearch: 'Axtarışı Təmizlə',
-        experienceLabel: 'İş təcrübəsi',
-        profileButton: 'Profili',
-        appointmentButton: 'Qəbul',
-        modalTitle: 'Həkim Profili',
-        modalFallback: 'Seçilmiş həkim üzrə detallı məlumat.',
-        roomLabel: 'Otaq',
-        educationLabel: 'Təhsil',
-        contactLabel: 'Əlaqə',
-        scheduleLabel: 'Qəbul cədvəli',
-        proceduresLabel: 'Qəbul etdiyi istiqamətlər',
-        languagesLabel: 'Danışdığı dillər',
-        expertiseLabel: 'Ekspertiza sahələri',
-        notSpecified: 'Qeyd edilməyib',
-        callButton: 'Zəng et',
-        detailMissing: 'Bu həkim üzrə detaylı məlumat tapılmadı.',
-        detailLoadFailed: 'Detallı məlumat yüklənmədi.',
-        detailRetry: 'Detalları yenilə',
-        detailUnavailable: 'Bu həkim üzrə məlumat hazırda əlçatan deyil.',
-    },
-    en: {
-        badge: 'Ultramed Team',
-        heading: 'Our Medical Experts',
-        intro:
-            'Our doctors are trained in leading institutions and bring years of clinical experience to provide accurate diagnosis and effective treatment plans.',
-        searchPlaceholder: 'Search by doctor name, specialty, or condition...',
-        loadingTitle: 'Loading doctors...',
-        loadingDescription: 'Doctor data will be ready in a few seconds.',
-        fetchFailedTitle: 'Failed to load doctors',
-        fetchFailedDescription: 'Please try again.',
-        retry: 'Retry',
-        noResultsTitle: 'No matching doctors found',
-        noResultsDescription: 'Try another keyword or clear your search.',
-        clearSearch: 'Clear Search',
-        experienceLabel: 'Experience',
-        profileButton: 'Profile',
-        appointmentButton: 'Appointment',
-        modalTitle: 'Doctor Profile',
-        modalFallback: 'Detailed information about the selected doctor.',
-        roomLabel: 'Room',
-        educationLabel: 'Education',
-        contactLabel: 'Contact',
-        scheduleLabel: 'Consultation schedule',
-        proceduresLabel: 'Consultation focus',
-        languagesLabel: 'Languages',
-        expertiseLabel: 'Expertise',
-        notSpecified: 'Not specified',
-        callButton: 'Call',
-        detailMissing: 'Detailed profile for this doctor was not found.',
-        detailLoadFailed: 'Failed to load detailed profile.',
-        detailRetry: 'Retry details',
-        detailUnavailable: 'Doctor details are currently unavailable.',
-    },
-    ru: {
-        badge: 'Команда Ultramed',
-        heading: 'Наши Врачи',
-        intro:
-            'Наши специалисты прошли подготовку в ведущих медицинских школах и имеют многолетний практический опыт для точной диагностики и эффективного лечения.',
-        searchPlaceholder: 'Поиск по имени врача, отделению или заболеванию...',
-        loadingTitle: 'Загрузка врачей...',
-        loadingDescription: 'Данные будут готовы через несколько секунд.',
-        fetchFailedTitle: 'Не удалось загрузить данные',
-        fetchFailedDescription: 'Пожалуйста, попробуйте снова.',
-        retry: 'Повторить',
-        noResultsTitle: 'По вашему запросу ничего не найдено',
-        noResultsDescription: 'Используйте другой запрос или очистите фильтр.',
-        clearSearch: 'Очистить поиск',
-        experienceLabel: 'Стаж',
-        profileButton: 'Профиль',
-        appointmentButton: 'Записаться',
-        modalTitle: 'Профиль Врача',
-        modalFallback: 'Подробная информация о выбранном враче.',
-        roomLabel: 'Кабинет',
-        educationLabel: 'Образование',
-        contactLabel: 'Контакты',
-        scheduleLabel: 'График приема',
-        proceduresLabel: 'Основные направления',
-        languagesLabel: 'Языки',
-        expertiseLabel: 'Экспертиза',
-        notSpecified: 'Не указано',
-        callButton: 'Позвонить',
-        detailMissing: 'Подробная информация по этому врачу не найдена.',
-        detailLoadFailed: 'Не удалось загрузить подробную информацию.',
-        detailRetry: 'Обновить данные',
-        detailUnavailable: 'Информация по этому врачу сейчас недоступна.',
-    },
-};
 
 function normalizeLocale(localeRaw: string | undefined): 'az' | 'en' | 'ru' {
     if (localeRaw === 'en' || localeRaw === 'ru') {
@@ -156,7 +22,7 @@ function normalizeLocale(localeRaw: string | undefined): 'az' | 'en' | 'ru' {
 export default function DoctorsPage() {
     const params = useParams<{ locale: string }>();
     const locale = normalizeLocale(params?.locale);
-    const copy = UI_COPY[locale];
+    const t = useTranslations('DoctorsPage');
 
     const [searchQuery, setSearchQuery] = useState('');
     const [refreshKey, setRefreshKey] = useState(0);
@@ -184,7 +50,7 @@ export default function DoctorsPage() {
                 }
             } catch (fetchError) {
                 if (!isCancelled) {
-                    const message = fetchError instanceof Error ? fetchError.message : copy.fetchFailedDescription;
+                    const message = fetchError instanceof Error ? fetchError.message : t('fetchFailedDescription');
                     setError(message);
                 }
             } finally {
@@ -204,7 +70,7 @@ export default function DoctorsPage() {
         return () => {
             isCancelled = true;
         };
-    }, [copy.fetchFailedDescription, locale, refreshKey]);
+    }, [locale, refreshKey, t]);
 
     const filteredDoctors = useMemo(() => {
         const needle = searchQuery.trim().toLowerCase();
@@ -254,7 +120,7 @@ export default function DoctorsPage() {
         try {
             const detail = await getDoctorById(doctorId, locale);
             if (!detail) {
-                setProfileError(copy.detailMissing);
+                setProfileError(t('detailMissing'));
                 return;
             }
 
@@ -263,7 +129,7 @@ export default function DoctorsPage() {
                 [doctorId]: detail,
             }));
         } catch (fetchError) {
-            const message = fetchError instanceof Error ? fetchError.message : copy.detailLoadFailed;
+            const message = fetchError instanceof Error ? fetchError.message : t('detailLoadFailed');
             setProfileError(message);
         } finally {
             setIsProfileLoading(false);
@@ -284,10 +150,10 @@ export default function DoctorsPage() {
                 <div className="container mx-auto px-6 relative z-10 text-center">
                     <div className="inline-flex items-center space-x-2 bg-brand-blue-soft/80 backdrop-blur border border-brand-blue-soft text-brand-blue font-medium px-4 py-2 rounded-full text-sm mb-6 shadow-sm">
                         <HeartPulse className="h-4 w-4" />
-                        <span>{copy.badge}</span>
+                        <span>{t('badge')}</span>
                     </div>
-                    <h1 className="text-4xl md:text-5xl font-extrabold text-slate-900 mb-6 tracking-tight">{copy.heading}</h1>
-                    <p className="text-lg md:text-xl text-slate-600 max-w-2xl mx-auto leading-relaxed">{copy.intro}</p>
+                    <h1 className="text-4xl md:text-5xl font-extrabold text-slate-900 mb-6 tracking-tight">{t('heading')}</h1>
+                    <p className="text-lg md:text-xl text-slate-600 max-w-2xl mx-auto leading-relaxed">{t('intro')}</p>
 
                     <div className="mt-10 max-w-md mx-auto relative group">
                         <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
@@ -295,7 +161,7 @@ export default function DoctorsPage() {
                         </div>
                         <Input
                             type="text"
-                            placeholder={copy.searchPlaceholder}
+                            placeholder={t('searchPlaceholder')}
                             className="pl-12 pr-4 py-6 w-full rounded-2xl border-slate-200 shadow-sm focus-visible:ring-brand-blue focus-visible:ring-offset-2 text-[15px] transition-shadow"
                             value={searchQuery}
                             onChange={(event) => setSearchQuery(event.target.value)}
@@ -308,19 +174,19 @@ export default function DoctorsPage() {
                 <div className="container mx-auto px-6">
                     {isLoading && doctors.length === 0 ? (
                         <div className="text-center py-20 bg-slate-50 rounded-3xl border border-slate-100">
-                            <h3 className="text-xl font-semibold text-slate-900 mb-2">{copy.loadingTitle}</h3>
-                            <p className="text-slate-500">{copy.loadingDescription}</p>
+                            <h3 className="text-xl font-semibold text-slate-900 mb-2">{t('loadingTitle')}</h3>
+                            <p className="text-slate-500">{t('loadingDescription')}</p>
                         </div>
                     ) : error && doctors.length === 0 ? (
                         <div className="text-center py-20 bg-slate-50 rounded-3xl border border-slate-100">
-                            <h3 className="text-xl font-semibold text-slate-900 mb-2">{copy.fetchFailedTitle}</h3>
-                            <p className="text-slate-500 mb-6">{copy.fetchFailedDescription}</p>
+                            <h3 className="text-xl font-semibold text-slate-900 mb-2">{t('fetchFailedTitle')}</h3>
+                            <p className="text-slate-500 mb-6">{t('fetchFailedDescription')}</p>
                             <Button
                                 variant="outline"
                                 className="border-brand-blue text-brand-blue hover:bg-brand-blue-soft"
                                 onClick={() => setRefreshKey((key) => key + 1)}
                             >
-                                {copy.retry}
+                                {t('retry')}
                             </Button>
                         </div>
                     ) : filteredDoctors.length === 0 ? (
@@ -328,14 +194,14 @@ export default function DoctorsPage() {
                             <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-4 text-slate-400 shadow-sm">
                                 <Search className="w-8 h-8" />
                             </div>
-                            <h3 className="text-xl font-semibold text-slate-900 mb-2">{copy.noResultsTitle}</h3>
-                            <p className="text-slate-500">{copy.noResultsDescription}</p>
+                            <h3 className="text-xl font-semibold text-slate-900 mb-2">{t('noResultsTitle')}</h3>
+                            <p className="text-slate-500">{t('noResultsDescription')}</p>
                             <Button
                                 variant="outline"
                                 className="mt-6 border-slate-200 text-slate-700"
                                 onClick={() => setSearchQuery('')}
                             >
-                                {copy.clearSearch}
+                                {t('clearSearch')}
                             </Button>
                         </div>
                     ) : (
@@ -366,7 +232,7 @@ export default function DoctorsPage() {
                                             <li className="flex items-start">
                                                 <Calendar className="w-5 h-5 text-brand-orange mr-3 mt-0.5 shrink-0" />
                                                 <span className="text-sm text-slate-600">
-                                                    {copy.experienceLabel}: <span className="font-semibold text-slate-900">{doctor.experience}</span>
+                                                    {t('experienceLabel')}: <span className="font-semibold text-slate-900">{doctor.experience}</span>
                                                 </span>
                                             </li>
                                         </ul>
@@ -385,10 +251,10 @@ export default function DoctorsPage() {
                                                 className="w-full border-slate-200 text-slate-700 bg-white hover:bg-slate-50 hover:text-slate-900"
                                                 onClick={() => void openProfileModal(doctor.id)}
                                             >
-                                                {copy.profileButton}
+                                                {t('profileButton')}
                                             </Button>
                                             <Button asChild className="w-full bg-brand-orange hover:bg-brand-orange-dark text-white shadow-sm">
-                                                <Link href={`/${locale}/contact`}>{copy.appointmentButton}</Link>
+                                                <Link href={`/${locale}/contact`}>{t('appointmentButton')}</Link>
                                             </Button>
                                         </div>
                                     </CardFooter>
@@ -405,7 +271,7 @@ export default function DoctorsPage() {
                         <div className="relative h-64 w-full bg-slate-100">
                             <Image
                                 src={selectedDoctorDetail?.image ?? selectedDoctor?.image ?? '/logo.png'}
-                                alt={selectedDoctorDetail?.name ?? selectedDoctor?.name ?? 'Doctor'}
+                                alt={selectedDoctorDetail?.name ?? selectedDoctor?.name ?? t('doctorAlt')}
                                 fill
                                 className="object-cover object-top"
                             />
@@ -423,9 +289,9 @@ export default function DoctorsPage() {
 
                     <div className="p-6 space-y-6">
                         <DialogHeader className="space-y-2">
-                            <DialogTitle className="text-2xl text-slate-900">{copy.modalTitle}</DialogTitle>
+                            <DialogTitle className="text-2xl text-slate-900">{t('modalTitle')}</DialogTitle>
                             <DialogDescription className="text-base text-slate-600">
-                                {selectedDoctorDetail?.bio ?? selectedDoctor?.bio ?? copy.modalFallback}
+                                {selectedDoctorDetail?.bio ?? selectedDoctor?.bio ?? t('modalFallback')}
                             </DialogDescription>
                         </DialogHeader>
 
@@ -443,7 +309,7 @@ export default function DoctorsPage() {
                                     className="border-brand-blue text-brand-blue hover:bg-brand-blue-soft"
                                     onClick={() => void retrySelectedDoctorDetail()}
                                 >
-                                    {copy.detailRetry}
+                                    {t('detailRetry')}
                                 </Button>
                             </div>
                         ) : selectedDoctorDetail ? (
@@ -454,35 +320,35 @@ export default function DoctorsPage() {
                                     <div className="rounded-xl border border-slate-200 bg-white p-4">
                                         <div className="flex items-center gap-2 text-slate-500 text-xs uppercase tracking-wide mb-1">
                                             <Calendar className="h-4 w-4" />
-                                            <span>{copy.experienceLabel}</span>
+                                            <span>{t('experienceLabel')}</span>
                                         </div>
-                                        <p className="font-semibold text-slate-900">{selectedDoctorDetail.experience || copy.notSpecified}</p>
+                                        <p className="font-semibold text-slate-900">{selectedDoctorDetail.experience || t('notSpecified')}</p>
                                     </div>
 
                                     <div className="rounded-xl border border-slate-200 bg-white p-4">
                                         <div className="flex items-center gap-2 text-slate-500 text-xs uppercase tracking-wide mb-1">
                                             <MapPin className="h-4 w-4" />
-                                            <span>{copy.roomLabel}</span>
+                                            <span>{t('roomLabel')}</span>
                                         </div>
-                                        <p className="font-semibold text-slate-900">{selectedDoctorDetail.room || copy.notSpecified}</p>
+                                        <p className="font-semibold text-slate-900">{selectedDoctorDetail.room || t('notSpecified')}</p>
                                     </div>
 
                                     <div className="rounded-xl border border-slate-200 bg-white p-4">
                                         <div className="flex items-center gap-2 text-slate-500 text-xs uppercase tracking-wide mb-1">
                                             <UserRound className="h-4 w-4" />
-                                            <span>{copy.educationLabel}</span>
+                                            <span>{t('educationLabel')}</span>
                                         </div>
-                                        <p className="font-semibold text-slate-900">{selectedDoctorDetail.education || copy.notSpecified}</p>
+                                        <p className="font-semibold text-slate-900">{selectedDoctorDetail.education || t('notSpecified')}</p>
                                     </div>
 
                                     <div className="rounded-xl border border-slate-200 bg-white p-4">
                                         <div className="flex items-center gap-2 text-slate-500 text-xs uppercase tracking-wide mb-1">
                                             <Phone className="h-4 w-4" />
-                                            <span>{copy.contactLabel}</span>
+                                            <span>{t('contactLabel')}</span>
                                         </div>
                                         <div className="space-y-1">
-                                            <p className="font-medium text-slate-900">{selectedDoctorDetail.phone || copy.notSpecified}</p>
-                                            <p className="text-sm text-slate-600">{selectedDoctorDetail.email || copy.notSpecified}</p>
+                                            <p className="font-medium text-slate-900">{selectedDoctorDetail.phone || t('notSpecified')}</p>
+                                            <p className="text-sm text-slate-600">{selectedDoctorDetail.email || t('notSpecified')}</p>
                                         </div>
                                     </div>
                                 </div>
@@ -491,12 +357,12 @@ export default function DoctorsPage() {
                                     <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
                                         <h4 className="font-semibold text-slate-900 mb-3 flex items-center gap-2">
                                             <Calendar className="h-4 w-4 text-brand-blue" />
-                                            {copy.scheduleLabel}
+                                            {t('scheduleLabel')}
                                         </h4>
                                         <ul className="space-y-2">
                                             {(selectedDoctorDetail.schedule.length > 0
                                                 ? selectedDoctorDetail.schedule
-                                                : [copy.notSpecified]
+                                                : [t('notSpecified')]
                                             ).map((item) => (
                                                 <li key={item} className="text-sm text-slate-700">
                                                     {item}
@@ -508,12 +374,12 @@ export default function DoctorsPage() {
                                     <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
                                         <h4 className="font-semibold text-slate-900 mb-3 flex items-center gap-2">
                                             <Stethoscope className="h-4 w-4 text-brand-orange" />
-                                            {copy.proceduresLabel}
+                                            {t('proceduresLabel')}
                                         </h4>
                                         <ul className="space-y-2">
                                             {(selectedDoctorDetail.procedures.length > 0
                                                 ? selectedDoctorDetail.procedures
-                                                : [copy.notSpecified]
+                                                : [t('notSpecified')]
                                             ).map((item) => (
                                                 <li key={item} className="text-sm text-slate-700">
                                                     {item}
@@ -527,12 +393,12 @@ export default function DoctorsPage() {
                                     <div className="rounded-xl border border-slate-200 bg-white p-4">
                                         <h4 className="font-semibold text-slate-900 mb-3 flex items-center gap-2">
                                             <Languages className="h-4 w-4 text-brand-blue" />
-                                            {copy.languagesLabel}
+                                            {t('languagesLabel')}
                                         </h4>
                                         <div className="flex flex-wrap gap-2">
                                             {(selectedDoctorDetail.languages.length > 0
                                                 ? selectedDoctorDetail.languages
-                                                : [copy.notSpecified]
+                                                : [t('notSpecified')]
                                             ).map((language) => (
                                                 <span
                                                     key={language}
@@ -547,10 +413,10 @@ export default function DoctorsPage() {
                                     <div className="rounded-xl border border-slate-200 bg-white p-4">
                                         <h4 className="font-semibold text-slate-900 mb-3 flex items-center gap-2">
                                             <HeartPulse className="h-4 w-4 text-brand-orange" />
-                                            {copy.expertiseLabel}
+                                            {t('expertiseLabel')}
                                         </h4>
                                         <div className="flex flex-wrap gap-2">
-                                            {(selectedDoctorDetail.tags.length > 0 ? selectedDoctorDetail.tags : [copy.notSpecified]).map(
+                                            {(selectedDoctorDetail.tags.length > 0 ? selectedDoctorDetail.tags : [t('notSpecified')]).map(
                                                 (tag) => (
                                                     <span
                                                         key={tag}
@@ -566,13 +432,13 @@ export default function DoctorsPage() {
 
                                 <div className="flex flex-wrap gap-3 pt-1">
                                     <Button asChild className="bg-brand-orange hover:bg-brand-orange-dark text-white">
-                                        <Link href={`/${locale}/contact`}>{copy.appointmentButton}</Link>
+                                        <Link href={`/${locale}/contact`}>{t('appointmentButton')}</Link>
                                     </Button>
                                     {phoneHref && (
                                         <Button asChild variant="outline" className="border-brand-blue text-brand-blue hover:bg-brand-blue-soft">
                                             <a href={phoneHref}>
                                                 <Phone className="h-4 w-4 mr-2" />
-                                                {copy.callButton}
+                                                {t('callButton')}
                                             </a>
                                         </Button>
                                     )}
@@ -580,14 +446,14 @@ export default function DoctorsPage() {
                                         <Button asChild variant="outline" className="border-slate-200 text-slate-700">
                                             <a href={`mailto:${selectedDoctorDetail.email}`}>
                                                 <Mail className="h-4 w-4 mr-2" />
-                                                Email
+                                                {t('emailButton')}
                                             </a>
                                         </Button>
                                     )}
                                 </div>
                             </div>
                         ) : (
-                            <p className="text-slate-600">{copy.detailUnavailable}</p>
+                            <p className="text-slate-600">{t('detailUnavailable')}</p>
                         )}
                     </div>
                 </DialogContent>

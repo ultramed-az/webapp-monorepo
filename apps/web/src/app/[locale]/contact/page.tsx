@@ -1,7 +1,8 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -10,37 +11,55 @@ import { Textarea } from '@/components/ui/textarea';
 import { MapPin, Phone, Mail, Clock, Send, MessageSquare } from 'lucide-react';
 import { getContactInfo, type ContactInfoResponse } from '@/lib/api';
 
-const defaultContact: ContactInfoResponse = {
-    address: 'Bakı şəhəri, Nəsimi rayonu, Səməd Vurğun küçəsi 14A',
-    map: {
-        latitude: 40.3771901,
-        longitude: 49.8394444,
-        embedUrl:
-            'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3039.4286745147575!2d49.83944441539243!3d40.37719007936952!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x40307dabacc0eb35%3A0xad52d0fa31b143ec!2sBaku%2C%20Azerbaijan!5e0!3m2!1sen!2s!4v1620000000000!5m2!1sen!2s',
-    },
-    phones: [
-        { label: 'Mərkəzi Çağrı Mərkəzi', value: '*4444' },
-        { label: 'Əlaqə nömrəsi', value: '+994 12 555 44 44' },
-    ],
-    emails: [
-        { label: 'Ümumi', value: 'info@ultramed.az' },
-        { label: 'Dəstək', value: 'support@ultramed.az' },
-    ],
-    workingHours: [
-        { label: 'B.E - Ş', value: '08:00 - 20:00' },
-        { label: 'Şənbə', value: '09:00 - 15:00' },
-    ],
-};
+function isWhatsAppValue(value: string): boolean {
+    return value.toLowerCase().includes('wa.me');
+}
+
+function toPhoneHref(value: string): string | null {
+    if (isWhatsAppValue(value)) {
+        return value.startsWith('http') ? value : `https://${value}`;
+    }
+
+    const digits = value.replace(/[^\d+]/g, '');
+    if (!digits) {
+        return null;
+    }
+
+    return `tel:${digits}`;
+}
 
 export default function ContactPage() {
     const params = useParams<{ locale: string }>();
     const locale = params?.locale ?? 'az';
+    const t = useTranslations('ContactPage');
 
     const [isSubmitted, setIsSubmitted] = useState(false);
     const [refreshKey, setRefreshKey] = useState(0);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    const [contactInfo, setContactInfo] = useState<ContactInfoResponse>(defaultContact);
+    const fallbackContact = useMemo<ContactInfoResponse>(
+        () => ({
+            address: t('fallback.address'),
+            map: {
+                latitude: 40.3763297,
+                longitude: 49.9628667,
+                embedUrl: 'https://maps.google.com/maps?q=N%C9%99sr%C9%99ddin%20Tusi%2055%20Baku&z=15&output=embed',
+            },
+            phones: [
+                { label: t('fallback.phoneLabel'), value: '055/070-223-58-56' },
+                { label: t('fallback.whatsappLabel'), value: 'https://wa.me/994552235856' },
+            ],
+            emails: [
+                { label: t('fallback.emailLabel'), value: 'ultramedclinics@gmail.com' },
+            ],
+            workingHours: [
+                { label: t('fallback.workDayLabel'), value: '09:00 - 19:00' },
+                { label: t('fallback.saturdayLabel'), value: '10:00 - 16:00' },
+            ],
+        }),
+        [t],
+    );
+    const [contactInfo, setContactInfo] = useState<ContactInfoResponse>(fallbackContact);
 
     useEffect(() => {
         let isCancelled = false;
@@ -48,6 +67,7 @@ export default function ContactPage() {
         async function loadContactInfo() {
             setIsLoading(true);
             setError(null);
+            setContactInfo(fallbackContact);
 
             try {
                 const data = await getContactInfo(locale);
@@ -56,7 +76,7 @@ export default function ContactPage() {
                 }
             } catch (fetchError) {
                 if (!isCancelled) {
-                    const message = fetchError instanceof Error ? fetchError.message : 'Əlaqə məlumatları yüklənmədi.';
+                    const message = fetchError instanceof Error ? fetchError.message : t('fetchFailedDescription');
                     setError(message);
                 }
             } finally {
@@ -71,7 +91,7 @@ export default function ContactPage() {
         return () => {
             isCancelled = true;
         };
-    }, [locale, refreshKey]);
+    }, [fallbackContact, locale, refreshKey, t]);
 
     const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -86,10 +106,10 @@ export default function ContactPage() {
                 <div className="absolute inset-0 z-0 opacity-10 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-brand-blue via-brand-blue-soft to-transparent"></div>
                 <div className="container mx-auto px-6 relative z-10 text-center">
                     <h1 className="text-4xl md:text-5xl font-extrabold text-slate-900 mb-6 tracking-tight">
-                        Bizimlə Əlaqə
+                        {t('heroTitle')}
                     </h1>
                     <p className="text-lg md:text-xl text-slate-600 max-w-2xl mx-auto leading-relaxed">
-                        Suallarınız, təklifləriniz və ya qəbula yazılmaq üçün bizimlə əlaqə saxlamaqdan çəkinməyin. Komandamız sizə kömək etməyə hər zaman hazırdır.
+                        {t('heroDescription')}
                     </p>
                 </div>
             </section>
@@ -99,13 +119,13 @@ export default function ContactPage() {
                 <div className="container mx-auto px-6">
                     {error && (
                         <div className="mb-8 rounded-lg border border-brand-orange/25 bg-brand-orange/10 px-4 py-3 text-brand-orange-dark flex items-center justify-between gap-4">
-                            <span>Məlumatlar serverdən yüklənmədi. Hazırda son mövcud məlumat göstərilir.</span>
+                            <span>{t('fetchFailedBanner')}</span>
                             <Button
                                 variant="outline"
                                 className="border-brand-blue text-brand-blue hover:bg-brand-blue-soft"
                                 onClick={() => setRefreshKey((key) => key + 1)}
                             >
-                                Yenidən yoxla
+                                {t('retry')}
                             </Button>
                         </div>
                     )}
@@ -114,7 +134,7 @@ export default function ContactPage() {
 
                         {/* Contact Information Cards */}
                         <div className="lg:col-span-5 space-y-6">
-                            <h2 className="text-2xl font-bold text-slate-900 mb-6">Əlaqə Vasitələri</h2>
+                            <h2 className="text-2xl font-bold text-slate-900 mb-6">{t('contactMethodsTitle')}</h2>
 
                             <Card className="border-slate-100 shadow-sm hover:shadow-md transition-shadow bg-brand-blue-soft/60">
                                 <CardContent className="p-6 flex items-start">
@@ -122,12 +142,12 @@ export default function ContactPage() {
                                         <MapPin className="h-6 w-6" />
                                     </div>
                                     <div>
-                                        <h3 className="font-semibold text-slate-900 mb-1">Ünvanımız</h3>
+                                        <h3 className="font-semibold text-slate-900 mb-1">{t('addressTitle')}</h3>
                                         <p className="text-slate-600 text-sm leading-relaxed">
                                             {contactInfo.address}
                                         </p>
                                         <p className="text-xs text-slate-500 mt-2">
-                                            Koordinatlar: {contactInfo.map.latitude.toFixed(6)}, {contactInfo.map.longitude.toFixed(6)}
+                                            {t('coordinatesLabel')}: {contactInfo.map.latitude.toFixed(6)}, {contactInfo.map.longitude.toFixed(6)}
                                         </p>
                                     </div>
                                 </CardContent>
@@ -139,12 +159,23 @@ export default function ContactPage() {
                                         <Phone className="h-6 w-6" />
                                     </div>
                                     <div>
-                                        <h3 className="font-semibold text-slate-900 mb-3">Telefon</h3>
+                                        <h3 className="font-semibold text-slate-900 mb-3">{t('phoneTitle')}</h3>
                                         <div className="space-y-2">
                                             {contactInfo.phones.map((phone) => (
                                                 <div key={`${phone.label}-${phone.value}`}>
                                                     <p className="text-slate-600 text-sm mb-1">{phone.label}</p>
-                                                    <p className="font-semibold text-base text-brand-orange-dark">{phone.value}</p>
+                                                    {toPhoneHref(phone.value) ? (
+                                                        <a
+                                                            href={toPhoneHref(phone.value) ?? '#'}
+                                                            target={isWhatsAppValue(phone.value) ? '_blank' : undefined}
+                                                            rel={isWhatsAppValue(phone.value) ? 'noreferrer' : undefined}
+                                                            className={`font-semibold text-base transition-colors ${isWhatsAppValue(phone.value) ? 'text-brand-blue hover:text-brand-blue-dark' : 'text-brand-orange-dark hover:text-brand-orange'}`}
+                                                        >
+                                                            {phone.value.replace(/^https?:\/\//, '')}
+                                                        </a>
+                                                    ) : (
+                                                        <p className="font-semibold text-base text-brand-orange-dark">{phone.value}</p>
+                                                    )}
                                                 </div>
                                             ))}
                                         </div>
@@ -158,7 +189,7 @@ export default function ContactPage() {
                                         <div className="bg-brand-orange/20 p-3 rounded-full mb-4 text-brand-orange">
                                             <Clock className="h-6 w-6" />
                                         </div>
-                                        <h3 className="font-semibold text-slate-900 mb-2">İş Saatları</h3>
+                                        <h3 className="font-semibold text-slate-900 mb-2">{t('workingHoursTitle')}</h3>
                                         <div className="space-y-1">
                                             {contactInfo.workingHours.map((hour) => (
                                                 <p key={`${hour.label}-${hour.value}`} className="text-slate-600 text-sm">
@@ -174,12 +205,16 @@ export default function ContactPage() {
                                         <div className="bg-brand-blue-soft p-3 rounded-full mb-4 text-brand-blue">
                                             <Mail className="h-6 w-6" />
                                         </div>
-                                        <h3 className="font-semibold text-slate-900 mb-2">E-poçt</h3>
+                                        <h3 className="font-semibold text-slate-900 mb-2">{t('emailTitle')}</h3>
                                         <div className="space-y-1">
                                             {contactInfo.emails.map((email) => (
-                                                <p key={`${email.label}-${email.value}`} className="text-slate-600 text-sm">
+                                                <a
+                                                    key={`${email.label}-${email.value}`}
+                                                    href={`mailto:${email.value}`}
+                                                    className="text-slate-600 text-sm hover:text-brand-blue transition-colors break-all"
+                                                >
                                                     {email.value}
-                                                </p>
+                                                </a>
                                             ))}
                                         </div>
                                     </CardContent>
@@ -187,7 +222,7 @@ export default function ContactPage() {
                             </div>
 
                             {isLoading && (
-                                <p className="text-sm text-slate-500">Serverdən əlaqə məlumatları yenilənir...</p>
+                                <p className="text-sm text-slate-500">{t('loadingInfo')}</p>
                             )}
                         </div>
 
@@ -199,48 +234,48 @@ export default function ContactPage() {
                                         <div className="bg-brand-blue p-2 rounded-lg text-white">
                                             <MessageSquare className="w-5 h-5" />
                                         </div>
-                                        <h2 className="text-2xl font-bold text-slate-900">Bizə Yazın</h2>
+                                        <h2 className="text-2xl font-bold text-slate-900">{t('formTitle')}</h2>
                                     </div>
 
                                     {isSubmitted && (
                                         <div className="mb-6 rounded-lg border border-brand-blue/20 bg-brand-blue-soft px-4 py-3 text-brand-blue">
-                                            Mesajiniz ugurla gonderildi. En qisa zamanda sizinle elaqe saxlayacagiq.
+                                            {t('submitSuccess')}
                                         </div>
                                     )}
 
                                     <form onSubmit={handleFormSubmit} className="space-y-6">
                                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                                             <div className="space-y-2">
-                                                <Label htmlFor="firstName" className="text-slate-700">Adınız</Label>
-                                                <Input id="firstName" placeholder="Adınızı daxil edin" required className="h-12 bg-slate-50 border-slate-200 focus-visible:ring-brand-blue" />
+                                                <Label htmlFor="firstName" className="text-slate-700">{t('firstNameLabel')}</Label>
+                                                <Input id="firstName" placeholder={t('firstNamePlaceholder')} required className="h-12 bg-slate-50 border-slate-200 focus-visible:ring-brand-blue" />
                                             </div>
                                             <div className="space-y-2">
-                                                <Label htmlFor="lastName" className="text-slate-700">Soyadınız</Label>
-                                                <Input id="lastName" placeholder="Soyadınızı daxil edin" required className="h-12 bg-slate-50 border-slate-200 focus-visible:ring-brand-blue" />
+                                                <Label htmlFor="lastName" className="text-slate-700">{t('lastNameLabel')}</Label>
+                                                <Input id="lastName" placeholder={t('lastNamePlaceholder')} required className="h-12 bg-slate-50 border-slate-200 focus-visible:ring-brand-blue" />
                                             </div>
                                         </div>
 
                                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                                             <div className="space-y-2">
-                                                <Label htmlFor="email" className="text-slate-700">E-poçt Ünvanı</Label>
-                                                <Input id="email" type="email" placeholder="E-poçtunuzu daxil edin" required className="h-12 bg-slate-50 border-slate-200 focus-visible:ring-brand-blue" />
+                                                <Label htmlFor="email" className="text-slate-700">{t('emailFieldLabel')}</Label>
+                                                <Input id="email" type="email" placeholder={t('emailFieldPlaceholder')} required className="h-12 bg-slate-50 border-slate-200 focus-visible:ring-brand-blue" />
                                             </div>
                                             <div className="space-y-2">
-                                                <Label htmlFor="phone" className="text-slate-700">Əlaqə Nömrəsi</Label>
-                                                <Input id="phone" type="tel" placeholder="+994" className="h-12 bg-slate-50 border-slate-200 focus-visible:ring-brand-blue" />
+                                                <Label htmlFor="phone" className="text-slate-700">{t('phoneFieldLabel')}</Label>
+                                                <Input id="phone" type="tel" placeholder={t('phoneFieldPlaceholder')} className="h-12 bg-slate-50 border-slate-200 focus-visible:ring-brand-blue" />
                                             </div>
                                         </div>
 
                                         <div className="space-y-2">
-                                            <Label htmlFor="subject" className="text-slate-700">Mövzu</Label>
-                                            <Input id="subject" placeholder="Müraciətinizin mövzusu" required className="h-12 bg-slate-50 border-slate-200 focus-visible:ring-brand-blue" />
+                                            <Label htmlFor="subject" className="text-slate-700">{t('subjectLabel')}</Label>
+                                            <Input id="subject" placeholder={t('subjectPlaceholder')} required className="h-12 bg-slate-50 border-slate-200 focus-visible:ring-brand-blue" />
                                         </div>
 
                                         <div className="space-y-2">
-                                            <Label htmlFor="message" className="text-slate-700">Mesajınız</Label>
+                                            <Label htmlFor="message" className="text-slate-700">{t('messageLabel')}</Label>
                                             <Textarea
                                                 id="message"
-                                                placeholder="Bizə nə demək istəyirsiniz?"
+                                                placeholder={t('messagePlaceholder')}
                                                 rows={5}
                                                 required
                                                 className="bg-slate-50 border-slate-200 focus-visible:ring-brand-blue resize-none"
@@ -248,7 +283,7 @@ export default function ContactPage() {
                                         </div>
 
                                         <Button type="submit" className="w-full h-14 bg-brand-orange hover:bg-brand-orange-dark text-white font-medium text-lg rounded-xl">
-                                            Müraciəti Göndər <Send className="ml-2 w-5 h-5" />
+                                            {t('submitButton')} <Send className="ml-2 w-5 h-5" />
                                         </Button>
                                     </form>
                                 </CardContent>
@@ -267,11 +302,10 @@ export default function ContactPage() {
                     style={{ border: 0 }}
                     allowFullScreen={false}
                     loading="lazy"
-                    title="Clinic Location"
+                    title={t('mapTitle')}
                     className="absolute inset-0"
                 ></iframe>
             </section>
         </div>
     );
 }
-

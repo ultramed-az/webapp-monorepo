@@ -1,47 +1,49 @@
 import Image from 'next/image';
+import { useTranslations } from 'next-intl';
 import { Card } from '@/components/ui/card';
 
-const galleryItems = [
-    {
-        id: 1,
-        title: 'Muasir Diaqnostika Merkezi',
-        image: 'https://images.unsplash.com/photo-1586773860418-d37222d8fce3?q=80&w=1800&auto=format&fit=crop',
-    },
-    {
-        id: 2,
-        title: 'Cerahiyye Bloku',
-        image: 'https://images.unsplash.com/photo-1516549655669-df522f7c8f89?q=80&w=1800&auto=format&fit=crop',
-    },
-    {
-        id: 3,
-        title: 'Laboratoriya',
-        image: 'https://images.unsplash.com/photo-1579154204601-01588f351e67?q=80&w=1800&auto=format&fit=crop',
-    },
-    {
-        id: 4,
-        title: 'Pasiyent Gozleme Sahesi',
-        image: 'https://images.unsplash.com/photo-1538108149393-fbbd81895907?q=80&w=1800&auto=format&fit=crop',
-    },
-    {
-        id: 5,
-        title: 'Kardiologiya Sobesi',
-        image: 'https://images.unsplash.com/photo-1666214280391-8ff5bd3c0bf0?q=80&w=1800&auto=format&fit=crop',
-    },
-    {
-        id: 6,
-        title: 'Pediatriya Sobesi',
-        image: 'https://images.unsplash.com/photo-1584515933487-779824d29309?q=80&w=1800&auto=format&fit=crop',
-    },
-];
-
 export default function GalleryPage() {
+    const t = useTranslations('GalleryPage');
+    const galleryItems = [
+        {
+            id: 1,
+            title: t('items.0.title'),
+            image: 'https://images.unsplash.com/photo-1586773860418-d37222d8fce3?q=80&w=1800&auto=format&fit=crop',
+        },
+        {
+            id: 2,
+            title: t('items.1.title'),
+            image: 'https://images.unsplash.com/photo-1516549655669-df522f7c8f89?q=80&w=1800&auto=format&fit=crop',
+        },
+        {
+            id: 3,
+            title: t('items.2.title'),
+            image: 'https://images.unsplash.com/photo-1579154204601-01588f351e67?q=80&w=1800&auto=format&fit=crop',
+        },
+        {
+            id: 4,
+            title: t('items.3.title'),
+            image: 'https://images.unsplash.com/photo-1538108149393-fbbd81895907?q=80&w=1800&auto=format&fit=crop',
+        },
+        {
+            id: 5,
+            title: t('items.4.title'),
+            image: 'https://images.unsplash.com/photo-1666214280391-8ff5bd3c0bf0?q=80&w=1800&auto=format&fit=crop',
+        },
+        {
+            id: 6,
+            title: t('items.5.title'),
+            image: 'https://images.unsplash.com/photo-1584515933487-779824d29309?q=80&w=1800&auto=format&fit=crop',
+        },
+    ];
+
     return (
         <div className="bg-slate-50 min-h-screen">
             <section className="py-16 lg:py-20 border-b border-slate-100 bg-white">
                 <div className="container mx-auto px-6 max-w-5xl text-center">
-                    <h1 className="text-4xl md:text-5xl font-bold text-slate-900 mb-4">Qalereya</h1>
+                    <h1 className="text-4xl md:text-5xl font-bold text-slate-900 mb-4">{t('title')}</h1>
                     <p className="text-slate-600 text-lg">
-                        Klinikamizin muhitini, tibbi avadanliqlarini ve komandamizi yaxindan taniyin.
+                        {t('description')}
                     </p>
                 </div>
             </section>

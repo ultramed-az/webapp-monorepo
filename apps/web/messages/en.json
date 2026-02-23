@@ -1,82 +1,408 @@
 {
-    "HomePage": {
-        "title": "Welcome to Ultramed Clinic",
-        "description": "Modern medical services and professional medical staff.",
-        "heroBadge": "Your health matters to us",
-        "heroTitle": "Modern medicine with human care",
-        "heroDescription": "At Ultramed Clinic, we combine advanced technologies with an experienced team to protect your health.",
-        "featureExpert": "Expert doctors",
-        "featureExpertDesc": "Experienced specialists with strong international practice.",
-        "featureModern": "Modern equipment",
-        "featureModernDesc": "State-of-the-art diagnostics and laboratory technologies.",
-        "feature247": "24/7 service",
-        "feature247Desc": "We are available around the clock for urgent situations.",
-        "featureReliable": "Reliable diagnosis",
-        "featureReliableDesc": "Accurate results and the right treatment plans.",
-        "statPatients": "Satisfied patients",
-        "statDoctors": "Expert doctors",
-        "statDepartments": "Medical departments",
-        "statYears": "Years of experience",
-        "bookAppointment": "Book appointment",
-        "ourServices": "Our services",
-        "whyChooseUs": "Why choose us?",
-        "whyChooseUsDesc": "We focus on patient comfort and deliver high-quality medical care.",
-        "ctaTitle": "Take care of your health today",
-        "ctaDesc": "Book a doctor appointment now and benefit from our professional team.",
-        "contactUs": "Contact us"
-    },
-    "Navigation": {
-        "home": "Home",
-        "about": "About",
-        "services": "Services",
-        "doctors": "Doctors",
-        "blog": "Blog",
-        "gallery": "Gallery",
-        "testimonials": "Testimonials",
-        "faq": "FAQ",
-        "contact": "Contact",
-        "callUs": "Call us:",
-        "addressLine": "Baku city, Heydar Aliyev ave. 125",
-        "emergency": "Emergency: 103",
-        "bookAppointment": "Book appointment"
-    },
-    "Footer": {
-        "description": "Your health is our priority. Modern equipment and a professional team of doctors.",
-        "quickLinks": "Quick Links",
-        "home": "Home",
-        "about": "About",
-        "services": "Services",
-        "doctors": "Doctors",
-        "blog": "Blog",
-        "gallery": "Gallery",
-        "testimonials": "Testimonials",
-        "faq": "Frequently asked questions",
-        "ourServices": "Our Services",
-        "serviceKardiologiya": "Cardiology",
-        "serviceNevrologiya": "Neurology",
-        "serviceStomatologiya": "Dentistry",
-        "serviceLaboratoriya": "Laboratory",
-        "viewAll": "View all services",
-        "contactInfo": "Contact",
-        "address": "Baku city, Heydar Aliyev ave. 125",
-        "allRightsReserved": "All rights reserved.",
-        "privacyPolicy": "Privacy Policy",
-        "terms": "Terms of Service"
-    },
-    "Admin": {
-        "menu": "Menu",
-        "dashboard": "Dashboard",
-        "services": "Services",
-        "doctors": "Doctors",
-        "blog": "Blog",
-        "gallery": "Gallery",
-        "testimonials": "Testimonials",
-        "faq": "FAQ",
-        "privacyPolicy": "Privacy Policy",
-        "terms": "Terms of Service",
-        "logout": "Logout",
-        "search": "Search...",
-        "openMenu": "Open menu",
-        "profile": "Profile"
+  "HomePage": {
+    "title": "Welcome to Ultramed Clinic",
+    "description": "Modern medical services and professional medical staff.",
+    "heroBadge": "Your health matters to us",
+    "heroTitle": "Modern medicine with human care",
+    "heroDescription": "At Ultramed Clinic, we combine advanced technologies with an experienced team to protect your health.",
+    "featureExpert": "Expert doctors",
+    "featureExpertDesc": "Experienced specialists with strong international practice.",
+    "featureModern": "Modern equipment",
+    "featureModernDesc": "State-of-the-art diagnostics and laboratory technologies.",
+    "feature247": "24/7 service",
+    "feature247Desc": "We are available around the clock for urgent situations.",
+    "featureReliable": "Reliable diagnosis",
+    "featureReliableDesc": "Accurate results and the right treatment plans.",
+    "statPatients": "Satisfied patients",
+    "statDoctors": "Expert doctors",
+    "statDepartments": "Medical departments",
+    "statYears": "Years of experience",
+    "bookAppointment": "Book appointment",
+    "ourServices": "Our services",
+    "whyChooseUs": "Why choose us?",
+    "whyChooseUsDesc": "We focus on patient comfort and deliver high-quality medical care.",
+    "ctaTitle": "Take care of your health today",
+    "ctaDesc": "Book a doctor appointment now and benefit from our professional team.",
+    "contactUs": "Contact us"
+  },
+  "Navigation": {
+    "home": "Home",
+    "about": "About",
+    "services": "Services",
+    "doctors": "Doctors",
+    "blog": "Blog",
+    "gallery": "Gallery",
+    "testimonials": "Testimonials",
+    "faq": "FAQ",
+    "contact": "Contact",
+    "callUs": "Call us:",
+    "addressLine": "Baku city, Heydar Aliyev ave. 125",
+    "emergency": "Emergency: 103",
+    "bookAppointment": "Book appointment",
+    "whatsapp": "WhatsApp"
+  },
+  "Footer": {
+    "description": "Your health is our priority. Modern equipment and a professional team of doctors.",
+    "quickLinks": "Quick Links",
+    "home": "Home",
+    "about": "About",
+    "services": "Services",
+    "doctors": "Doctors",
+    "blog": "Blog",
+    "gallery": "Gallery",
+    "testimonials": "Testimonials",
+    "faq": "Frequently asked questions",
+    "ourServices": "Our Services",
+    "serviceKardiologiya": "Cardiology",
+    "serviceNevrologiya": "Neurology",
+    "serviceStomatologiya": "Dentistry",
+    "serviceLaboratoriya": "Laboratory",
+    "viewAll": "View all services",
+    "contactInfo": "Contact",
+    "address": "Baku city, Heydar Aliyev ave. 125",
+    "allRightsReserved": "All rights reserved.",
+    "privacyPolicy": "Privacy Policy",
+    "terms": "Terms of Service",
+    "whatsapp": "WhatsApp",
+    "social": {
+      "facebook": "Facebook",
+      "instagram": "Instagram",
+      "linkedin": "LinkedIn"
     }
+  },
+  "Admin": {
+    "menu": "Menu",
+    "dashboard": "Dashboard",
+    "services": "Services",
+    "doctors": "Doctors",
+    "blog": "Blog",
+    "gallery": "Gallery",
+    "testimonials": "Testimonials",
+    "faq": "FAQ",
+    "privacyPolicy": "Privacy Policy",
+    "terms": "Terms of Service",
+    "logout": "Logout",
+    "search": "Search...",
+    "openMenu": "Open menu",
+    "profile": "Profile"
+  },
+  "AboutPage": {
+    "heroTitle": "Who Are We?",
+    "heroDescription": "As a leading medical institution in Azerbaijan, we combine modern technology with a human-centered approach for your health.",
+    "mission": {
+      "imageAlt": "Modern clinic interior",
+      "badge": "Our Mission",
+      "title": "Excellence in Medical Care and Trust",
+      "description": "The mission of Ultramed Clinic is to apply modern medical protocols, deliver personalized care for every patient, and continuously improve public health standards.",
+      "points": [
+        "Internationally validated treatment protocols",
+        "Microbiology and genetics lab aligned with global standards",
+        "Full protection of patient rights and privacy",
+        "Ergonomic and stress-free clinic environment"
+      ]
+    },
+    "coreValues": {
+      "title": "Our Core Values",
+      "description": "These values guide every decision and every patient interaction across our team.",
+      "items": [
+        {
+          "title": "Compassion and Care",
+          "description": "We approach each patient with empathy and aim to reduce anxiety at every stage."
+        },
+        {
+          "title": "Accuracy and Reliability",
+          "description": "We maintain high standards of precision, transparency, and trust in diagnosis."
+        },
+        {
+          "title": "Professionalism",
+          "description": "Continuous development of our doctors and staff is one of our core commitments."
+        }
+      ]
+    },
+    "timeline": {
+      "title": "Our Proud Journey",
+      "description": "Years of continuous growth and innovation have built strong clinical expertise.",
+      "items": [
+        {
+          "year": "2010",
+          "title": "Clinic Foundation",
+          "description": "Ultramed started as a small outpatient clinic in Baku."
+        },
+        {
+          "year": "2015",
+          "title": "Inpatient Department Launch",
+          "description": "A 50-bed inpatient unit and surgical block were opened to meet growing demand."
+        },
+        {
+          "year": "2018",
+          "title": "International Accreditation",
+          "description": "Our quality of care was recognized in line with JCI-level standards."
+        },
+        {
+          "year": "2023",
+          "title": "Innovative Diagnostics Center",
+          "description": "High-frequency MRI and a modern genetics lab were deployed in the region."
+        }
+      ]
+    },
+    "stats": {
+      "experience": "Years of Experience",
+      "patients": "Recovered Patients",
+      "doctors": "Professional Doctors",
+      "departments": "Specialized Departments"
+    }
+  },
+  "ServicesPage": {
+    "heroTitle": "Our Clinical Services",
+    "heroDescription": "We provide a broad range of specialized medical services by combining modern medicine with a personalized approach for every patient.",
+    "loadingTitle": "Loading services...",
+    "fetchFailedTitle": "Failed to load services",
+    "fetchFailedDescription": "Please try again.",
+    "retry": "Retry",
+    "readMore": "Learn more",
+    "ctaTitle": "Could not find the right department?",
+    "ctaDescription": "If your symptoms are general, we recommend starting with a therapist consultation. After the initial evaluation, our doctor will guide you to the right specialist.",
+    "ctaPrimaryButton": "Book Therapist Consultation",
+    "ctaSecondaryButton": "Ask a Question",
+    "modalTitleFallback": "Service Details",
+    "modalDescriptionFallback": "Detailed information for the selected service.",
+    "highlightsTitle": "Key focus areas",
+    "detailNotFound": "No details found for this service.",
+    "detailLoadFailed": "Failed to load service details."
+  },
+  "DoctorsPage": {
+    "badge": "Ultramed Team",
+    "heading": "Our Medical Experts",
+    "intro": "Our doctors are trained in leading institutions and bring years of clinical experience to provide accurate diagnosis and effective treatment plans.",
+    "searchPlaceholder": "Search by doctor name, specialty, or condition...",
+    "loadingTitle": "Loading doctors...",
+    "loadingDescription": "Doctor data will be ready in a few seconds.",
+    "fetchFailedTitle": "Failed to load doctors",
+    "fetchFailedDescription": "Please try again.",
+    "retry": "Retry",
+    "noResultsTitle": "No matching doctors found",
+    "noResultsDescription": "Try another keyword or clear your search.",
+    "clearSearch": "Clear Search",
+    "experienceLabel": "Experience",
+    "profileButton": "Profile",
+    "appointmentButton": "Appointment",
+    "modalTitle": "Doctor Profile",
+    "modalFallback": "Detailed information about the selected doctor.",
+    "roomLabel": "Room",
+    "educationLabel": "Education",
+    "contactLabel": "Contact",
+    "scheduleLabel": "Consultation schedule",
+    "proceduresLabel": "Consultation focus",
+    "languagesLabel": "Languages",
+    "expertiseLabel": "Expertise",
+    "notSpecified": "Not specified",
+    "callButton": "Call",
+    "detailMissing": "Detailed profile for this doctor was not found.",
+    "detailLoadFailed": "Failed to load detailed profile.",
+    "detailRetry": "Retry details",
+    "detailUnavailable": "Doctor details are currently unavailable.",
+    "emailButton": "Email",
+    "doctorAlt": "Doctor"
+  },
+  "BlogPage": {
+    "badge": "Medical Blog",
+    "heroTitle": "Useful Insights",
+    "heroDescription": "Read practical recommendations from our doctors, latest medical updates, and educational content for a healthier life.",
+    "allCategories": "All Categories",
+    "loadingTitle": "Loading articles...",
+    "fetchFailedTitle": "Failed to load articles",
+    "fetchFailedDescription": "Please try again.",
+    "retry": "Retry",
+    "emptyByCategory": "No articles found for this category",
+    "featuredBadge": "ARTICLE OF THE DAY",
+    "readFeatured": "Read",
+    "readMore": "Details",
+    "loadMore": "Load More"
+  },
+  "ContactPage": {
+    "heroTitle": "Contact Us",
+    "heroDescription": "Feel free to contact us for questions, suggestions, or appointment requests. Our team is always ready to help.",
+    "fetchFailedDescription": "Failed to load contact details.",
+    "fetchFailedBanner": "Contact details could not be loaded from the server. Showing the latest available data.",
+    "retry": "Retry",
+    "contactMethodsTitle": "Contact Channels",
+    "addressTitle": "Our Address",
+    "coordinatesLabel": "Coordinates",
+    "phoneTitle": "Phone",
+    "workingHoursTitle": "Working Hours",
+    "emailTitle": "Email",
+    "loadingInfo": "Refreshing contact details from server...",
+    "formTitle": "Write to Us",
+    "submitSuccess": "Your message was sent successfully. We will contact you as soon as possible.",
+    "firstNameLabel": "First Name",
+    "firstNamePlaceholder": "Enter your first name",
+    "lastNameLabel": "Last Name",
+    "lastNamePlaceholder": "Enter your last name",
+    "emailFieldLabel": "Email Address",
+    "emailFieldPlaceholder": "Enter your email",
+    "phoneFieldLabel": "Phone Number",
+    "phoneFieldPlaceholder": "+994",
+    "subjectLabel": "Subject",
+    "subjectPlaceholder": "Subject of your request",
+    "messageLabel": "Your Message",
+    "messagePlaceholder": "How can we help you?",
+    "submitButton": "Send Request",
+    "fallback": {
+      "address": "Ultramed Clinic, Nasraddin Tusi 55 (Amal-2015 residential complex), Khatai district, Baku, Azerbaijan",
+      "phoneLabel": "Phone number",
+      "whatsappLabel": "WhatsApp",
+      "emailLabel": "Email",
+      "workDayLabel": "Mon - Fri",
+      "saturdayLabel": "Saturday"
+    },
+    "mapTitle": "Clinic map"
+  },
+  "GalleryPage": {
+    "title": "Gallery",
+    "description": "Explore our clinic environment, medical equipment, and team up close.",
+    "items": [
+      {
+        "title": "Advanced Diagnostics Center"
+      },
+      {
+        "title": "Surgical Unit"
+      },
+      {
+        "title": "Laboratory"
+      },
+      {
+        "title": "Patient Waiting Area"
+      },
+      {
+        "title": "Cardiology Department"
+      },
+      {
+        "title": "Pediatrics Department"
+      }
+    ]
+  },
+  "FaqPage": {
+    "title": "Frequently Asked Questions",
+    "description": "We collected the most common questions from our patients in one place. Contact us if you need more details.",
+    "items": [
+      {
+        "question": "How can I book an appointment?",
+        "answer": "You can book via the website form, by calling our contact center, or by visiting the clinic in person."
+      },
+      {
+        "question": "Can I view lab results online?",
+        "answer": "Yes. Once the personal cabinet functionality is active, results can be downloaded electronically."
+      },
+      {
+        "question": "Do you accept insurance?",
+        "answer": "We cooperate with many local insurance providers. Please confirm details with our administrator before your visit."
+      },
+      {
+        "question": "Do you provide emergency care?",
+        "answer": "For urgent cases, we have a 24/7 medical team. Our call center will direct you to the right department."
+      },
+      {
+        "question": "What documents are required for consultation?",
+        "answer": "Please bring your ID and, if available, previous lab results and treatment history."
+      }
+    ]
+  },
+  "TestimonialsPage": {
+    "title": "Patient Testimonials",
+    "description": "Patient satisfaction is our top priority. The feedback below reflects real experiences.",
+    "items": [
+      {
+        "name": "Nigar Hasanli",
+        "role": "Patient",
+        "quote": "The attention and professionalism at Ultramed are truly impressive. I was very satisfied with the doctors approach."
+      },
+      {
+        "name": "Samir Aliyev",
+        "role": "Patient relative",
+        "quote": "During my mother treatment, the team answered all our questions with patience. The clinic was clean and processes were well organized."
+      },
+      {
+        "name": "Aysel Mammadova",
+        "role": "Patient",
+        "quote": "The appointment process was smooth and lab results were delivered on time. I would choose this clinic again."
+      },
+      {
+        "name": "Rasim Huseynov",
+        "role": "Patient",
+        "quote": "I received excellent care at the cardiology department. The treatment plan was explained clearly."
+      }
+    ]
+  },
+  "PrivacyPolicyPage": {
+    "title": "Privacy Policy",
+    "description": "This policy explains how patient information is collected, processed, and protected.",
+    "sections": [
+      {
+        "title": "1. Data we collect",
+        "content": "For appointment registration and medical service delivery, we collect information such as full name, contact details, date of birth, and medical history."
+      },
+      {
+        "title": "2. Purpose of data usage",
+        "content": "Collected data is used for treatment workflows, appointment scheduling, lab result handling, and service quality monitoring."
+      },
+      {
+        "title": "3. Third-party sharing",
+        "content": "Except where required by law, your information is not shared with third parties without your consent."
+      },
+      {
+        "title": "4. Security measures",
+        "content": "Data is stored in protected infrastructure and is accessible only by authorized personnel."
+      },
+      {
+        "title": "5. Contact",
+        "content": "For privacy-related questions, please contact privacy@ultramed.az."
+      }
+    ]
+  },
+  "TermsPage": {
+    "title": "Terms of Service",
+    "description": "These terms define usage rules of the Ultramed platform and responsibilities of parties.",
+    "sections": [
+      {
+        "title": "1. General provisions",
+        "content": "By using the website, you agree to these terms. Terms may be updated when necessary."
+      },
+      {
+        "title": "2. Appointment registration",
+        "content": "Accuracy of information entered during online registration is the responsibility of the patient."
+      },
+      {
+        "title": "3. Limitation of liability",
+        "content": "Information on the website is for awareness purposes and does not replace professional medical advice."
+      },
+      {
+        "title": "4. Copyright",
+        "content": "Texts, design, and media elements on the website are protected by copyright of Ultramed and its partners."
+      },
+      {
+        "title": "5. Governing law",
+        "content": "Any disputes are resolved in accordance with the legislation of the Republic of Azerbaijan."
+      }
+    ]
+  },
+  "ErrorPages": {
+    "notFoundTitle": "Page not found",
+    "notFoundDescription": "The page you are looking for does not exist or has been removed. You can return to the home page.",
+    "backHome": "Back to home",
+    "genericTitle": "Something went wrong",
+    "genericDescription": "An unexpected technical error occurred. Please try again.",
+    "retry": "Try again",
+    "home": "Home page",
+    "internalTitle": "Internal server error",
+    "internalDescription": "An unexpected system issue occurred. Please retry in a few minutes.",
+    "contactPage": "Contact page"
+  },
+  "HealthPage": {
+    "title": "Frontend Health",
+    "description": "The page renders correctly, routing is active, and frontend is responding.",
+    "endpointLabel": "JSON endpoint",
+    "statusLabel": "status",
+    "componentLabel": "component",
+    "checkedAtLabel": "checkedAt"
+  }
 }

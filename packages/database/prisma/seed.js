@@ -732,70 +732,47 @@ async function seedBlog() {
 }
 
 async function seedContact() {
+  const contactPayload = {
+    addressAz: 'Xətai rayonu Nəsrəddin Tusi 55 (Amal-2015 yaşayış kompleksi), Ultramed Clinic, Bakı, Azərbaycan',
+    addressEn: 'Ultramed Clinic, Nasraddin Tusi 55 (Amal-2015 residential complex), Khatai district, Baku, Azerbaijan',
+    addressRu: 'Клиника Ultramed, ул. Насреддина Туси 55 (жилой комплекс Amal-2015), Хатаинский район, Баку, Азербайджан',
+    mapLatitude: 40.3763297,
+    mapLongitude: 49.9628667,
+    mapEmbedUrl: 'https://maps.google.com/maps?q=N%C9%99sr%C9%99ddin%20Tusi%2055%20Baku&z=15&output=embed',
+    phones: [
+      {
+        labelAz: 'Əlaqə nömrəsi',
+        labelEn: 'Phone number',
+        labelRu: 'Контактный номер',
+        value: '055/070-223-58-56',
+      },
+      {
+        labelAz: 'WhatsApp',
+        labelEn: 'WhatsApp',
+        labelRu: 'WhatsApp',
+        value: 'https://wa.me/994552235856',
+      },
+    ],
+    emails: [
+      {
+        labelAz: 'E-poçt',
+        labelEn: 'Email',
+        labelRu: 'Эл. почта',
+        value: 'ultramedclinics@gmail.com',
+      },
+    ],
+    workingHours: [
+      { labelAz: 'B.E - C', labelEn: 'Mon - Fri', labelRu: 'Пн - Пт', value: '09:00 - 19:00' },
+      { labelAz: 'Şənbə', labelEn: 'Saturday', labelRu: 'Суббота', value: '10:00 - 16:00' },
+    ],
+  };
+
   await prisma.contactInfo.upsert({
     where: { slug: 'main' },
-    update: {
-      addressAz: 'Bakı şəhəri, Nəsimi rayonu, Səməd Vurğun küçəsi 14A',
-      addressEn: '14A Samad Vurgun street, Nasimi district, Baku',
-      addressRu: 'г. Баку, Насиминский район, ул. Самеда Вургуна 14A',
-      mapLatitude: 40.3771901,
-      mapLongitude: 49.8394444,
-      mapEmbedUrl:
-        'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3039.4286745147575!2d49.83944441539243!3d40.37719007936952!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x40307dabacc0eb35%3A0xad52d0fa31b143ec!2sBaku%2C%20Azerbaijan!5e0!3m2!1sen!2s!4v1620000000000!5m2!1sen!2s',
-      phones: [
-        {
-          labelAz: 'Mərkəzi Çağrı Mərkəzi',
-          labelEn: 'Main Call Center',
-          labelRu: 'Главный колл-центр',
-          value: '*4444',
-        },
-        {
-          labelAz: 'Əlaqə nömrəsi',
-          labelEn: 'Phone number',
-          labelRu: 'Контактный номер',
-          value: '+994 12 555 44 44',
-        },
-      ],
-      emails: [
-        { labelAz: 'Ümumi', labelEn: 'General', labelRu: 'Общий', value: 'info@ultramed.az' },
-        { labelAz: 'Dəstək', labelEn: 'Support', labelRu: 'Поддержка', value: 'support@ultramed.az' },
-      ],
-      workingHours: [
-        { labelAz: 'B.E - Ş', labelEn: 'Mon - Fri', labelRu: 'Пн - Пт', value: '08:00 - 20:00' },
-        { labelAz: 'Şənbə', labelEn: 'Saturday', labelRu: 'Суббота', value: '09:00 - 15:00' },
-      ],
-    },
+    update: contactPayload,
     create: {
       slug: 'main',
-      addressAz: 'Bakı şəhəri, Nəsimi rayonu, Səməd Vurğun küçəsi 14A',
-      addressEn: '14A Samad Vurgun street, Nasimi district, Baku',
-      addressRu: 'г. Баку, Насиминский район, ул. Самеда Вургуна 14A',
-      mapLatitude: 40.3771901,
-      mapLongitude: 49.8394444,
-      mapEmbedUrl:
-        'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3039.4286745147575!2d49.83944441539243!3d40.37719007936952!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x40307dabacc0eb35%3A0xad52d0fa31b143ec!2sBaku%2C%20Azerbaijan!5e0!3m2!1sen!2s!4v1620000000000!5m2!1sen!2s',
-      phones: [
-        {
-          labelAz: 'Mərkəzi Çağrı Mərkəzi',
-          labelEn: 'Main Call Center',
-          labelRu: 'Главный колл-центр',
-          value: '*4444',
-        },
-        {
-          labelAz: 'Əlaqə nömrəsi',
-          labelEn: 'Phone number',
-          labelRu: 'Контактный номер',
-          value: '+994 12 555 44 44',
-        },
-      ],
-      emails: [
-        { labelAz: 'Ümumi', labelEn: 'General', labelRu: 'Общий', value: 'info@ultramed.az' },
-        { labelAz: 'Dəstək', labelEn: 'Support', labelRu: 'Поддержка', value: 'support@ultramed.az' },
-      ],
-      workingHours: [
-        { labelAz: 'B.E - Ş', labelEn: 'Mon - Fri', labelRu: 'Пн - Пт', value: '08:00 - 20:00' },
-        { labelAz: 'Şənbə', labelEn: 'Saturday', labelRu: 'Суббота', value: '09:00 - 15:00' },
-      ],
+      ...contactPayload,
     },
   });
 }

@@ -1,82 +1,408 @@
 {
-    "HomePage": {
-        "title": "Ultramed Klinikasına xoş gəlmisiniz",
-        "description": "Müasir tibbi xidmətlər və peşəkar tibbi heyət.",
-        "heroBadge": "Sağlamlığınız bizim üçün önəmlidir",
-        "heroTitle": "İnsan qayğısı ilə birləşən müasir təbabət",
-        "heroDescription": "Ultramed Klinikasında sağlamlığınızı qorumaq üçün qabaqcıl texnologiyaları təcrübəli komanda ilə birləşdiririk.",
-        "featureExpert": "Ekspert həkimlər",
-        "featureExpertDesc": "Güclü beynəlxalq təcrübəyə malik mütəxəssislər.",
-        "featureModern": "Müasir avadanlıq",
-        "featureModernDesc": "Ən son diaqnostika və laboratoriya texnologiyaları.",
-        "feature247": "24/7 xidmət",
-        "feature247Desc": "Təcili vəziyyətlər üçün günün hər saatı xidmətinizdəyik.",
-        "featureReliable": "Etibarlı diaqnoz",
-        "featureReliableDesc": "Dəqiq nəticələr və düzgün müalicə planları.",
-        "statPatients": "Məmnun pasiyentlər",
-        "statDoctors": "Ekspert həkimlər",
-        "statDepartments": "Tibbi şöbələr",
-        "statYears": "İllik təcrübə",
-        "bookAppointment": "Qəbula yazılmaq",
-        "ourServices": "Xidmətlərimiz",
-        "whyChooseUs": "Niyə biz?",
-        "whyChooseUsDesc": "Biz pasiyent rahatlığına diqqət yetirir və yüksək keyfiyyətli tibbi yardım göstəririk.",
-        "ctaTitle": "Sağlamlığınızın qeydinə bu gün qalın",
-        "ctaDesc": "İndi həkim qəbuluna yazılın və peşəkar komandamızın xidmətlərindən yararlanın.",
-        "contactUs": "Bizimlə əlaqə"
-    },
-    "Navigation": {
-        "home": "Ana səhifə",
-        "about": "Haqqımızda",
-        "services": "Xidmətlər",
-        "doctors": "Həkimlər",
-        "blog": "Bloq",
-        "gallery": "Qalereya",
-        "testimonials": "Rəylər",
-        "faq": "MVS",
-        "contact": "Əlaqə",
-        "callUs": "Zəng edin:",
-        "addressLine": "Bakı şəhəri, Heydər Əliyev pr. 125",
-        "emergency": "Təcili yardım: 103",
-        "bookAppointment": "Qəbula yazıl"
-    },
-    "Footer": {
-        "description": "Sağlamlığınız bizim prioritetimizdir. Müasir avadanlıqlar və peşəkar həkim heyəti.",
-        "quickLinks": "Faydalı linklər",
-        "home": "Ana səhifə",
-        "about": "Haqqımızda",
-        "services": "Xidmətlər",
-        "doctors": "Həkimlər",
-        "blog": "Bloq",
-        "gallery": "Qalereya",
-        "testimonials": "Rəylər",
-        "faq": "Mütəmadi verilən suallar",
-        "ourServices": "Xidmətlərimiz",
-        "serviceKardiologiya": "Kardiologiya",
-        "serviceNevrologiya": "Nevrologiya",
-        "serviceStomatologiya": "Stomatologiya",
-        "serviceLaboratoriya": "Laboratoriya",
-        "viewAll": "Bütün xidmətlərə bax",
-        "contactInfo": "Əlaqə",
-        "address": "Bakı şəhəri, Heydər Əliyev pr. 125",
-        "allRightsReserved": "Bütün hüquqlar qorunur.",
-        "privacyPolicy": "Məxfilik siyasəti",
-        "terms": "İstifadə şərtləri"
-    },
-    "Admin": {
-        "menu": "Menyu",
-        "dashboard": "İdarəetmə paneli",
-        "services": "Xidmətlər",
-        "doctors": "Həkimlər",
-        "blog": "Bloq",
-        "gallery": "Qalereya",
-        "testimonials": "Rəylər",
-        "faq": "MVS",
-        "privacyPolicy": "Məxfilik siyasəti",
-        "terms": "İstifadə şərtləri",
-        "logout": "Çıxış",
-        "search": "Axtar...",
-        "openMenu": "Menyunu aç",
-        "profile": "Profil"
+  "HomePage": {
+    "title": "Ultramed Klinikasına Xoş Gəlmisiniz",
+    "description": "Müasir tibbi xidmətlər və peşəkar tibbi heyət.",
+    "heroBadge": "Sizin sağlamlığınız bizim üçün önəmlidir",
+    "heroTitle": "İnsani qayğı ilə müasir təbabət",
+    "heroDescription": "Ultramed Klinikasında sağlamlığınızı qorumaq üçün qabaqcıl texnologiyaları təcrübəli komanda ilə birləşdiririk.",
+    "featureExpert": "Ekspert həkimlər",
+    "featureExpertDesc": "Güclü beynəlxalq təcrübəyə malik mütəxəssislər.",
+    "featureModern": "Müasir avadanlıqlar",
+    "featureModernDesc": "Ən son diaqnostika və laboratoriya texnologiyaları.",
+    "feature247": "24/7 xidmət",
+    "feature247Desc": "Təcili vəziyyətlər üçün günün hər saatı xidmətinizdəyik.",
+    "featureReliable": "Etibarlı diaqnoz",
+    "featureReliableDesc": "Dəqiq nəticələr və düzgün müalicə planları.",
+    "statPatients": "Razı qalan pasiyentlər",
+    "statDoctors": "Ekspert həkimlər",
+    "statDepartments": "Tibbi şöbələr",
+    "statYears": "İllik təcrübə",
+    "bookAppointment": "Qəbula yazılmaq",
+    "ourServices": "Xidmətlərimiz",
+    "whyChooseUs": "Niyə biz?",
+    "whyChooseUsDesc": "Pasiyent rahatlığına fokuslanır və yüksək keyfiyyətli tibbi xidmət təqdim edirik.",
+    "ctaTitle": "Sağlamlığınızın qayğısına bu gün qalın",
+    "ctaDesc": "İndi həkim qəbuluna yazıln və peşəkar komandamızın xidmətlərindən yararlanın.",
+    "contactUs": "Bizimlə əlaqə"
+  },
+  "Navigation": {
+    "home": "Ana Səhifə",
+    "about": "Haqqımızda",
+    "services": "Xidmətlər",
+    "doctors": "Həkimlər",
+    "blog": "Bloq",
+    "gallery": "Qalereya",
+    "testimonials": "Rəylər",
+    "faq": "Mualicə",
+    "contact": "Əlaqə",
+    "callUs": "Zəng edin:",
+    "addressLine": "Bakı şəhəri, Heydər Əliyev pr. 125",
+    "emergency": "Təcili yardım: 103",
+    "bookAppointment": "Qəbula yazılmaq",
+    "whatsapp": "WhatsApp"
+  },
+  "Footer": {
+    "description": "Sizin sağlamlığınız bizim prioritetimizdir. Müasir avadanlıqlar və peşəkar həkim heyəti.",
+    "quickLinks": "Faydalı linklər",
+    "home": "Ana Səhifə",
+    "about": "Haqqımızda",
+    "services": "Xidmətlər",
+    "doctors": "Həkimlər",
+    "blog": "Bloq",
+    "gallery": "Qalereya",
+    "testimonials": "Rəylər",
+    "faq": "Tez-tez verilən suallar",
+    "ourServices": "Xidmətlərimiz",
+    "serviceKardiologiya": "Kardiologiya",
+    "serviceNevrologiya": "Nevrologiya",
+    "serviceStomatologiya": "Stomatologiya",
+    "serviceLaboratoriya": "Laboratoriya",
+    "viewAll": "Bütün xidmətlərə bax",
+    "contactInfo": "Əlaqə",
+    "address": "Bakı şəhəri, Heydər Əliyev pr. 125",
+    "allRightsReserved": "Bütün hüquqlar qorunur.",
+    "privacyPolicy": "Məxfilik siyasəti",
+    "terms": "İstifadə şərtləri",
+    "whatsapp": "WhatsApp",
+    "social": {
+      "facebook": "Facebook",
+      "instagram": "Instagram",
+      "linkedin": "LinkedIn"
     }
+  },
+  "Admin": {
+    "menu": "Menyu",
+    "dashboard": "İdarəetmə paneli",
+    "services": "Xidmətlər",
+    "doctors": "Həkimlər",
+    "blog": "Bloq",
+    "gallery": "Qalereya",
+    "testimonials": "Rəylər",
+    "faq": "TVS",
+    "privacyPolicy": "Məxfilik siyasəti",
+    "terms": "İstifadə şərtləri",
+    "logout": "Çıxış",
+    "search": "Axtar...",
+    "openMenu": "Menyunu aç",
+    "profile": "Profil"
+  },
+  "AboutPage": {
+    "heroTitle": "Biz Kimik?",
+    "heroDescription": "Azərbaycanın qabaqcıl tibb müəssisəsi olaraq, sağlamlığınız üçün müasir texnologiyanı insana yönəlmiş yanaşma ilə birləşdiririk.",
+    "mission": {
+      "imageAlt": "Müasir klinika interyeri",
+      "badge": "Missiyamız",
+      "title": "Tibbi Xidmətdə Mükəmməllik və Etibar",
+      "description": "Ultramed Klinikasının missiyası müasir tibbi protokolları tətbiq etmək, hər bir pasiyent üçün fərdiləşdirilmiş qayğı göstərmək və ictimai sağlamlıq standartlarını davamlı olaraq təkmilləşdirməkdir.",
+      "points": [
+        "Beynəlxalq səviyyədə təsdiqlənmiş müalicə protokolları",
+        "Qlobal standartlara uyğun mikrobiologiya və genetika laboratoriyası",
+        "Pasiyent hüquqlarının və məxfiliyinin tam qorunması",
+        "Erqonomik və stressiz klinika mühiti"
+      ]
+    },
+    "coreValues": {
+      "title": "Əsas Dəyərlərimiz",
+      "description": "Bu dəyərlər komandamızın hər bir qərarına və pasiyentlərlə hər bir qarşılıqlı əlaqəsinə rəhbərlik edir.",
+      "items": [
+        {
+          "title": "Şəfqət və Qayğı",
+          "description": "Hər bir pasiyentə empatiya ilə yanaşır və hər mərhələdə narahatlığı minimuma endirməyi hədəfləyirik."
+        },
+        {
+          "title": "Dəqiqlik və Etibarlılıq",
+          "description": "Diaqnostikada yüksək dəqiqlik, şəffaflıq və etibar standartlarını qoruyuruq."
+        },
+        {
+          "title": "Peşəkarlıq",
+          "description": "Həkimlərimizin və işçi heyətimizin davamlı inkişafı bizim əsas öhdəliklərimizdən biridir."
+        }
+      ]
+    },
+    "timeline": {
+      "title": "Qürur Dolu Yolumuz",
+      "description": "İllərlə davam edən inkişaf və innovasiyalar güclü klinik təcrübəmizi formalaşdırıb.",
+      "items": [
+        {
+          "year": "2010",
+          "title": "Klinikanın Yaradılması",
+          "description": "Ultramed Bakıda kiçik bir ambulator klinika kimi fəaliyyətə başladı."
+        },
+        {
+          "year": "2015",
+          "title": "Stasionar Şöbənin Açılışı",
+          "description": "Artan tələbatı qarşılamaq üçün 50 çarpayılıq stasionar blok və cərrahi bölmə istifadəyə verildi."
+        },
+        {
+          "year": "2018",
+          "title": "Beynəlxalq Akkreditasiya",
+          "description": "Göstərdiyimiz xidmətin keyfiyyəti JCI səviyyəli standartlara uyğun olaraq tanındı."
+        },
+        {
+          "year": "2023",
+          "title": "İnnovativ Diaqnostika Mərkəzi",
+          "description": "Regionda yüksək tezlikli MRT və müasir genetika laboratoriyası istifadəyə verildi."
+        }
+      ]
+    },
+    "stats": {
+      "experience": "İllik Təcrübə",
+      "patients": "Sağalmış Pasiyentlər",
+      "doctors": "Peşəkar Həkimlər",
+      "departments": "İxtisaslaşmış Şöbələr"
+    }
+  },
+  "ServicesPage": {
+    "heroTitle": "Klinik Xidmətlərimiz",
+    "heroDescription": "Müasir tibbi hər bir pasiyent üçün fərdi yanaşma ilə birləşdirərək geniş çeşiddə ixtisaslaşmış tibbi xidmətlər təqdim edirik.",
+    "loadingTitle": "Xidmətlər yüklənir...",
+    "fetchFailedTitle": "Xidmətləri yükləmək mümkün olmadı",
+    "fetchFailedDescription": "Zəhmət olmasa, yenidən cəhd edin.",
+    "retry": "Yenidən cəhd et",
+    "readMore": "Daha çox",
+    "ctaTitle": "Lazımi şöbəni tapa bilmədiniz?",
+    "ctaDescription": "Əgər simptomlarınız ümumi xarakter daşıyırsa, terapevt məsləhəti ilə başlamağınızı tövsiyə edirik. İlkin qiymətləndirmədən sonra həkimimiz sizi düzgün mütəxəssisə yönləndirəcək.",
+    "ctaPrimaryButton": "Terapevt Qəbuluna Yazıl",
+    "ctaSecondaryButton": "Sual Ver",
+    "modalTitleFallback": "Xidmət Haqqında",
+    "modalDescriptionFallback": "Seçilmiş xidmət haqqında ətraflı məlumat.",
+    "highlightsTitle": "Əsas diqqət mərkəzində olan sahələr",
+    "detailNotFound": "Bu xidmət üçün təfərrüat tapılmadı.",
+    "detailLoadFailed": "Xidmət təfərrüatlarını yükləmək mümkün olmadı."
+  },
+  "DoctorsPage": {
+    "badge": "Ultramed Komandası",
+    "heading": "Tibbi Ekspertlərimiz",
+    "intro": "Həkimlərimiz aparıcı müəssisələrdə təhsil almış və dəqiq diaqnoz, effektiv müalicə planları təqdim etmək üçün illərlə klinik təcrübə toplamışdır.",
+    "searchPlaceholder": "Həkim adı, ixtisas və ya xəstəliyə görə axtar...",
+    "loadingTitle": "Həkimlər yüklənir...",
+    "loadingDescription": "Həkim məlumatları bir neçə saniyəyə hazır olacaq.",
+    "fetchFailedTitle": "Həkimləri yükləmək mümkün olmadı",
+    "fetchFailedDescription": "Zəhmət olmasa, yenidən cəhd edin.",
+    "retry": "Yenidən cəhd et",
+    "noResultsTitle": "Uyğun həkim tapılmadı",
+    "noResultsDescription": "Başqa bir açar söz sınayın və ya axtarışı təmizləyin.",
+    "clearSearch": "Axtarışı təmizlə",
+    "experienceLabel": "Təcrübə",
+    "profileButton": "Profil",
+    "appointmentButton": "Qəbul",
+    "modalTitle": "Həkim Profili",
+    "modalFallback": "Seçilmiş həkim haqqında ətraflı məlumat.",
+    "roomLabel": "Otaq",
+    "educationLabel": "Təhsil",
+    "contactLabel": "Əlaqə",
+    "scheduleLabel": "Məsləhət qrafiki",
+    "proceduresLabel": "Məsləhət istiqaməti",
+    "languagesLabel": "Dillər",
+    "expertiseLabel": "İxtisaslaşma",
+    "notSpecified": "Qeyd edilməyib",
+    "callButton": "Zəng et",
+    "detailMissing": "Bu həkim üçün ətraflı profil tapılmadı.",
+    "detailLoadFailed": "Ətraflı profili yükləmək mümkün olmadı.",
+    "detailRetry": "Yenidən cəhd et",
+    "detailUnavailable": "Həkim məlumatları hazırda mövcud deyil.",
+    "emailButton": "E-poçt",
+    "doctorAlt": "Həkim"
+  },
+  "BlogPage": {
+    "badge": "Tibbi Bloq",
+    "heroTitle": "Faydalı Məlumatlar",
+    "heroDescription": "Həkimlərimizdən praktiki tövsiyələr, ən son tibbi yeniliklər və sağlam həyat üçün maarifləndirici məzmunlar oxuyun.",
+    "allCategories": "Bütün Kateqoriyalar",
+    "loadingTitle": "Məqalələr yüklənir...",
+    "fetchFailedTitle": "Məqalələri yükləmək mümkün olmadı",
+    "fetchFailedDescription": "Zəhmət olmasa, yenidən cəhd edin.",
+    "retry": "Yenidən cəhd et",
+    "emptyByCategory": "Bu kateqoriya üzrə məqalə tapılmadı",
+    "featuredBadge": "GÜNÜN MƏQALƏSİ",
+    "readFeatured": "Oxu",
+    "readMore": "Ətraflı",
+    "loadMore": "Daha çox yüklə"
+  },
+  "ContactPage": {
+    "heroTitle": "Bizimlə Əlaqə",
+    "heroDescription": "Sual, təklif və ya qəbula yazılmaq üçün bizimlə əlaqə saxlaya bilərsiniz. Komandamız hər zaman sizə kömək etməyə hazırdır.",
+    "fetchFailedDescription": "Əlaqə məlumatlarını yükləmək mümkün olmadı.",
+    "fetchFailedBanner": "Əlaqə məlumatları serverdən yüklənə bilmədi. Ən son mövcud məlumatlar göstərilir.",
+    "retry": "Yenidən cəhd et",
+    "contactMethodsTitle": "Əlaqə Kanalları",
+    "addressTitle": "Ünvanımız",
+    "coordinatesLabel": "Koordinatlar",
+    "phoneTitle": "Telefon",
+    "workingHoursTitle": "İş Saatları",
+    "emailTitle": "E-poçt",
+    "loadingInfo": "Əlaqə məlumatları serverdən yenilənir...",
+    "formTitle": "Bizə Yazın",
+    "submitSuccess": "Mesajınız uğurla göndərildi. Ən qısa zamanda sizinlə əlaqə saxlayacağıq.",
+    "firstNameLabel": "Ad",
+    "firstNamePlaceholder": "Adınızı daxil edin",
+    "lastNameLabel": "Soyad",
+    "lastNamePlaceholder": "Soyadınızı daxil edin",
+    "emailFieldLabel": "E-poçt Ünvanı",
+    "emailFieldPlaceholder": "E-poçtunuzu daxil edin",
+    "phoneFieldLabel": "Telefon Nömrəsi",
+    "phoneFieldPlaceholder": "+994",
+    "subjectLabel": "Mövzu",
+    "subjectPlaceholder": "Müraciətinizin mövzusu",
+    "messageLabel": "Mesajınız",
+    "messagePlaceholder": "Sizə necə kömək edə bilərik?",
+    "submitButton": "Sorğunu Göndər",
+    "fallback": {
+      "address": "Ultramed Klinikası, Nəsrəddin Tusi 55 (Amal-2015 yaşayış kompleksi), Xətai rayonu, Bakı, Azərbaycan",
+      "phoneLabel": "Telefon nömrəsi",
+      "whatsappLabel": "WhatsApp",
+      "emailLabel": "E-poçt",
+      "workDayLabel": "Bazar ertəsi - Cümə",
+      "saturdayLabel": "Şənbə"
+    },
+    "mapTitle": "Klinikanın xəritəsi"
+  },
+  "GalleryPage": {
+    "title": "Qalereya",
+    "description": "Klinika mühiti, tibbi avadanlıqlarımız və komandamızla daha yaxından tanış olun.",
+    "items": [
+      {
+        "title": "Qabaqcıl Diaqnostika Mərkəzi"
+      },
+      {
+        "title": "Cərrahi Bölmə"
+      },
+      {
+        "title": "Laboratoriya"
+      },
+      {
+        "title": "Pasiyent Gözləmə Sahəsi"
+      },
+      {
+        "title": "Kardiologiya Şöbəsi"
+      },
+      {
+        "title": "Pediatriya Şöbəsi"
+      }
+    ]
+  },
+  "FaqPage": {
+    "title": "Tez-tez Verilən Suallar",
+    "description": "Pasiyentlərimizdən gələn ən çox yayılmış sualları bir yerə topladıq. Əlavə məlumat üçün bizimlə əlaqə saxlayın.",
+    "items": [
+      {
+        "question": "Həkim qəbuluna necə yazıla bilərəm?",
+        "answer": "Veb-saytdakı forma vasitəsilə, çağrı mərkəzimizə zəng edərək və ya klinikaya şəxsən gələrək qəbula yazıla bilərsiniz."
+      },
+      {
+        "question": "Laboratoriya nəticələrinə onlayn baxa bilərəm?",
+        "answer": "Bəli. Şəxsi kabinet funksiyası aktivləşdikdən sonra nəticələri elektron formatda yükləmək mümkün olacaq."
+      },
+      {
+        "question": "Sığorta qəbul edirsiniz?",
+        "answer": "Bir çox yerli sığorta şirkətləri ilə əməkdaşlıq edirik. Zəhmət olmasa, gəlməzdən əvvəl administratorumuzla təfərrüatları dəqiqləşdirin."
+      },
+      {
+        "question": "Təcili yardım xidməti göstərirsiniz?",
+        "answer": "Təcili hallar üçün 24/7 fəaliyyət göstərən tibbi komandamız var. Çağrı mərkəzimiz sizi düzgün şöbəyə yönləndirəcək."
+      },
+      {
+        "question": "Məsləhət üçün hansı sənədlər tələb olunur?",
+        "answer": "Zəhmət olmasa, şəxsiyyət vəsiqənizi və əgər varsa, əvvəlki analiz nəticələrinizi və müalicə tarixcənizi gətirin."
+      }
+    ]
+  },
+  "TestimonialsPage": {
+    "title": "Pasiyent Rəyləri",
+    "description": "Pasiyent məmnuniyyəti bizim əsas prioritetimizdir. Aşağıdakı rəylər real təcrübələri əks etdirir.",
+    "items": [
+      {
+        "name": "Nigar Həsənli",
+        "role": "Pasiyent",
+        "quote": "Ultramed-dəki diqqət və peşəkarlıq həqiqətən təsiredicidir. Həkimin yanaşmasından çox razı qaldım."
+      },
+      {
+        "name": "Samir Əliyev",
+        "role": "Pasiyent yaxını",
+        "quote": "Anamın müalicəsi zamanı komanda bütün suallarımızı səbrlə cavablandırdı. Klinika təmiz, proseslər isə çox yaxşı təşkil olunmuşdu."
+      },
+      {
+        "name": "Aysel Məmmədova",
+        "role": "Pasiyent",
+        "quote": "Qəbul prosesi çox rahat keçdi və laboratoriya nəticələri vaxtında çatdırıldı. Bu klinikanı təkrar seçərdim."
+      },
+      {
+        "name": "Rasim Hüseynov",
+        "role": "Pasiyent",
+        "quote": "Kardiologiya şöbəsində mükəmməl xidmət aldım. Müalicə planı mənə çox aydın şəkildə izah edildi."
+      }
+    ]
+  },
+  "PrivacyPolicyPage": {
+    "title": "Məxfilik Siyasəti",
+    "description": "Bu siyasət pasiyent məlumatlarının necə toplanması, işlənməsi və qorunmasını izah edir.",
+    "sections": [
+      {
+        "title": "1. Topladığımız məlumatlar",
+        "content": "Qəbula yazılmaq və tibbi xidmət göstərmək üçün ad, soyad, əlaqə məlumatları, təvəllüd və tibbi keçmiş kimi məlumatları toplayırıq."
+      },
+      {
+        "title": "2. Məlumatların istifadə məqsədi",
+        "content": "Toplanan məlumatlar müalicə prosesləri, görüşlərin planlaşdırılması, analiz nəticələrinin idarə edilməsi və xidmət keyfiyyətinin monitorinqi üçün istifadə olunur."
+      },
+      {
+        "title": "3. Üçüncü tərəflərlə paylaşma",
+        "content": "Qanunla tələb olunan hallar istisna olmaqla, məlumatlarınız sizin razılığınız olmadan üçüncü tərəflərlə paylaşılmır."
+      },
+      {
+        "title": "4. Təhlükəsizlik tədbirləri",
+        "content": "Məlumatlar qorunan infrastrukturda saxlanılır və yalnız səlahiyyətli işçilər tərəfindən əldə edilə bilər."
+      },
+      {
+        "title": "5. Əlaqə",
+        "content": "Məxfiliklə bağlı suallarınız üçün privacy@ultramed.az ünvanına müraciət edə bilərsiniz."
+      }
+    ]
+  },
+  "TermsPage": {
+    "title": "İstifadə Şərtləri",
+    "description": "Bu şərtlər Ultramed platformasının istifadə qaydalarını və tərəflərin öhdəliklərini müəyyən edir.",
+    "sections": [
+      {
+        "title": "1. Ümumi müddəalar",
+        "content": "Veb-saytdan istifadə etməklə siz bu şərtlərlə razılaşırsınız. Şərtlər zərurət yarandıqda yenilənə bilər."
+      },
+      {
+        "title": "2. Qəbula yazılma",
+        "content": "Onlayn qeydiyyat zamanı daxil edilən məlumatların dəqiqliyi pasiyentin məsuliyyətidir."
+      },
+      {
+        "title": "3. Məsuliyyətin məhdudlaşdırılması",
+        "content": "Veb-saytdakı məlumatlar məlumatlandırma xarakteri daşıyır və peşəkar tibbi məsləhəti əvəz etmir."
+      },
+      {
+        "title": "4. Müəllif hüquqları",
+        "content": "Veb-saytdakı mətnlər, dizayn və media elementləri Ultramed və onun tərəfdaşlarının müəllif hüquqları ilə qorunur."
+      },
+      {
+        "title": "5. Tətbiq olunan hüquq",
+        "content": "Hər hansı mübahisələr Azərbaycan Respublikasının qanunvericiliyinə uyğun olaraq həll edilir."
+      }
+    ]
+  },
+  "ErrorPages": {
+    "notFoundTitle": "Səhifə tapılmadı",
+    "notFoundDescription": "Axtardığınız səhifə mövcud deyil və ya silinib. Ana səhifəyə qayıda bilərsiniz.",
+    "backHome": "Ana səhifəyə qayıt",
+    "genericTitle": "Xəta baş verdi",
+    "genericDescription": "Gözlənilməz texniki xəta baş verdi. Zəhmət olmasa, yenidən cəhd edin.",
+    "retry": "Yenidən cəhd et",
+    "home": "Ana səhifə",
+    "internalTitle": "Daxili server xətası",
+    "internalDescription": "Sistemdə gözlənilməz bir problem baş verdi. Bir neçə dəqiqədən sonra yenidən cəhd edin.",
+    "contactPage": "Əlaqə səhifəsi"
+  },
+  "HealthPage": {
+    "title": "Frontend Vəziyyəti",
+    "description": "Səhifə düzgün göstərilir, marşrutlaşdırma aktivdir və frontend cavab verir.",
+    "endpointLabel": "JSON son nöqtəsi",
+    "statusLabel": "status",
+    "componentLabel": "komponent",
+    "checkedAtLabel": "yoxlanılma vaxtı"
+  }
 }

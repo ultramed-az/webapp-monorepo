@@ -4,38 +4,25 @@ import {
     AccordionItem,
     AccordionTrigger,
 } from '@/components/ui/accordion';
-
-const faqs = [
-    {
-        q: 'Qebula nece yazila bilerem?',
-        a: 'Saytdaki qebul formasindan, cagri merkezine zeng ederek ve ya klinikaya yaxinlasaraq qeydiyyatdan kece bilersiniz.',
-    },
-    {
-        q: 'Analiz neticelerini onlayn gormek mumkundur?',
-        a: 'Beli. Sexsi kabinet funksiyasi aktiv olduqda neticeleri elektron formatda yuklemek mumkun olacaq.',
-    },
-    {
-        q: 'Sigorta ile xidmet gosterilir?',
-        a: 'Bir cox yerli sigorta sirketleri ile emekdasliq edirik. Daxil olmadan once administratorla deqiqlestirin.',
-    },
-    {
-        q: 'Tecili yardim xidmeti movcuddurmu?',
-        a: 'Tecili hallarda 7/24 xidmet gosteren hekim qrupu movcuddur. Zeng merkezimiz sizi uygun bolmeye yonlendirecek.',
-    },
-    {
-        q: 'Qebula gelirken hansi senedler lazimdir?',
-        a: 'Sexsiyyet vesiqesi, varsa evvelki analiz neticeleri ve mualice tarixcesi ile gelmeyiniz tovsiye olunur.',
-    },
-];
+import { useTranslations } from 'next-intl';
 
 export default function FaqPage() {
+    const t = useTranslations('FaqPage');
+    const faqs = [
+        { q: t('items.0.question'), a: t('items.0.answer') },
+        { q: t('items.1.question'), a: t('items.1.answer') },
+        { q: t('items.2.question'), a: t('items.2.answer') },
+        { q: t('items.3.question'), a: t('items.3.answer') },
+        { q: t('items.4.question'), a: t('items.4.answer') },
+    ];
+
     return (
         <div className="min-h-screen bg-slate-50">
             <section className="py-16 lg:py-20 bg-white border-b border-slate-100">
                 <div className="container mx-auto px-6 max-w-4xl text-center">
-                    <h1 className="text-4xl md:text-5xl font-bold text-slate-900 mb-4">Tez-tez Sorusulan Suallar</h1>
+                    <h1 className="text-4xl md:text-5xl font-bold text-slate-900 mb-4">{t('title')}</h1>
                     <p className="text-lg text-slate-600">
-                        Pasiyentlerimizin en cox verdiyi suallari bir yerde topladig. Elave sualiniz olsa bizimle elaqe saxlayin.
+                        {t('description')}
                     </p>
                 </div>
             </section>

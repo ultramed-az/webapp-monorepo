@@ -1,11 +1,12 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useTranslations } from 'next-intl';
 import { Link, useRouter, usePathname } from '@/i18n/routing';
 import { useParams } from 'next/navigation';
 import { Menu, Phone, Search, MapPin } from 'lucide-react';
 import Image from 'next/image';
+import { getContactInfo, type ContactInfoResponse } from '@/lib/api';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -20,6 +21,10 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 
+function isWhatsAppValue(value: string): boolean {
+    return value.toLowerCase().includes('wa.me');
+}
+
 export default function Navbar() {
     const t = useTranslations('Navigation');
     const pathname = usePathname();
@@ -28,6 +33,24 @@ export default function Navbar() {
 
     const locale = params.locale as string;
     const [isScrolled, setIsScrolled] = useState(false);
+    const fallbackContactInfo = useMemo<ContactInfoResponse>(
+        () => ({
+            address: t('addressLine'),
+            map: {
+                latitude: 40.3763297,
+                longitude: 49.9628667,
+                embedUrl: 'https://maps.google.com/maps?q=N%C9%99sr%C9%99ddin%20Tusi%2055%20Baku&z=15&output=embed',
+            },
+            phones: [
+                { label: t('callUs'), value: '055/070-223-58-56' },
+                { label: t('whatsapp'), value: 'https://wa.me/994552235856' },
+            ],
+            emails: [{ label: 'Email', value: 'ultramedclinics@gmail.com' }],
+            workingHours: [],
+        }),
+        [t],
+    );
+    const [contactInfo, setContactInfo] = useState<ContactInfoResponse>(fallbackContactInfo);
 
     useEffect(() => {
         const handleScroll = () => {
@@ -42,6 +65,28 @@ export default function Navbar() {
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
+    useEffect(() => {
+        let isCancelled = false;
+
+        async function loadContactInfo() {
+            setContactInfo(fallbackContactInfo);
+            try {
+                const data = await getContactInfo(locale);
+                if (!isCancelled) {
+                    setContactInfo(data);
+                }
+            } catch {
+                // Keep default contact info if API is unavailable.
+            }
+        }
+
+        void loadContactInfo();
+
+        return () => {
+            isCancelled = true;
+        };
+    }, [fallbackContactInfo, locale]);
+
     const languages = [
         { code: 'az', label: 'AZ' },
         { code: 'en', label: 'EN' },
@@ -49,6 +94,22 @@ export default function Navbar() {
     ];
 
     const currentLanguage = languages.find(l => l.code === locale) || languages[0];
+
+    const primaryPhone = useMemo(() => {
+        const phone = contactInfo.phones.find((item) => !isWhatsAppValue(item.value)) ?? contactInfo.phones[0];
+        return phone?.value ?? '';
+    }, [contactInfo.phones]);
+
+    const whatsappLink = useMemo(() => {
+        const whatsapp = contactInfo.phones.find(
+            (item) => isWhatsAppValue(item.value) || item.label.toLowerCase().includes('whatsapp'),
+        );
+        if (!whatsapp?.value) {
+            return null;
+        }
+
+        return whatsapp.value.startsWith('http') ? whatsapp.value : `https://${whatsapp.value}`;
+    }, [contactInfo.phones]);
 
     const navLinks = [
         { href: '/', label: t('home', { default: 'Home' }) },
@@ -77,14 +138,26 @@ export default function Navbar() {
                 <div className="flex items-center space-x-6">
                     <div className="flex items-center">
                         <Phone className="w-4 h-4 mr-2" />
-                        <span>{t('callUs', { default: 'Bizə zəng edin:' })} +994 12 345 67 89</span>
+                        <a href={`tel:${primaryPhone.replace(/[^\d+]/g, '')}`} className="hover:text-white transition-colors">
+                            {t('callUs', { default: 'Bizə zəng edin:' })} {primaryPhone}
+                        </a>
                     </div>
-                    <div className="flex items-center">
+                    <div className="flex items-center min-w-0">
                         <MapPin className="w-4 h-4 mr-2" />
-                        <span>{t('addressLine', { default: 'Bakı şəhəri, Heydər Əliyev pr. 125' })}</span>
+                        <span className="truncate max-w-[520px]">{contactInfo.address}</span>
                     </div>
                 </div>
                 <div className="flex items-center space-x-4">
+                    {whatsappLink && (
+                        <a
+                            href={whatsappLink}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="hover:text-white transition-colors"
+                        >
+                            {t('whatsapp')}
+                        </a>
+                    )}
                     <span className="cursor-pointer hover:text-white transition-colors">{t('emergency', { default: 'Təcili Yardım: 103' })}</span>
 
                     <DropdownMenu>

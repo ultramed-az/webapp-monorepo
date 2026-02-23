@@ -1,40 +1,42 @@
 import { Card, CardContent } from '@/components/ui/card';
-
-const testimonials = [
-    {
-        id: 1,
-        name: 'Nigar Hasanli',
-        role: 'Pasiyent',
-        quote: 'Ultramedde gosterilen diqqet ve pesekarlik cox yuksek seviyyededir. Hekimlerin yanasmasindan cox razi qaldim.',
-    },
-    {
-        id: 2,
-        name: 'Samir Aliyev',
-        role: 'Pasiyent yaxini',
-        quote: 'Anamin mualicesi zamani komanda butun suallarimiza sebrle cavab verdi. Klinika tertemiz ve prosesler nizamli idi.',
-    },
-    {
-        id: 3,
-        name: 'Aysel Memmedova',
-        role: 'Pasiyent',
-        quote: 'Qebul prosesi cox rahat idi, analiz neticeleri vaxtinda cixdi. Tekrar da bu klinikani secerdim.',
-    },
-    {
-        id: 4,
-        name: 'Rasim Huseynov',
-        role: 'Pasiyent',
-        quote: 'Kardiologiya sobesinde cox peşekar xidmet aldim. Mualice plani anlasilan sekilde izah olundu.',
-    },
-];
+import { useTranslations } from 'next-intl';
 
 export default function TestimonialsPage() {
+    const t = useTranslations('TestimonialsPage');
+    const testimonials = [
+        {
+            id: 1,
+            name: t('items.0.name'),
+            role: t('items.0.role'),
+            quote: t('items.0.quote'),
+        },
+        {
+            id: 2,
+            name: t('items.1.name'),
+            role: t('items.1.role'),
+            quote: t('items.1.quote'),
+        },
+        {
+            id: 3,
+            name: t('items.2.name'),
+            role: t('items.2.role'),
+            quote: t('items.2.quote'),
+        },
+        {
+            id: 4,
+            name: t('items.3.name'),
+            role: t('items.3.role'),
+            quote: t('items.3.quote'),
+        },
+    ];
+
     return (
         <div className="bg-white min-h-screen">
             <section className="py-16 lg:py-20 border-b border-slate-100 bg-slate-50">
                 <div className="container mx-auto px-6 max-w-5xl text-center">
-                    <h1 className="text-4xl md:text-5xl font-bold text-slate-900 mb-4">Pasiyent Reyleri</h1>
+                    <h1 className="text-4xl md:text-5xl font-bold text-slate-900 mb-4">{t('title')}</h1>
                     <p className="text-slate-600 text-lg">
-                        Bizim ucun en vacib meyar pasiyent memnuniyyetidir. Asagidaki reyler real tecrubeleri eks etdirir.
+                        {t('description')}
                     </p>
                 </div>
             </section>

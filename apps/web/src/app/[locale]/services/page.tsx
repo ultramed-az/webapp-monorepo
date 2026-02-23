@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import {
     Activity,
     ArrowRight,
@@ -82,6 +83,7 @@ const FALLBACK_ICON: IconConfig = {
 export default function ServicesPage() {
     const params = useParams<{ locale: string }>();
     const locale = params?.locale ?? 'az';
+    const t = useTranslations('ServicesPage');
 
     const [refreshKey, setRefreshKey] = useState(0);
     const [isLoading, setIsLoading] = useState(true);
@@ -108,7 +110,7 @@ export default function ServicesPage() {
                 }
             } catch (fetchError) {
                 if (!isCancelled) {
-                    const message = fetchError instanceof Error ? fetchError.message : 'Xidmətlər yüklənmədi.';
+                    const message = fetchError instanceof Error ? fetchError.message : t('fetchFailedTitle');
                     setError(message);
                 }
             } finally {
@@ -126,7 +128,7 @@ export default function ServicesPage() {
         return () => {
             isCancelled = true;
         };
-    }, [locale, refreshKey]);
+    }, [locale, refreshKey, t]);
 
     const selectedService = useMemo(
         () => services.find((service) => service.id === selectedServiceId) ?? null,
@@ -151,7 +153,7 @@ export default function ServicesPage() {
         try {
             const detail = await getServiceById(serviceId, locale);
             if (!detail) {
-                setDetailError('Bu xidmət üzrə detallı məlumat tapılmadı.');
+                setDetailError(t('detailNotFound'));
                 return;
             }
 
@@ -160,7 +162,7 @@ export default function ServicesPage() {
                 [serviceId]: detail,
             }));
         } catch (fetchError) {
-            const message = fetchError instanceof Error ? fetchError.message : 'Detallı məlumat yüklənmədi.';
+            const message = fetchError instanceof Error ? fetchError.message : t('detailLoadFailed');
             setDetailError(message);
         } finally {
             setIsDetailLoading(false);
@@ -180,9 +182,9 @@ export default function ServicesPage() {
                 <div className="absolute inset-0 z-0 opacity-25 bg-[radial-gradient(circle_at_bottom_right,_var(--tw-gradient-stops))] from-brand-orange/40 via-transparent to-transparent"></div>
                 <div className="container mx-auto px-6 relative z-10">
                     <div className="max-w-3xl">
-                        <h1 className="text-4xl md:text-5xl font-extrabold mb-6 tracking-tight">Klinik Xidmətlərimiz</h1>
+                        <h1 className="text-4xl md:text-5xl font-extrabold mb-6 tracking-tight">{t('heroTitle')}</h1>
                         <p className="text-lg md:text-xl text-white/85 leading-relaxed">
-                            Müasir tibbin ən son nailiyyətlərini tətbiq edərək, geniş spektrli ixtisaslaşmış tibbi xidmətlərimizlə sağlamlığınızın keşiyindəyik. Hər bir pasiyentə fərdi yanaşma bizim əsas prinsipimizdir.
+                            {t('heroDescription')}
                         </p>
                     </div>
                 </div>
@@ -192,18 +194,18 @@ export default function ServicesPage() {
                 <div className="container mx-auto px-6">
                     {isLoading && services.length === 0 ? (
                         <div className="text-center py-20 bg-white rounded-2xl border border-slate-100">
-                            <h3 className="text-xl font-semibold text-slate-900 mb-2">Xidmətlər yüklənir...</h3>
+                            <h3 className="text-xl font-semibold text-slate-900 mb-2">{t('loadingTitle')}</h3>
                         </div>
                     ) : error && services.length === 0 ? (
                         <div className="text-center py-20 bg-white rounded-2xl border border-slate-100">
-                            <h3 className="text-xl font-semibold text-slate-900 mb-2">Xidmətlər yüklənmədi</h3>
-                            <p className="text-slate-500 mb-6">Zəhmət olmasa bir daha yoxlayın.</p>
+                            <h3 className="text-xl font-semibold text-slate-900 mb-2">{t('fetchFailedTitle')}</h3>
+                            <p className="text-slate-500 mb-6">{t('fetchFailedDescription')}</p>
                             <Button
                                 variant="outline"
                                 className="border-brand-blue text-brand-blue hover:bg-brand-blue-soft"
                                 onClick={() => setRefreshKey((key) => key + 1)}
                             >
-                                Yenidən yoxla
+                                {t('retry')}
                             </Button>
                         </div>
                     ) : (
@@ -238,7 +240,7 @@ export default function ServicesPage() {
                                                 onClick={() => void openDetailModal(service.id)}
                                                 className="inline-flex items-center text-sm font-semibold text-brand-orange hover:text-brand-orange-dark transition-colors"
                                             >
-                                                Daha ətraflı <ArrowRight className="ml-1 w-4 h-4" />
+                                                {t('readMore')} <ArrowRight className="ml-1 w-4 h-4" />
                                             </button>
                                         </CardFooter>
                                     </Card>
@@ -251,23 +253,23 @@ export default function ServicesPage() {
 
             <section className="py-20 bg-white border-t border-slate-100">
                 <div className="container mx-auto px-6 text-center max-w-4xl">
-                    <h2 className="text-3xl font-bold text-slate-900 mb-6">Uyğun Şöbəni Tapa Bilmədiniz?</h2>
+                    <h2 className="text-3xl font-bold text-slate-900 mb-6">{t('ctaTitle')}</h2>
                     <p className="text-lg text-slate-600 mb-8">
-                        Ümumi şikayətləriniz varsa, terapevt qəbuluna yazılmağınız məsləhətdir. İlkin müayinədən sonra həkimimiz sizi lazımi profil mütəxəssisinə yönəldəcək.
+                        {t('ctaDescription')}
                     </p>
                     <div className="flex flex-col sm:flex-row justify-center gap-4">
                         <Button
                             size="lg"
                             className="bg-brand-orange hover:bg-brand-orange-dark text-white rounded-full h-14 px-8 text-base"
                         >
-                            Terapevt Qəbulu Üçün Yazılın
+                            {t('ctaPrimaryButton')}
                         </Button>
                         <Button
                             size="lg"
                             variant="outline"
                             className="border-brand-blue text-brand-blue hover:bg-brand-blue-soft rounded-full h-14 px-8 text-base"
                         >
-                            Sual Verin
+                            {t('ctaSecondaryButton')}
                         </Button>
                     </div>
                 </div>
@@ -277,10 +279,10 @@ export default function ServicesPage() {
                 <DialogContent className="sm:max-w-2xl max-h-[85vh] overflow-y-auto">
                     <DialogHeader>
                         <DialogTitle className="text-2xl text-slate-900">
-                            {selectedServiceDetail?.title ?? selectedService?.title ?? 'Xidmət Detalları'}
+                            {selectedServiceDetail?.title ?? selectedService?.title ?? t('modalTitleFallback')}
                         </DialogTitle>
                         <DialogDescription className="text-base text-slate-600">
-                            {selectedServiceDetail?.summary ?? selectedService?.summary ?? 'Seçilmiş xidmət üzrə detallı məlumat.'}
+                            {selectedServiceDetail?.summary ?? selectedService?.summary ?? t('modalDescriptionFallback')}
                         </DialogDescription>
                     </DialogHeader>
 
@@ -298,7 +300,7 @@ export default function ServicesPage() {
                                 className="border-brand-blue text-brand-blue hover:bg-brand-blue-soft"
                                 onClick={() => void retrySelectedServiceDetail()}
                             >
-                                Yenidən yoxla
+                                {t('retry')}
                             </Button>
                         </div>
                     ) : selectedServiceDetail ? (
@@ -316,7 +318,7 @@ export default function ServicesPage() {
                             {selectedServiceDetail.highlights.length > 0 && (
                                 <div>
                                     <h4 className="text-sm font-semibold uppercase tracking-wide text-slate-900 mb-3">
-                                        Əsas istiqamətlər
+                                        {t('highlightsTitle')}
                                     </h4>
                                     <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                                         {selectedServiceDetail.highlights.map((item) => (
@@ -332,7 +334,7 @@ export default function ServicesPage() {
                             )}
                         </div>
                     ) : (
-                        <p className="text-slate-600">Bu xidmət üzrə məlumat tapılmadı.</p>
+                        <p className="text-slate-600">{t('detailNotFound')}</p>
                     )}
                 </DialogContent>
             </Dialog>
