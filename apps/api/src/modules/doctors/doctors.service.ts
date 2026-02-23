@@ -55,6 +55,23 @@ export class DoctorsService {
         };
     }
 
+    async create(data: any) {
+        return this.prisma.doctor.create({ data });
+    }
+
+    async update(id: string, data: any) {
+        return this.prisma.doctor.update({
+            where: { id },
+            data,
+        });
+    }
+
+    async remove(id: string) {
+        return this.prisma.doctor.delete({
+            where: { id },
+        });
+    }
+
     private normalizeLocale(locale: string): 'az' | 'en' | 'ru' {
         if (locale === 'en' || locale === 'ru') {
             return locale;

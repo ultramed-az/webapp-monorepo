@@ -1,5 +1,7 @@
 import type { NextConfig } from "next";
 
+const backendPort = process.env.BACKEND_PORT ?? "5555";
+
 const nextConfig: NextConfig = {
   reactCompiler: true,
   images: {
@@ -13,6 +15,18 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "plus.unsplash.com",
         pathname: "/**",
+      },
+      {
+        protocol: "http",
+        hostname: "localhost",
+        port: backendPort,
+        pathname: "/cdn/**",
+      },
+      {
+        protocol: "http",
+        hostname: "127.0.0.1",
+        port: backendPort,
+        pathname: "/cdn/**",
       },
     ],
   },

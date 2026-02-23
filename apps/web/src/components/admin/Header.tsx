@@ -2,6 +2,7 @@
 
 import { useTranslations } from 'next-intl';
 import { Menu, Search, Bell, User } from 'lucide-react';
+import { useRouter } from '@/i18n/routing';
 import { Button } from '@/components/ui/button';
 import {
     DropdownMenu,
@@ -12,6 +13,7 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
+import { logoutAdmin } from '@/lib/admin-api';
 
 type HeaderProps = {
     onMenuClick?: () => void;
@@ -19,6 +21,13 @@ type HeaderProps = {
 
 export default function Header({ onMenuClick }: HeaderProps) {
     const t = useTranslations('Admin');
+    const router = useRouter();
+
+    const handleLogout = async () => {
+        await logoutAdmin();
+        router.push('/admin/login');
+        router.refresh();
+    };
 
     return (
         <header className="h-16 bg-white border-b border-brand-blue-soft flex items-center justify-between px-4 lg:px-6 z-10">
@@ -71,7 +80,10 @@ export default function Header({ onMenuClick }: HeaderProps) {
                             <span>{t('profile', { default: 'Profile' })}</span>
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem className="cursor-pointer text-brand-orange focus:text-brand-orange-dark focus:bg-brand-orange/10">
+                        <DropdownMenuItem
+                            className="cursor-pointer text-brand-orange focus:text-brand-orange-dark focus:bg-brand-orange/10"
+                            onClick={handleLogout}
+                        >
                             {t('logout', { default: 'Logout' })}
                         </DropdownMenuItem>
                     </DropdownMenuContent>

@@ -7,10 +7,10 @@ type SupportedLocale = 'az' | 'en' | 'ru';
 export class ContactService {
     constructor(private readonly prisma: PrismaService) { }
 
-    async getContact(localeRaw: string) {
+    async getContact(localeRaw: string, slug = 'main') {
         const locale = this.normalizeLocale(localeRaw);
         const contact = await this.prisma.contactInfo.findUnique({
-            where: { slug: 'main' },
+            where: { slug },
         });
 
         if (!contact) {
@@ -32,6 +32,23 @@ export class ContactService {
             emails: this.mapLocalizedItems(contact.emails, locale),
             workingHours: this.mapLocalizedItems(contact.workingHours, locale),
         };
+    }
+
+    async create(data: any) {
+        return this.prisma.contactInfo.create({ data });
+    }
+
+    async update(slug: string, data: any) {
+        return this.prisma.contactInfo.update({
+            where: { slug },
+            data,
+        });
+    }
+
+    async remove(slug: string) {
+        return this.prisma.contactInfo.delete({
+            where: { slug },
+        });
     }
 
     private normalizeLocale(locale: string): SupportedLocale {
@@ -94,4 +111,3 @@ export class ContactService {
         return typeof fieldValue === 'string' ? fieldValue : '';
     }
 }
-

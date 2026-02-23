@@ -32,6 +32,47 @@ export class BlogService {
         }));
     }
 
+    async findOne(id: string, localeRaw: string) {
+        const locale = this.normalizeLocale(localeRaw);
+        const post = await this.prisma.blogPost.findUnique({
+            where: { id },
+        });
+
+        if (!post || !post.published) {
+            return null;
+        }
+
+        return {
+            id: post.id,
+            title: this.pickLocalizedField(post, 'title', locale),
+            excerpt: this.pickLocalizedField(post, 'excerpt', locale),
+            content: this.pickLocalizedField(post, 'content', locale),
+            author: post.authorName ?? 'Ultramed',
+            category: this.pickLocalizedField(post, 'category', locale),
+            image: post.image,
+            featured: post.featured,
+            views: post.views,
+            date: (post.publishedAt ?? post.createdAt).toISOString(),
+        };
+    }
+
+    async create(data: any) {
+        return this.prisma.blogPost.create({ data });
+    }
+
+    async update(id: string, data: any) {
+        return this.prisma.blogPost.update({
+            where: { id },
+            data,
+        });
+    }
+
+    async remove(id: string) {
+        return this.prisma.blogPost.delete({
+            where: { id },
+        });
+    }
+
     private normalizeLocale(locale: string): 'az' | 'en' | 'ru' {
         if (locale === 'en' || locale === 'ru') {
             return locale;

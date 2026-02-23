@@ -15,5 +15,23 @@ export class HomeService {
             value: stat.value,
         }));
     }
-}
 
+    async createStat(data: any) {
+        return this.prisma.homeStat.create({
+            data,
+        });
+    }
+
+    async updateStat(id: string, data: any) {
+        return this.prisma.homeStat.update({
+            where: { id },
+            data,
+        });
+    }
+
+    async removeStat(id: string) {
+        return this.prisma.homeStat.delete({
+            where: { id },
+        });
+    }
+}

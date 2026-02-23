@@ -107,7 +107,19 @@ export type ServiceDetailItem = {
     image: string | null;
 };
 
-const API_BASE_URL = (process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:5555').replace(/\/$/, '');
+function resolveApiBaseUrl(): string {
+    if (typeof window === 'undefined') {
+        return (
+            process.env.API_INTERNAL_URL ??
+            process.env.NEXT_PUBLIC_API_URL ??
+            'http://localhost:5555'
+        ).replace(/\/$/, '');
+    }
+
+    return (process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:5555').replace(/\/$/, '');
+}
+
+const API_BASE_URL = resolveApiBaseUrl();
 const REQUEST_TIMEOUT_MS = 6000;
 
 export class ApiRequestError extends Error {

@@ -27,6 +27,15 @@ services:
     environment:
       DATABASE_URL: "${DATABASE_URL}"
       BACKEND_PORT: "${BACKEND_PORT}"
+      FRONTEND_ORIGIN: "${FRONTEND_ORIGIN}"
+      CDN_BASE_URL: "${CDN_BASE_URL}"
+      JWT_SECRET: "${JWT_SECRET}"
+      ADMIN_SESSION_TTL_HOURS: "${ADMIN_SESSION_TTL_HOURS}"
+      ADMIN_LOGIN_MAX_ATTEMPTS: "${ADMIN_LOGIN_MAX_ATTEMPTS}"
+      ADMIN_LOGIN_LOCK_WINDOW_MINUTES: "${ADMIN_LOGIN_LOCK_WINDOW_MINUTES}"
+      ADMIN_SEED_EMAIL: "${ADMIN_SEED_EMAIL}"
+      ADMIN_SEED_PASSWORD: "${ADMIN_SEED_PASSWORD}"
+      NODE_ENV: "${NODE_ENV}"
     depends_on:
       db:
         condition: service_healthy
@@ -43,6 +52,7 @@ services:
       - "${FRONTEND_PORT}:${FRONTEND_PORT}"
     environment:
       NEXT_PUBLIC_API_URL: "https://api.ultramed.az" # Change to actual domain
+      API_INTERNAL_URL: "http://api:${BACKEND_PORT}"
       FRONTEND_PORT: "${FRONTEND_PORT}"
     restart: always
 

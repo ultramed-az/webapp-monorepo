@@ -3,17 +3,21 @@
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { useRouter } from '@/i18n/routing';
+import { useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Loader2 } from 'lucide-react';
 import Image from 'next/image';
+import { loginAdmin } from '@/lib/admin-api';
 
 export default function AdminLoginPage() {
     const t = useTranslations('Admin');
     const router = useRouter();
+    const searchParams = useSearchParams();
     const [isLoading, setIsLoading] = useState(false);
+    const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
     // In a real app we would use react-hook-form + zod here
     const [email, setEmail] = useState('');
@@ -22,13 +26,26 @@ export default function AdminLoginPage() {
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsLoading(true);
+        setErrorMessage(null);
 
-        // Simulate API call
-        setTimeout(() => {
-            setIsLoading(false);
-            // Redirect to dashboard after "successful" login
+        try {
+            await loginAdmin(email, password);
+            const nextPath = searchParams.get('next');
+            if (nextPath && nextPath.startsWith('/admin')) {
+                window.location.href = nextPath;
+                return;
+            }
             router.push('/admin/dashboard');
-        }, 1500);
+            router.refresh();
+        } catch (error) {
+            const message =
+                error instanceof Error
+                    ? error.message
+                    : 'Daxil olarkən xəta baş verdi.';
+            setErrorMessage(message);
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     return (
@@ -69,7 +86,7 @@ export default function AdminLoginPage() {
                         <div className="space-y-2">
                             <div className="flex items-center justify-between">
                                 <Label htmlFor="password" className="text-sm font-medium text-slate-700">Şifrə</Label>
-                                <a href="#" className="text-sm font-medium text-brand-blue hover:underline">Şifrəni unutmusunuz?</a>
+                                <span className="text-sm font-medium text-slate-400 cursor-not-allowed">Şifrəni unutmusunuz?</span>
                             </div>
                             <Input
                                 id="password"
@@ -81,6 +98,11 @@ export default function AdminLoginPage() {
                                 className="h-11 border-slate-200 focus-visible:ring-brand-blue"
                             />
                         </div>
+                        {errorMessage ? (
+                            <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-md px-3 py-2">
+                                {errorMessage}
+                            </p>
+                        ) : null}
                         <Button
                             type="submit"
                             className="w-full h-11 bg-brand-orange hover:bg-brand-orange-dark text-white mt-6 rounded-lg text-sm font-medium transition-colors"

@@ -43,6 +43,40 @@ export class ContentService {
     return this.getSectionPage('terms-of-service', localeRaw);
   }
 
+  async createTestimonial(data: any) {
+    return this.prisma.testimonial.create({ data });
+  }
+
+  async updateTestimonial(id: string, data: any) {
+    return this.prisma.testimonial.update({
+      where: { id },
+      data,
+    });
+  }
+
+  async removeTestimonial(id: string) {
+    return this.prisma.testimonial.delete({
+      where: { id },
+    });
+  }
+
+  async createPage(data: any) {
+    return (this.prisma as any).contentPage.create({ data });
+  }
+
+  async updatePage(slug: string, data: any) {
+    return (this.prisma as any).contentPage.update({
+      where: { slug },
+      data,
+    });
+  }
+
+  async removePage(slug: string) {
+    return (this.prisma as any).contentPage.delete({
+      where: { slug },
+    });
+  }
+
   private async getSectionPage(slug: 'privacy-policy' | 'terms-of-service', localeRaw: string) {
     const locale = this.normalizeLocale(localeRaw);
     const page = await (this.prisma as any).contentPage.findUnique({

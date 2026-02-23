@@ -1,5 +1,6 @@
 /* eslint-disable no-console */
 const { PrismaClient } = require('@prisma/client');
+const { hash } = require('bcryptjs');
 
 const prisma = new PrismaClient();
 
@@ -954,12 +955,18 @@ const homeStats = [
 ];
 
 async function seedAdmin() {
+  const adminEmail = process.env.ADMIN_SEED_EMAIL ?? 'admin@ultramed.az';
+  const adminPassword = process.env.ADMIN_SEED_PASSWORD ?? 'admin123';
+  const hashedPassword = await hash(adminPassword, 12);
+
   await prisma.admin.upsert({
-    where: { email: 'admin@ultramed.az' },
-    update: {},
+    where: { email: adminEmail },
+    update: {
+      password: hashedPassword,
+    },
     create: {
-      email: 'admin@ultramed.az',
-      password: 'admin123',
+      email: adminEmail,
+      password: hashedPassword,
     },
   });
 }
