@@ -1,199 +1,567 @@
 'use client';
 
-import { useState } from 'react';
-import { useTranslations } from 'next-intl';
+import { useEffect, useMemo, useState } from 'react';
+import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
 } from '@/components/ui/table';
 import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Plus, Search, MoreHorizontal, FileEdit, Trash2, Eye, Calendar, User, Tag } from 'lucide-react';
-import Image from 'next/image';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Plus, Search, MoreHorizontal, FileEdit, Trash2, Loader2, Upload } from 'lucide-react';
+import {
+  AdminBlogRecord,
+  createAdminBlogPost,
+  deleteAdminBlogPost,
+  getAdminBlogPosts,
+  updateAdminBlogPost,
+  uploadAdminMedia,
+} from '@/lib/admin-api';
 
-const initialPosts = [
-    {
-        id: 1,
-        title: 'Ürək sağlamlığı üçün 5 qızıl qayda',
-        author: 'Dr. Əli Vəliyev',
-        category: 'Kardiologiya',
-        date: '2024-03-14',
-        views: 1245,
-        status: 'published',
-        image: 'https://images.unsplash.com/photo-1505576399279-565b52d4ac71?q=80&w=600&auto=format&fit=crop'
-    },
-    {
-        id: 2,
-        title: 'Bahar aylarında allergiyadan necə qorunmalı?',
-        author: 'Dr. Famil Abbasov',
-        category: 'Terapiya',
-        date: '2024-03-10',
-        views: 856,
-        status: 'published',
-        image: 'https://images.unsplash.com/photo-1512069772995-ec65ed45afd6?q=80&w=600&auto=format&fit=crop'
-    },
-    {
-        id: 3,
-        title: 'Uşaqlarda diş kariesinin yaranma səbəbləri',
-        author: 'Dr. Rəşad Hüseynov',
-        category: 'Stomatologiya',
-        date: '2024-03-05',
-        views: 0,
-        status: 'draft',
-        image: 'https://images.unsplash.com/photo-1606811841689-23dfddce3e95?q=80&w=600&auto=format&fit=crop'
-    },
-    {
-        id: 4,
-        title: 'Sağlam qidalanmanın əsasları nədir?',
-        author: 'Dr. Leyla Quliyeva',
-        category: 'Dietologiya',
-        date: '2024-02-28',
-        views: 2314,
-        status: 'published',
-        image: 'https://images.unsplash.com/photo-1490645935967-10de6ba17061?q=80&w=600&auto=format&fit=crop'
-    },
-];
+type FormState = {
+  titleAz: string;
+  titleEn: string;
+  titleRu: string;
+  excerptAz: string;
+  excerptEn: string;
+  excerptRu: string;
+  contentAz: string;
+  contentEn: string;
+  contentRu: string;
+  authorName: string;
+  categoryAz: string;
+  categoryEn: string;
+  categoryRu: string;
+  image: string;
+  sortOrder: string;
+  views: string;
+  published: 'true' | 'false';
+  featured: 'true' | 'false';
+};
+
+const EMPTY_FORM: FormState = {
+  titleAz: '',
+  titleEn: '',
+  titleRu: '',
+  excerptAz: '',
+  excerptEn: '',
+  excerptRu: '',
+  contentAz: '',
+  contentEn: '',
+  contentRu: '',
+  authorName: '',
+  categoryAz: '',
+  categoryEn: '',
+  categoryRu: '',
+  image: '',
+  sortOrder: '0',
+  views: '0',
+  published: 'true',
+  featured: 'false',
+};
+
+function toFormState(record: AdminBlogRecord): FormState {
+  return {
+    titleAz: record.titleAz,
+    titleEn: record.titleEn,
+    titleRu: record.titleRu,
+    excerptAz: record.excerptAz ?? '',
+    excerptEn: record.excerptEn ?? '',
+    excerptRu: record.excerptRu ?? '',
+    contentAz: record.contentAz,
+    contentEn: record.contentEn,
+    contentRu: record.contentRu,
+    authorName: record.authorName ?? '',
+    categoryAz: record.categoryAz ?? '',
+    categoryEn: record.categoryEn ?? '',
+    categoryRu: record.categoryRu ?? '',
+    image: record.image ?? '',
+    sortOrder: String(record.sortOrder ?? 0),
+    views: String(record.views ?? 0),
+    published: record.published ? 'true' : 'false',
+    featured: record.featured ? 'true' : 'false',
+  };
+}
+
+function formatDate(value: string | null): string {
+  if (!value) {
+    return '-';
+  }
+  return new Date(value).toLocaleDateString('az-AZ');
+}
 
 export default function BlogPage() {
-    const t = useTranslations('Admin');
-    const [searchTerm, setSearchTerm] = useState('');
+  const [items, setItems] = useState<AdminBlogRecord[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
 
-    return (
-        <div className="space-y-6">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                <div>
-                    <h2 className="text-2xl font-bold tracking-tight text-slate-900">Bloq İdarəetməsi</h2>
-                    <p className="text-slate-500">Məqalələr, məsləhətlər və xəbərləri buradan idarə edin.</p>
-                </div>
-                <Button className="bg-brand-orange hover:bg-brand-orange-dark text-white shadow-sm flex items-center gap-2">
-                    <Plus className="w-4 h-4" />
-                    Yeni Məqalə Yaz
-                </Button>
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [editingItem, setEditingItem] = useState<AdminBlogRecord | null>(null);
+  const [form, setForm] = useState<FormState>(EMPTY_FORM);
+
+  const [submitting, setSubmitting] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+
+  const filteredItems = useMemo(() => {
+    const needle = searchTerm.trim().toLowerCase();
+    if (!needle) {
+      return items;
+    }
+
+    return items.filter((item) =>
+      [item.titleAz, item.authorName ?? '', item.categoryAz ?? '']
+        .join(' ')
+        .toLowerCase()
+        .includes(needle),
+    );
+  }, [items, searchTerm]);
+
+  const loadItems = async () => {
+    setLoading(true);
+    setErrorMessage(null);
+    try {
+      const data = await getAdminBlogPosts();
+      setItems(data);
+    } catch (error) {
+      setErrorMessage(error instanceof Error ? error.message : 'Bloq məqalələri yüklənmədi.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    void loadItems();
+  }, []);
+
+  const openCreateDialog = () => {
+    setEditingItem(null);
+    setForm(EMPTY_FORM);
+    setDialogOpen(true);
+  };
+
+  const openEditDialog = (item: AdminBlogRecord) => {
+    setEditingItem(item);
+    setForm(toFormState(item));
+    setDialogOpen(true);
+  };
+
+  const handleDelete = async (item: AdminBlogRecord) => {
+    const accepted = window.confirm(`"${item.titleAz}" məqaləsi silinsin?`);
+    if (!accepted) {
+      return;
+    }
+
+    setErrorMessage(null);
+    setSuccessMessage(null);
+
+    try {
+      await deleteAdminBlogPost(item.id);
+      setSuccessMessage('Məqalə silindi.');
+      await loadItems();
+    } catch (error) {
+      setErrorMessage(error instanceof Error ? error.message : 'Məqalə silinmədi.');
+    }
+  };
+
+  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) {
+      return;
+    }
+
+    setUploading(true);
+    setErrorMessage(null);
+    setSuccessMessage(null);
+
+    try {
+      const media = await uploadAdminMedia(file);
+      setForm((prev) => ({ ...prev, image: media.url }));
+      setSuccessMessage('Şəkil yükləndi.');
+    } catch (error) {
+      setErrorMessage(error instanceof Error ? error.message : 'Şəkil yüklənmədi.');
+    } finally {
+      setUploading(false);
+      event.target.value = '';
+    }
+  };
+
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
+    setSubmitting(true);
+    setErrorMessage(null);
+    setSuccessMessage(null);
+
+    const titleAz = form.titleAz.trim();
+    const contentAz = form.contentAz.trim();
+
+    if (!titleAz || !contentAz) {
+      setSubmitting(false);
+      setErrorMessage('AZ title və AZ content mütləqdir.');
+      return;
+    }
+
+    const payload: Partial<AdminBlogRecord> = {
+      titleAz,
+      titleEn: form.titleEn.trim() || titleAz,
+      titleRu: form.titleRu.trim() || titleAz,
+      excerptAz: form.excerptAz.trim() || null,
+      excerptEn: form.excerptEn.trim() || null,
+      excerptRu: form.excerptRu.trim() || null,
+      contentAz: contentAz,
+      contentEn: form.contentEn.trim() || contentAz,
+      contentRu: form.contentRu.trim() || contentAz,
+      authorName: form.authorName.trim() || 'Ultramed',
+      categoryAz: form.categoryAz.trim() || null,
+      categoryEn: form.categoryEn.trim() || null,
+      categoryRu: form.categoryRu.trim() || null,
+      image: form.image.trim() || null,
+      sortOrder: Number.parseInt(form.sortOrder, 10) || 0,
+      views: Number.parseInt(form.views, 10) || 0,
+      published: form.published === 'true',
+      featured: form.featured === 'true',
+      publishedAt: form.published === 'true' ? new Date().toISOString() : null,
+    };
+
+    try {
+      if (editingItem) {
+        await updateAdminBlogPost(editingItem.id, payload);
+        setSuccessMessage('Məqalə yeniləndi.');
+      } else {
+        await createAdminBlogPost(payload);
+        setSuccessMessage('Məqalə yaradıldı.');
+      }
+
+      setDialogOpen(false);
+      await loadItems();
+    } catch (error) {
+      setErrorMessage(error instanceof Error ? error.message : 'Əməliyyat zamanı xəta baş verdi.');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <h2 className="text-2xl font-bold tracking-tight text-slate-900">Bloq İdarəetməsi</h2>
+          <p className="text-slate-500">Məqalələr backend CRUD ilə idarə olunur.</p>
+        </div>
+        <Button
+          className="bg-brand-orange hover:bg-brand-orange-dark text-white shadow-sm flex items-center gap-2"
+          onClick={openCreateDialog}
+          type="button"
+        >
+          <Plus className="w-4 h-4" />
+          Yeni Məqalə
+        </Button>
+      </div>
+
+      {errorMessage ? (
+        <div className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+          {errorMessage}
+        </div>
+      ) : null}
+      {successMessage ? (
+        <div className="rounded-md border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-700">
+          {successMessage}
+        </div>
+      ) : null}
+
+      <Card className="border-slate-200 shadow-sm">
+        <CardHeader className="pb-3">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div>
+              <CardTitle className="text-lg">Məqalələrin Siyahısı</CardTitle>
+              <CardDescription>Cəmi: {filteredItems.length} məqalə</CardDescription>
+            </div>
+            <div className="relative w-full sm:w-64">
+              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-slate-400" />
+              <Input
+                placeholder="Başlıq və müəllif axtar..."
+                className="pl-9 h-9"
+                value={searchTerm}
+                onChange={(event) => setSearchTerm(event.target.value)}
+              />
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent>
+          {loading ? (
+            <div className="space-y-2">
+              {Array.from({ length: 5 }).map((_, index) => (
+                <Skeleton key={String(index)} className="h-10 w-full" />
+              ))}
+            </div>
+          ) : (
+            <div className="rounded-md border border-slate-100 overflow-hidden">
+              <Table>
+                <TableHeader className="bg-slate-50">
+                  <TableRow>
+                    <TableHead>Şəkil</TableHead>
+                    <TableHead>Başlıq</TableHead>
+                    <TableHead>Müəllif</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Baxış</TableHead>
+                    <TableHead>Tarix</TableHead>
+                    <TableHead className="text-right">Əməliyyat</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filteredItems.map((item) => (
+                    <TableRow key={item.id}>
+                      <TableCell>
+                        {item.image ? (
+                          <div className="h-10 w-14 relative rounded overflow-hidden border border-slate-200">
+                            <Image src={item.image} alt={item.titleAz} fill className="object-cover" />
+                          </div>
+                        ) : (
+                          <span className="text-xs text-slate-500">Yoxdur</span>
+                        )}
+                      </TableCell>
+                      <TableCell className="font-semibold text-slate-900 max-w-80 truncate">{item.titleAz}</TableCell>
+                      <TableCell>{item.authorName ?? '-'}</TableCell>
+                      <TableCell>
+                        <span
+                          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                            item.published
+                              ? 'bg-brand-blue-soft text-brand-blue border border-brand-blue/20'
+                              : 'bg-brand-orange/15 text-brand-orange-dark border border-brand-orange/25'
+                          }`}
+                        >
+                          {item.published ? 'Published' : 'Draft'}
+                        </span>
+                      </TableCell>
+                      <TableCell>{item.views}</TableCell>
+                      <TableCell>{formatDate(item.publishedAt ?? item.createdAt)}</TableCell>
+                      <TableCell className="text-right">
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" className="h-8 w-8 p-0">
+                              <span className="sr-only">Menyu</span>
+                              <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem
+                              className="cursor-pointer"
+                              onClick={() => openEditDialog(item)}
+                            >
+                              <FileEdit className="mr-2 h-4 w-4" />
+                              <span>Redaktə Et</span>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              className="cursor-pointer text-red-600 focus:text-red-700 focus:bg-red-50"
+                              onClick={() => void handleDelete(item)}
+                            >
+                              <Trash2 className="mr-2 h-4 w-4" />
+                              <span>Sil</span>
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <DialogContent className="sm:max-w-5xl">
+          <DialogHeader>
+            <DialogTitle>{editingItem ? 'Məqaləni redaktə et' : 'Yeni məqalə yarat'}</DialogTitle>
+            <DialogDescription>
+              Böyük mətnlər daxil olmaqla bütün əsas sahələr buradan idarə olunur.
+            </DialogDescription>
+          </DialogHeader>
+
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="max-h-[68vh] overflow-y-auto pr-1 space-y-4">
+              <div className="grid gap-3 md:grid-cols-3">
+                <Input
+                  placeholder="Başlıq AZ"
+                  value={form.titleAz}
+                  onChange={(event) => setForm((prev) => ({ ...prev, titleAz: event.target.value }))}
+                  required
+                />
+                <Input
+                  placeholder="Title EN"
+                  value={form.titleEn}
+                  onChange={(event) => setForm((prev) => ({ ...prev, titleEn: event.target.value }))}
+                />
+                <Input
+                  placeholder="Title RU"
+                  value={form.titleRu}
+                  onChange={(event) => setForm((prev) => ({ ...prev, titleRu: event.target.value }))}
+                />
+              </div>
+
+              <div className="grid gap-3 md:grid-cols-3">
+                <Textarea
+                  className="min-h-20"
+                  placeholder="Excerpt AZ"
+                  value={form.excerptAz}
+                  onChange={(event) => setForm((prev) => ({ ...prev, excerptAz: event.target.value }))}
+                />
+                <Textarea
+                  className="min-h-20"
+                  placeholder="Excerpt EN"
+                  value={form.excerptEn}
+                  onChange={(event) => setForm((prev) => ({ ...prev, excerptEn: event.target.value }))}
+                />
+                <Textarea
+                  className="min-h-20"
+                  placeholder="Excerpt RU"
+                  value={form.excerptRu}
+                  onChange={(event) => setForm((prev) => ({ ...prev, excerptRu: event.target.value }))}
+                />
+              </div>
+
+              <div className="grid gap-3 md:grid-cols-3">
+                <Textarea
+                  className="min-h-40"
+                  placeholder="Content AZ"
+                  value={form.contentAz}
+                  onChange={(event) => setForm((prev) => ({ ...prev, contentAz: event.target.value }))}
+                  required
+                />
+                <Textarea
+                  className="min-h-40"
+                  placeholder="Content EN"
+                  value={form.contentEn}
+                  onChange={(event) => setForm((prev) => ({ ...prev, contentEn: event.target.value }))}
+                />
+                <Textarea
+                  className="min-h-40"
+                  placeholder="Content RU"
+                  value={form.contentRu}
+                  onChange={(event) => setForm((prev) => ({ ...prev, contentRu: event.target.value }))}
+                />
+              </div>
+
+              <div className="grid gap-3 md:grid-cols-4">
+                <Input
+                  placeholder="Müəllif"
+                  value={form.authorName}
+                  onChange={(event) => setForm((prev) => ({ ...prev, authorName: event.target.value }))}
+                />
+                <Input
+                  placeholder="Kateqoriya AZ"
+                  value={form.categoryAz}
+                  onChange={(event) => setForm((prev) => ({ ...prev, categoryAz: event.target.value }))}
+                />
+                <Input
+                  placeholder="Category EN"
+                  value={form.categoryEn}
+                  onChange={(event) => setForm((prev) => ({ ...prev, categoryEn: event.target.value }))}
+                />
+                <Input
+                  placeholder="Category RU"
+                  value={form.categoryRu}
+                  onChange={(event) => setForm((prev) => ({ ...prev, categoryRu: event.target.value }))}
+                />
+              </div>
+
+              <div className="grid gap-3 md:grid-cols-5">
+                <Input
+                  placeholder="Sort order"
+                  type="number"
+                  value={form.sortOrder}
+                  onChange={(event) => setForm((prev) => ({ ...prev, sortOrder: event.target.value }))}
+                />
+                <Input
+                  placeholder="Views"
+                  type="number"
+                  value={form.views}
+                  onChange={(event) => setForm((prev) => ({ ...prev, views: event.target.value }))}
+                />
+                <select
+                  className="h-9 rounded-md border border-slate-200 bg-white px-3 text-sm"
+                  value={form.published}
+                  onChange={(event) =>
+                    setForm((prev) => ({
+                      ...prev,
+                      published: event.target.value === 'false' ? 'false' : 'true',
+                    }))
+                  }
+                >
+                  <option value="true">Published</option>
+                  <option value="false">Draft</option>
+                </select>
+                <select
+                  className="h-9 rounded-md border border-slate-200 bg-white px-3 text-sm"
+                  value={form.featured}
+                  onChange={(event) =>
+                    setForm((prev) => ({
+                      ...prev,
+                      featured: event.target.value === 'true' ? 'true' : 'false',
+                    }))
+                  }
+                >
+                  <option value="false">Not featured</option>
+                  <option value="true">Featured</option>
+                </select>
+                <label className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-md border border-slate-200 px-3 py-2 text-sm">
+                  <Upload className="h-4 w-4" />
+                  {uploading ? 'Yüklənir...' : 'Şəkil yüklə'}
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={(event) => void handleImageUpload(event)}
+                  />
+                </label>
+              </div>
+
+              <Input
+                placeholder="Şəkil URL"
+                value={form.image}
+                onChange={(event) => setForm((prev) => ({ ...prev, image: event.target.value }))}
+              />
             </div>
 
-            <Card className="border-slate-200 shadow-sm">
-                <CardHeader className="pb-3">
-                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                        <div>
-                            <CardTitle className="text-lg">Məqalələrin Siyahısı</CardTitle>
-                            <CardDescription>Sistemdə ümumi {initialPosts.length} məqalə mövcuddur</CardDescription>
-                        </div>
-                        <div className="relative w-full sm:w-64">
-                            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-slate-400" />
-                            <Input
-                                placeholder="Başlıq və ya müəllif axtar..."
-                                className="pl-9 h-9"
-                                value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
-                            />
-                        </div>
-                    </div>
-                </CardHeader>
-                <CardContent>
-                    <div className="rounded-md border border-slate-100 overflow-hidden">
-                        <Table>
-                            <TableHeader className="bg-slate-50">
-                                <TableRow>
-                                    <TableHead className="w-[80px]">Məqalə</TableHead>
-                                    <TableHead>Məlumat</TableHead>
-                                    <TableHead>Müəllif & Kateqoriya</TableHead>
-                                    <TableHead>Statistika</TableHead>
-                                    <TableHead>Status</TableHead>
-                                    <TableHead className="text-right">Əməliyyat</TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {initialPosts.map((post) => (
-                                    <TableRow key={post.id} className="group">
-                                        <TableCell>
-                                            <div className="h-12 w-16 relative rounded overflow-hidden border border-slate-200">
-                                                <Image
-                                                    src={post.image}
-                                                    alt={post.title}
-                                                    fill
-                                                    className="object-cover"
-                                                />
-                                            </div>
-                                        </TableCell>
-                                        <TableCell className="max-w-[250px]">
-                                            <div className="flex flex-col">
-                                                <span className="font-semibold text-slate-900 truncate" title={post.title}>{post.title}</span>
-                                                <span className="text-xs text-slate-500 mt-1 flex items-center">
-                                                    <Calendar className="w-3 h-3 mr-1" />
-                                                    {post.date}
-                                                </span>
-                                            </div>
-                                        </TableCell>
-                                        <TableCell>
-                                            <div className="flex flex-col space-y-1">
-                                                <div className="flex items-center text-sm font-medium text-slate-700">
-                                                    <User className="w-3.5 h-3.5 mr-1.5 text-brand-blue" />
-                                                    {post.author}
-                                                </div>
-                                                <div className="flex items-center text-xs text-slate-500">
-                                                    <Tag className="w-3.5 h-3.5 mr-1.5 text-slate-400" />
-                                                    {post.category}
-                                                </div>
-                                            </div>
-                                        </TableCell>
-                                        <TableCell>
-                                            <div className="flex items-center text-sm font-medium text-slate-600">
-                                                <Eye className="w-4 h-4 mr-1.5 text-slate-400" />
-                                                {post.views > 0 ? post.views.toLocaleString() : '-'}
-                                            </div>
-                                        </TableCell>
-                                        <TableCell>
-                                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${post.status === 'published' ? 'bg-brand-blue-soft text-brand-blue border-brand-blue/20' :
-                                                    'bg-brand-orange/15 text-brand-orange-dark border-brand-orange/25'
-                                                }`}>
-                                                {post.status === 'published' ? 'Paylaşılıb' : 'Qaralama'}
-                                            </span>
-                                        </TableCell>
-                                        <TableCell className="text-right">
-                                            <div className="flex items-center justify-end gap-2 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
-                                                <Button variant="ghost" size="icon" className="h-8 w-8 text-brand-blue hover:text-brand-blue hover:bg-brand-blue-soft">
-                                                    <FileEdit className="h-4 w-4" />
-                                                </Button>
-                                                <Button variant="ghost" size="icon" className="h-8 w-8 text-red-600 hover:text-red-700 hover:bg-red-50">
-                                                    <Trash2 className="h-4 w-4" />
-                                                </Button>
-                                            </div>
-                                            <DropdownMenu>
-                                                <DropdownMenuTrigger asChild>
-                                                    <Button variant="ghost" className="h-8 w-8 p-0 sm:hidden">
-                                                        <MoreHorizontal className="h-4 w-4" />
-                                                    </Button>
-                                                </DropdownMenuTrigger>
-                                                <DropdownMenuContent align="end">
-                                                    <DropdownMenuItem>
-                                                        <FileEdit className="mr-2 h-4 w-4" />
-                                                        <span>Redaktə Et</span>
-                                                    </DropdownMenuItem>
-                                                    <DropdownMenuItem className="text-red-600 focus:text-red-700 focus:bg-red-50">
-                                                        <Trash2 className="mr-2 h-4 w-4" />
-                                                        <span>Məqaləni Sil</span>
-                                                    </DropdownMenuItem>
-                                                </DropdownMenuContent>
-                                            </DropdownMenu>
-                                        </TableCell>
-                                    </TableRow>
-                                ))}
-                            </TableBody>
-                        </Table>
-                    </div>
-                </CardContent>
-            </Card>
-        </div>
-    );
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={() => setDialogOpen(false)}>
+                Ləğv et
+              </Button>
+              <Button
+                type="submit"
+                className="bg-brand-orange hover:bg-brand-orange-dark text-white"
+                disabled={submitting || uploading}
+              >
+                {submitting ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : null}
+                {editingItem ? 'Yenilə' : 'Yarat'}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
 }

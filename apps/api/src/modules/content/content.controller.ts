@@ -16,6 +16,24 @@ import { ContentService } from './content.service';
 export class ContentController {
   constructor(private readonly contentService: ContentService) {}
 
+  @UseGuards(AdminAuthGuard)
+  @Get('admin/testimonials')
+  getTestimonialsAdmin() {
+    return this.contentService.getTestimonialsAdmin();
+  }
+
+  @UseGuards(AdminAuthGuard)
+  @Get('admin/pages')
+  getPagesAdmin() {
+    return this.contentService.getPagesAdmin();
+  }
+
+  @UseGuards(AdminAuthGuard)
+  @Get('admin/pages/:slug')
+  getPageBySlugAdmin(@Param('slug') slug: string) {
+    return this.contentService.getPageBySlugAdmin(slug);
+  }
+
   @Get('testimonials')
   getTestimonials(@Query('locale') locale = 'az') {
     return this.contentService.getTestimonials(locale);

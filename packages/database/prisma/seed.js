@@ -947,6 +947,120 @@ const contentPages = [
   },
 ];
 
+const faqs = [
+  {
+    id: 'faq-appointment',
+    questionAz: 'Qəbula necə yazıla bilərəm?',
+    questionEn: 'How can I book an appointment?',
+    questionRu: 'Как записаться на прием?',
+    answerAz:
+      'Qəbula yazılmaq üçün sayt üzərindən formu doldura, WhatsApp ilə əlaqə saxlaya və ya klinikamıza zəng edə bilərsiniz.',
+    answerEn:
+      'You can book an appointment through the website form, by contacting us on WhatsApp, or by calling the clinic.',
+    answerRu:
+      'Вы можете записаться через форму на сайте, связаться с нами в WhatsApp или позвонить в клинику.',
+  },
+  {
+    id: 'faq-insurance',
+    questionAz: 'Sığorta ilə xidmət göstərirsiniz?',
+    questionEn: 'Do you provide services through insurance?',
+    questionRu: 'Вы работаете со страхованием?',
+    answerAz:
+      'Bəli, bir sıra sığorta şirkətləri ilə əməkdaşlıq edirik. Dəqiq məlumat üçün qəbul şöbəsi ilə əlaqə saxlayın.',
+    answerEn:
+      'Yes, we cooperate with selected insurance providers. Please contact reception for exact coverage details.',
+    answerRu:
+      'Да, мы сотрудничаем с рядом страховых компаний. Для уточнения покрытия обратитесь в регистратуру.',
+  },
+  {
+    id: 'faq-lab-results',
+    questionAz: 'Laborator analiz nəticələri nə vaxt hazır olur?',
+    questionEn: 'When are laboratory test results ready?',
+    questionRu: 'Когда готовы результаты лабораторных анализов?',
+    answerAz:
+      'Əksər analizlər gün ərzində hazır olur. Bəzi xüsusi testlər üçün nəticə müddəti daha uzun ola bilər.',
+    answerEn:
+      'Most tests are completed the same day. Some specialized tests may require a longer turnaround.',
+    answerRu:
+      'Большинство анализов готово в течение дня. Для некоторых специализированных исследований срок может быть больше.',
+  },
+  {
+    id: 'faq-documents',
+    questionAz: 'Qəbula gələrkən hansı sənədlər lazımdır?',
+    questionEn: 'What documents should I bring to my appointment?',
+    questionRu: 'Какие документы нужно взять на прием?',
+    answerAz:
+      'Şəxsiyyət vəsiqəsi, varsa əvvəlki tibbi nəticələr və sığorta sənədlərinizi özünüzlə gətirməyiniz tövsiyə olunur.',
+    answerEn:
+      'Please bring your ID, previous medical records (if available), and insurance documents when applicable.',
+    answerRu:
+      'Рекомендуем взять удостоверение личности, предыдущие медицинские результаты и страховые документы (если есть).',
+  },
+  {
+    id: 'faq-working-hours',
+    questionAz: 'Klinikanın iş saatları necədir?',
+    questionEn: 'What are the clinic working hours?',
+    questionRu: 'Какой график работы клиники?',
+    answerAz:
+      'Bazar ertəsindən cüməyə 09:00-19:00, şənbə 10:00-16:00 xidmət göstəririk.',
+    answerEn:
+      'We are open Monday to Friday from 09:00 to 19:00, and Saturday from 10:00 to 16:00.',
+    answerRu:
+      'Мы работаем с понедельника по пятницу с 09:00 до 19:00, в субботу с 10:00 до 16:00.',
+  },
+];
+
+const galleryItems = [
+  {
+    id: 'gallery-diagnostic-room',
+    imageUrl:
+      'https://images.unsplash.com/photo-1586773860418-d37222d8fce3?q=80&w=1800&auto=format&fit=crop',
+    captionAz: 'Diaqnostika otağı',
+    captionEn: 'Diagnostics room',
+    captionRu: 'Диагностический кабинет',
+  },
+  {
+    id: 'gallery-operation-room',
+    imageUrl:
+      'https://images.unsplash.com/photo-1516549655669-df522f7c8f89?q=80&w=1800&auto=format&fit=crop',
+    captionAz: 'Əməliyyat zalı',
+    captionEn: 'Operation room',
+    captionRu: 'Операционный зал',
+  },
+  {
+    id: 'gallery-laboratory',
+    imageUrl:
+      'https://images.unsplash.com/photo-1579154204601-01588f351e67?q=80&w=1800&auto=format&fit=crop',
+    captionAz: 'Klinik laboratoriya',
+    captionEn: 'Clinical laboratory',
+    captionRu: 'Клиническая лаборатория',
+  },
+  {
+    id: 'gallery-reception',
+    imageUrl:
+      'https://images.unsplash.com/photo-1538108149393-fbbd81895907?q=80&w=1800&auto=format&fit=crop',
+    captionAz: 'Resepsion sahəsi',
+    captionEn: 'Reception area',
+    captionRu: 'Зона ресепшн',
+  },
+  {
+    id: 'gallery-imaging',
+    imageUrl:
+      'https://images.unsplash.com/photo-1666214280391-8ff5bd3c0bf0?q=80&w=1800&auto=format&fit=crop',
+    captionAz: 'Görüntüləmə bölməsi',
+    captionEn: 'Imaging department',
+    captionRu: 'Отделение визуализации',
+  },
+  {
+    id: 'gallery-cardiology',
+    imageUrl:
+      'https://images.unsplash.com/photo-1584515933487-779824d29309?q=80&w=1800&auto=format&fit=crop',
+    captionAz: 'Kardiologiya şöbəsi',
+    captionEn: 'Cardiology department',
+    captionRu: 'Кардиологическое отделение',
+  },
+];
+
 const homeStats = [
   { id: 'patients', value: '15,000+', sortOrder: 1 },
   { id: 'doctors', value: '50+', sortOrder: 2 },
@@ -1021,6 +1135,26 @@ async function seedContentPages() {
   }
 }
 
+async function seedFaq() {
+  for (const item of faqs) {
+    await prisma.faq.upsert({
+      where: { id: item.id },
+      update: item,
+      create: item,
+    });
+  }
+}
+
+async function seedGallery() {
+  for (const item of galleryItems) {
+    await prisma.gallery.upsert({
+      where: { id: item.id },
+      update: item,
+      create: item,
+    });
+  }
+}
+
 async function seedContact() {
   const contactPayload = {
     addressAz: 'Xətai rayonu Nəsrəddin Tusi 55 (Amal-2015 yaşayış kompleksi), Ultramed Clinic, Bakı, Azərbaycan',
@@ -1085,6 +1219,8 @@ async function main() {
   await seedBlog();
   await seedTestimonials();
   await seedContentPages();
+  await seedFaq();
+  await seedGallery();
   await seedContact();
   await seedHomeStats();
   console.log('Database seeding complete.');

@@ -16,6 +16,18 @@ import { BlogService } from './blog.service';
 export class BlogController {
     constructor(private readonly blogService: BlogService) { }
 
+    @UseGuards(AdminAuthGuard)
+    @Get('admin/all')
+    findAllAdmin() {
+        return this.blogService.findAllAdmin();
+    }
+
+    @UseGuards(AdminAuthGuard)
+    @Get('admin/:id')
+    findOneAdmin(@Param('id') id: string) {
+        return this.blogService.findOneAdmin(id);
+    }
+
     @Get()
     findAll(@Query('locale') locale = 'az') {
         return this.blogService.findAll(locale);

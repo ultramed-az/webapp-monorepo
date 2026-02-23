@@ -16,6 +16,18 @@ import { DoctorsService } from './doctors.service';
 export class DoctorsController {
     constructor(private readonly doctorsService: DoctorsService) { }
 
+    @UseGuards(AdminAuthGuard)
+    @Get('admin/all')
+    findAllAdmin() {
+        return this.doctorsService.findAllAdmin();
+    }
+
+    @UseGuards(AdminAuthGuard)
+    @Get('admin/:id')
+    findOneAdmin(@Param('id') id: string) {
+        return this.doctorsService.findOneAdmin(id);
+    }
+
     @Get()
     findAll(@Query('locale') locale = 'az') {
         return this.doctorsService.findAll(locale);

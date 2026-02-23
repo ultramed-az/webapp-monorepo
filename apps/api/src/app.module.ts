@@ -9,9 +9,22 @@ import { BlogModule } from './modules/blog/blog.module';
 import { ContactModule } from './modules/contact/contact.module';
 import { HomeModule } from './modules/home/home.module';
 import { ContentModule } from './modules/content/content.module';
+import { FaqModule } from './modules/faq/faq.module';
+import { GalleryModule } from './modules/gallery/gallery.module';
 
 @Module({
-  imports: [PrismaModule, AdminModule, ServicesModule, DoctorsModule, BlogModule, ContactModule, HomeModule, ContentModule],
+  imports: [
+    PrismaModule,
+    AdminModule,
+    ServicesModule,
+    DoctorsModule,
+    BlogModule,
+    ContactModule,
+    HomeModule,
+    ContentModule,
+    FaqModule,
+    GalleryModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })

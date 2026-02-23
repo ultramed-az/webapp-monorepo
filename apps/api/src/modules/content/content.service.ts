@@ -8,6 +8,24 @@ type SectionItem = { title: string; content: string };
 export class ContentService {
   constructor(private readonly prisma: PrismaService) {}
 
+  async getTestimonialsAdmin() {
+    return this.prisma.testimonial.findMany({
+      orderBy: [{ createdAt: 'desc' }],
+    });
+  }
+
+  async getPagesAdmin() {
+    return (this.prisma as any).contentPage.findMany({
+      orderBy: [{ slug: 'asc' }],
+    });
+  }
+
+  async getPageBySlugAdmin(slug: string) {
+    return (this.prisma as any).contentPage.findUnique({
+      where: { slug },
+    });
+  }
+
   async getTestimonials(localeRaw: string) {
     const locale = this.normalizeLocale(localeRaw);
     const page = await (this.prisma as any).contentPage.findUnique({

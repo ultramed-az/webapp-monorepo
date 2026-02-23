@@ -1,59 +1,368 @@
-import Image from 'next/image';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { Plus, Trash2, Pencil } from 'lucide-react';
+'use client';
 
-const galleryItems = [
-    {
-        id: 1,
-        title: 'Diaqnostika Otagi',
-        image: 'https://images.unsplash.com/photo-1584515933487-779824d29309?q=80&w=1200&auto=format&fit=crop',
-    },
-    {
-        id: 2,
-        title: 'Emeliyyat Zali',
-        image: 'https://images.unsplash.com/photo-1516549655669-df522f7c8f89?q=80&w=1200&auto=format&fit=crop',
-    },
-    {
-        id: 3,
-        title: 'Resepsn Sahesi',
-        image: 'https://images.unsplash.com/photo-1538108149393-fbbd81895907?q=80&w=1200&auto=format&fit=crop',
-    },
-];
+import Image from 'next/image';
+import { ChangeEvent, useEffect, useMemo, useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Skeleton } from '@/components/ui/skeleton';
+import { FileEdit, Loader2, Plus, Search, Trash2, Upload } from 'lucide-react';
+import {
+  type AdminGalleryRecord,
+  createAdminGalleryItem,
+  deleteAdminGalleryItem,
+  getAdminGalleryItems,
+  updateAdminGalleryItem,
+  uploadAdminMedia,
+} from '@/lib/admin-api';
+
+type FormState = {
+  imageUrl: string;
+  captionAz: string;
+  captionEn: string;
+  captionRu: string;
+};
+
+const EMPTY_FORM: FormState = {
+  imageUrl: '',
+  captionAz: '',
+  captionEn: '',
+  captionRu: '',
+};
+
+function toFormState(item: AdminGalleryRecord): FormState {
+  return {
+    imageUrl: item.imageUrl,
+    captionAz: item.captionAz ?? '',
+    captionEn: item.captionEn ?? '',
+    captionRu: item.captionRu ?? '',
+  };
+}
 
 export default function AdminGalleryPage() {
-    return (
-        <div className="space-y-6">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                <div>
-                    <h2 className="text-2xl font-bold tracking-tight text-slate-900">Qalereya Idareetmesi</h2>
-                    <p className="text-slate-500">Klinikaya aid sekilleri elave edin, redakte edin ve silin.</p>
+  const [items, setItems] = useState<AdminGalleryRecord[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
+
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [editingItem, setEditingItem] = useState<AdminGalleryRecord | null>(null);
+  const [form, setForm] = useState<FormState>(EMPTY_FORM);
+
+  const [uploading, setUploading] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+
+  const filteredItems = useMemo(() => {
+    const needle = searchTerm.trim().toLowerCase();
+    if (!needle) {
+      return items;
+    }
+
+    return items.filter((item) =>
+      [item.captionAz ?? '', item.captionEn ?? '', item.captionRu ?? '', item.imageUrl]
+        .join(' ')
+        .toLowerCase()
+        .includes(needle),
+    );
+  }, [items, searchTerm]);
+
+  const loadItems = async () => {
+    setLoading(true);
+    setErrorMessage(null);
+
+    try {
+      const data = await getAdminGalleryItems();
+      setItems(data);
+    } catch (error) {
+      setErrorMessage(error instanceof Error ? error.message : 'Qalereya məlumatları yüklənmədi.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    void loadItems();
+  }, []);
+
+  const openCreateDialog = () => {
+    setEditingItem(null);
+    setForm(EMPTY_FORM);
+    setDialogOpen(true);
+  };
+
+  const openEditDialog = (item: AdminGalleryRecord) => {
+    setEditingItem(item);
+    setForm(toFormState(item));
+    setDialogOpen(true);
+  };
+
+  const handleDelete = async (item: AdminGalleryRecord) => {
+    const accepted = window.confirm('Bu şəkil silinsin?');
+    if (!accepted) {
+      return;
+    }
+
+    setErrorMessage(null);
+    setSuccessMessage(null);
+
+    try {
+      await deleteAdminGalleryItem(item.id);
+      setSuccessMessage('Qalereya elementi silindi.');
+      await loadItems();
+    } catch (error) {
+      setErrorMessage(error instanceof Error ? error.message : 'Qalereya elementi silinmədi.');
+    }
+  };
+
+  const handleUpload = async (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) {
+      return;
+    }
+
+    setUploading(true);
+    setErrorMessage(null);
+
+    try {
+      const media = await uploadAdminMedia(file);
+      setForm((prev) => ({
+        ...prev,
+        imageUrl: media.url,
+      }));
+      setSuccessMessage('Şəkil yükləndi.');
+    } catch (error) {
+      setErrorMessage(error instanceof Error ? error.message : 'Şəkil yüklənmədi.');
+    } finally {
+      setUploading(false);
+      event.target.value = '';
+    }
+  };
+
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
+    setSubmitting(true);
+    setErrorMessage(null);
+    setSuccessMessage(null);
+
+    const imageUrl = form.imageUrl.trim();
+    if (!imageUrl) {
+      setSubmitting(false);
+      setErrorMessage('Şəkil URL boş ola bilməz.');
+      return;
+    }
+
+    const captionAz = form.captionAz.trim();
+    const payload: Partial<AdminGalleryRecord> = {
+      imageUrl,
+      captionAz: captionAz || null,
+      captionEn: form.captionEn.trim() || captionAz || null,
+      captionRu: form.captionRu.trim() || captionAz || null,
+    };
+
+    try {
+      if (editingItem) {
+        await updateAdminGalleryItem(editingItem.id, payload);
+        setSuccessMessage('Qalereya elementi yeniləndi.');
+      } else {
+        await createAdminGalleryItem(payload);
+        setSuccessMessage('Qalereya elementi yaradıldı.');
+      }
+
+      setDialogOpen(false);
+      await loadItems();
+    } catch (error) {
+      setErrorMessage(error instanceof Error ? error.message : 'Əməliyyat uğursuz oldu.');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <h2 className="text-2xl font-bold tracking-tight text-slate-900">Qalereya İdarəetməsi</h2>
+          <p className="text-slate-500">Qalereya backend CRUD və media upload ilə idarə olunur.</p>
+        </div>
+        <Button
+          className="bg-brand-orange hover:bg-brand-orange-dark text-white"
+          onClick={openCreateDialog}
+          type="button"
+        >
+          <Plus className="h-4 w-4 mr-2" />
+          Yeni Şəkil
+        </Button>
+      </div>
+
+      {errorMessage ? (
+        <div className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+          {errorMessage}
+        </div>
+      ) : null}
+      {successMessage ? (
+        <div className="rounded-md border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-700">
+          {successMessage}
+        </div>
+      ) : null}
+
+      <Card className="border-slate-200 shadow-sm">
+        <CardHeader>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <CardTitle>Qalereya Siyahısı</CardTitle>
+            <div className="relative w-full sm:w-72">
+              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-slate-400" />
+              <Input
+                placeholder="Qalereyada axtar..."
+                className="pl-9 h-9"
+                value={searchTerm}
+                onChange={(event) => setSearchTerm(event.target.value)}
+              />
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent>
+          {loading ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+              {Array.from({ length: 6 }).map((_, index) => (
+                <Skeleton key={String(index)} className="h-60 w-full rounded-xl" />
+              ))}
+            </div>
+          ) : filteredItems.length === 0 ? (
+            <div className="rounded-lg border border-slate-200 px-4 py-8 text-center text-sm text-slate-500">
+              Nəticə tapılmadı.
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+              {filteredItems.map((item) => (
+                <Card key={item.id} className="overflow-hidden border-slate-200">
+                  <div className="relative aspect-[4/3] bg-slate-100">
+                    <Image
+                      src={item.imageUrl}
+                      alt={item.captionAz ?? 'Gallery image'}
+                      fill
+                      className="object-cover"
+                    />
+                  </div>
+                  <CardContent className="p-4 space-y-3">
+                    <p className="font-semibold text-slate-900">{item.captionAz ?? 'Başlıq yoxdur'}</p>
+                    <div className="flex items-center gap-2">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => openEditDialog(item)}
+                        type="button"
+                      >
+                        <FileEdit className="h-4 w-4 mr-1" />
+                        Redaktə et
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="text-red-600 border-red-200 hover:bg-red-50"
+                        onClick={() => void handleDelete(item)}
+                        type="button"
+                      >
+                        <Trash2 className="h-4 w-4 mr-1" />
+                        Sil
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <DialogContent className="sm:max-w-3xl">
+          <DialogHeader>
+            <DialogTitle>{editingItem ? 'Şəkli redaktə et' : 'Yeni şəkil əlavə et'}</DialogTitle>
+            <DialogDescription>
+              Şəkli yükləyin və AZ/EN/RU başlıqları əlavə edin.
+            </DialogDescription>
+          </DialogHeader>
+
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="max-h-[68vh] overflow-y-auto pr-1 space-y-4">
+              <div className="grid gap-3 md:grid-cols-[1fr_auto]">
+                <Input
+                  placeholder="Şəkil URL"
+                  value={form.imageUrl}
+                  onChange={(event) =>
+                    setForm((prev) => ({ ...prev, imageUrl: event.target.value }))
+                  }
+                  required
+                />
+                <label className="inline-flex cursor-pointer items-center justify-center rounded-md border border-slate-200 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">
+                  <Upload className="h-4 w-4 mr-2" />
+                  {uploading ? 'Yüklənir...' : 'Şəkil yüklə'}
+                  <input
+                    type="file"
+                    className="hidden"
+                    accept="image/png,image/jpeg,image/webp,image/svg+xml,image/avif"
+                    onChange={handleUpload}
+                    disabled={uploading}
+                  />
+                </label>
+              </div>
+
+              {form.imageUrl ? (
+                <div className="relative h-52 w-full overflow-hidden rounded-lg border border-slate-200 bg-slate-100">
+                  <Image src={form.imageUrl} alt="Preview" fill className="object-cover" />
                 </div>
-                <Button className="bg-brand-orange hover:bg-brand-orange-dark text-white">
-                    <Plus className="w-4 h-4 mr-2" /> Yeni Sekil
-                </Button>
+              ) : null}
+
+              <div className="grid gap-3 md:grid-cols-3">
+                <Input
+                  placeholder="Başlıq AZ"
+                  value={form.captionAz}
+                  onChange={(event) =>
+                    setForm((prev) => ({ ...prev, captionAz: event.target.value }))
+                  }
+                />
+                <Input
+                  placeholder="Caption EN"
+                  value={form.captionEn}
+                  onChange={(event) =>
+                    setForm((prev) => ({ ...prev, captionEn: event.target.value }))
+                  }
+                />
+                <Input
+                  placeholder="Заголовок RU"
+                  value={form.captionRu}
+                  onChange={(event) =>
+                    setForm((prev) => ({ ...prev, captionRu: event.target.value }))
+                  }
+                />
+              </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                {galleryItems.map((item) => (
-                    <Card key={item.id} className="overflow-hidden border-slate-200 shadow-sm">
-                        <div className="relative aspect-[4/3] bg-slate-100">
-                            <Image src={item.image} alt={item.title} fill className="object-cover" />
-                        </div>
-                        <CardContent className="p-4 space-y-3">
-                            <p className="font-semibold text-slate-900">{item.title}</p>
-                            <div className="flex items-center gap-2">
-                                <Button variant="outline" size="sm">
-                                    <Pencil className="w-4 h-4 mr-1" /> Redakte et
-                                </Button>
-                                <Button variant="outline" size="sm" className="text-red-600 border-red-200 hover:bg-red-50">
-                                    <Trash2 className="w-4 h-4 mr-1" /> Sil
-                                </Button>
-                            </div>
-                        </CardContent>
-                    </Card>
-                ))}
-            </div>
-        </div>
-    );
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={() => setDialogOpen(false)}>
+                Ləğv et
+              </Button>
+              <Button
+                type="submit"
+                className="bg-brand-orange hover:bg-brand-orange-dark text-white"
+                disabled={submitting || uploading}
+              >
+                {submitting ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : null}
+                {editingItem ? 'Yenilə' : 'Yarat'}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
 }

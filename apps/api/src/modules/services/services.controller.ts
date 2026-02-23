@@ -6,6 +6,18 @@ import { ServicesService } from './services.service';
 export class ServicesController {
     constructor(private readonly servicesService: ServicesService) { }
 
+    @UseGuards(AdminAuthGuard)
+    @Get('admin/all')
+    findAllAdmin() {
+        return this.servicesService.findAllAdmin();
+    }
+
+    @UseGuards(AdminAuthGuard)
+    @Get('admin/:id')
+    findOneAdmin(@Param('id') id: string) {
+        return this.servicesService.findOneAdmin(id);
+    }
+
     @Get()
     findAll(@Query('locale') locale = 'az') {
         return this.servicesService.findAll(locale);

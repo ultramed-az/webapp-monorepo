@@ -89,6 +89,18 @@ export type HomeStatItem = {
     value: string;
 };
 
+export type FaqItem = {
+    id: string;
+    question: string;
+    answer: string;
+};
+
+export type GalleryItem = {
+    id: string;
+    imageUrl: string;
+    caption: string;
+};
+
 export type ServiceListItem = {
     id: string;
     title: string;
@@ -249,4 +261,12 @@ export async function getServices(locale: string | undefined): Promise<ServiceLi
 
 export async function getServiceById(id: string, locale: string | undefined): Promise<ServiceDetailItem | null> {
     return request<ServiceDetailItem | null>(`/services/${id}`, { locale: toLocale(locale) });
+}
+
+export async function getFaqItems(locale: string | undefined): Promise<FaqItem[]> {
+    return request<FaqItem[]>('/faq', { locale: toLocale(locale) });
+}
+
+export async function getGalleryItems(locale: string | undefined): Promise<GalleryItem[]> {
+    return request<GalleryItem[]>('/gallery', { locale: toLocale(locale) });
 }

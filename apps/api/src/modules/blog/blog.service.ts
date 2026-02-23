@@ -5,6 +5,23 @@ import { PrismaService } from '../../prisma/prisma.service';
 export class BlogService {
     constructor(private readonly prisma: PrismaService) { }
 
+    async findAllAdmin() {
+        return this.prisma.blogPost.findMany({
+            orderBy: [
+                { featured: 'desc' },
+                { sortOrder: 'asc' },
+                { publishedAt: 'desc' },
+                { createdAt: 'desc' },
+            ],
+        });
+    }
+
+    async findOneAdmin(id: string) {
+        return this.prisma.blogPost.findUnique({
+            where: { id },
+        });
+    }
+
     async findAll(localeRaw: string) {
         const locale = this.normalizeLocale(localeRaw);
 
