@@ -307,87 +307,12 @@
       }
     ]
   },
-  "TestimonialsPage": {
-    "title": "Patient Testimonials",
-    "description": "Patient satisfaction is our top priority. The feedback below reflects real experiences.",
-    "items": [
-      {
-        "name": "Nigar Hasanli",
-        "role": "Patient",
-        "quote": "The attention and professionalism at Ultramed are truly impressive. I was very satisfied with the doctors approach."
-      },
-      {
-        "name": "Samir Aliyev",
-        "role": "Patient relative",
-        "quote": "During my mother treatment, the team answered all our questions with patience. The clinic was clean and processes were well organized."
-      },
-      {
-        "name": "Aysel Mammadova",
-        "role": "Patient",
-        "quote": "The appointment process was smooth and lab results were delivered on time. I would choose this clinic again."
-      },
-      {
-        "name": "Rasim Huseynov",
-        "role": "Patient",
-        "quote": "I received excellent care at the cardiology department. The treatment plan was explained clearly."
-      }
-    ]
-  },
-  "PrivacyPolicyPage": {
-    "title": "Privacy Policy",
-    "description": "This policy explains how patient information is collected, processed, and protected.",
-    "sections": [
-      {
-        "title": "1. Data we collect",
-        "content": "For appointment registration and medical service delivery, we collect information such as full name, contact details, date of birth, and medical history."
-      },
-      {
-        "title": "2. Purpose of data usage",
-        "content": "Collected data is used for treatment workflows, appointment scheduling, lab result handling, and service quality monitoring."
-      },
-      {
-        "title": "3. Third-party sharing",
-        "content": "Except where required by law, your information is not shared with third parties without your consent."
-      },
-      {
-        "title": "4. Security measures",
-        "content": "Data is stored in protected infrastructure and is accessible only by authorized personnel."
-      },
-      {
-        "title": "5. Contact",
-        "content": "For privacy-related questions, please contact privacy@ultramed.az."
-      }
-    ]
-  },
-  "TermsPage": {
-    "title": "Terms of Service",
-    "description": "These terms define usage rules of the Ultramed platform and responsibilities of parties.",
-    "sections": [
-      {
-        "title": "1. General provisions",
-        "content": "By using the website, you agree to these terms. Terms may be updated when necessary."
-      },
-      {
-        "title": "2. Appointment registration",
-        "content": "Accuracy of information entered during online registration is the responsibility of the patient."
-      },
-      {
-        "title": "3. Limitation of liability",
-        "content": "Information on the website is for awareness purposes and does not replace professional medical advice."
-      },
-      {
-        "title": "4. Copyright",
-        "content": "Texts, design, and media elements on the website are protected by copyright of Ultramed and its partners."
-      },
-      {
-        "title": "5. Governing law",
-        "content": "Any disputes are resolved in accordance with the legislation of the Republic of Azerbaijan."
-      }
-    ]
-  },
   "ErrorPages": {
     "notFoundTitle": "Page not found",
     "notFoundDescription": "The page you are looking for does not exist or has been removed. You can return to the home page.",
+    "notFoundHelpBadge": "Quick links",
+    "notFoundHelpTitle": "Useful destinations",
+    "notFoundHelpDescription": "The content you need might be under a different section. Continue with one of these pages.",
     "backHome": "Back to home",
     "genericTitle": "Something went wrong",
     "genericDescription": "An unexpected technical error occurred. Please try again.",
@@ -395,7 +320,9 @@
     "home": "Home page",
     "internalTitle": "Internal server error",
     "internalDescription": "An unexpected system issue occurred. Please retry in a few minutes.",
-    "contactPage": "Contact page"
+    "contactPage": "Contact page",
+    "temporarilyUnavailableTitle": "Service is temporarily unavailable",
+    "temporarilyUnavailableDescription": "The backend is currently not responding. Please try again in a few minutes."
   },
   "HealthPage": {
     "title": "Frontend Health",

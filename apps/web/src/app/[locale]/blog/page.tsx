@@ -5,10 +5,12 @@ import { useParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
 import { Link } from '@/i18n/routing';
 import { Calendar, User, Tag, ArrowRight, BookOpen } from 'lucide-react';
 import Image from 'next/image';
-import { getBlogPosts, type BlogListItem } from '@/lib/api';
+import TemporaryUnavailable from '@/components/feedback/TemporaryUnavailable';
+import { getBlogPosts, isBackendUnavailableError, type BlogListItem } from '@/lib/api';
 
 const ALL_CATEGORIES = '__all__';
 
@@ -20,6 +22,7 @@ export default function BlogPage() {
     const [refreshKey, setRefreshKey] = useState(0);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [isUnavailable, setIsUnavailable] = useState(false);
     const [posts, setPosts] = useState<BlogListItem[]>([]);
     const [selectedCategory, setSelectedCategory] = useState<string>(ALL_CATEGORIES);
 
@@ -29,6 +32,7 @@ export default function BlogPage() {
         async function loadPosts() {
             setIsLoading(true);
             setError(null);
+            setIsUnavailable(false);
 
             try {
                 const data = await getBlogPosts(locale);
@@ -37,6 +41,10 @@ export default function BlogPage() {
                 }
             } catch (fetchError) {
                 if (!isCancelled) {
+                    if (isBackendUnavailableError(fetchError)) {
+                        setIsUnavailable(true);
+                        return;
+                    }
                     const message = fetchError instanceof Error ? fetchError.message : t('fetchFailedTitle');
                     setError(message);
                 }
@@ -79,6 +87,16 @@ export default function BlogPage() {
             year: 'numeric',
         }).format(new Date(isoDate));
     };
+
+    if (isUnavailable && posts.length === 0) {
+        return (
+            <div className="min-h-[70vh] bg-brand-cream/60 px-6 py-12">
+                <div className="container mx-auto max-w-4xl">
+                    <TemporaryUnavailable onRetry={() => setRefreshKey((key) => key + 1)} />
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="flex flex-col min-h-screen">
@@ -126,8 +144,32 @@ export default function BlogPage() {
             <section className="py-16 bg-white flex-grow">
                 <div className="container mx-auto px-6">
                     {isLoading && posts.length === 0 ? (
-                        <div className="text-center py-20 bg-slate-50 rounded-2xl border border-slate-100">
-                            <h3 className="text-xl font-semibold text-slate-900 mb-2">{t('loadingTitle')}</h3>
+                        <div className="space-y-10">
+                            <div className="grid grid-cols-1 gap-8 rounded-[2rem] border border-slate-100 bg-slate-50 p-6 lg:grid-cols-2 lg:p-10">
+                                <Skeleton className="h-[320px] w-full rounded-3xl" />
+                                <div className="space-y-4">
+                                    <Skeleton className="h-5 w-1/3" />
+                                    <Skeleton className="h-10 w-full" />
+                                    <Skeleton className="h-10 w-4/5" />
+                                    <Skeleton className="h-4 w-full" />
+                                    <Skeleton className="h-4 w-11/12" />
+                                    <Skeleton className="h-10 w-40" />
+                                </div>
+                            </div>
+                            <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
+                                {Array.from({ length: 6 }).map((_, index) => (
+                                    <Card key={index} className="overflow-hidden border-slate-100">
+                                        <Skeleton className="h-56 w-full rounded-none" />
+                                        <CardContent className="space-y-3 p-6">
+                                            <Skeleton className="h-4 w-2/3" />
+                                            <Skeleton className="h-5 w-full" />
+                                            <Skeleton className="h-5 w-5/6" />
+                                            <Skeleton className="h-4 w-full" />
+                                            <Skeleton className="h-4 w-4/5" />
+                                        </CardContent>
+                                    </Card>
+                                ))}
+                            </div>
                         </div>
                     ) : error && posts.length === 0 ? (
                         <div className="text-center py-20 bg-slate-50 rounded-2xl border border-slate-100">

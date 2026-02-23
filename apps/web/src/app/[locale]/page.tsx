@@ -4,8 +4,10 @@ import { useEffect, useMemo, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Skeleton } from '@/components/ui/skeleton';
+import TemporaryUnavailable from '@/components/feedback/TemporaryUnavailable';
 import { HeartPulse, Stethoscope, Clock, ShieldCheck, ArrowRight, Activity, Users } from 'lucide-react';
-import { getHomeStats } from '@/lib/api';
+import { getHomeStats, isBackendUnavailableError } from '@/lib/api';
 
 export default function HomePage() {
     const t = useTranslations('HomePage');
@@ -46,11 +48,17 @@ export default function HomePage() {
         departments: '20+',
         years: '15+',
     });
+    const [refreshKey, setRefreshKey] = useState(0);
+    const [isStatsLoading, setIsStatsLoading] = useState(true);
+    const [isStatsUnavailable, setIsStatsUnavailable] = useState(false);
 
     useEffect(() => {
         let isCancelled = false;
 
         async function loadStats() {
+            setIsStatsLoading(true);
+            setIsStatsUnavailable(false);
+
             try {
                 const response = await getHomeStats();
                 if (isCancelled) return;
@@ -64,8 +72,16 @@ export default function HomePage() {
                     ...currentValues,
                     ...nextValues,
                 }));
-            } catch {
+            } catch (fetchError) {
+                if (isCancelled) return;
+                if (isBackendUnavailableError(fetchError)) {
+                    setIsStatsUnavailable(true);
+                }
                 // Keep static defaults when API is not reachable.
+            } finally {
+                if (!isCancelled) {
+                    setIsStatsLoading(false);
+                }
             }
         }
 
@@ -74,7 +90,7 @@ export default function HomePage() {
         return () => {
             isCancelled = true;
         };
-    }, []);
+    }, [refreshKey]);
 
     const stats = useMemo(
         () => statsTemplate.map((stat) => ({
@@ -154,17 +170,34 @@ export default function HomePage() {
             {/* Statistics Section */}
             <section className="py-16 bg-brand-blue">
                 <div className="container mx-auto px-6">
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center divide-x divide-white/20">
-                        {stats.map((stat, idx) => (
-                            <div key={idx} className="flex flex-col items-center justify-center space-y-2 text-white px-4">
-                                <div className="bg-brand-orange/25 p-3 rounded-full mb-2">
-                                    {stat.icon}
+                    {isStatsUnavailable ? (
+                        <TemporaryUnavailable
+                            compact
+                            className="border-white/10 bg-white/95"
+                            onRetry={() => setRefreshKey((key) => key + 1)}
+                        />
+                    ) : (
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center divide-x divide-white/20">
+                            {stats.map((stat, idx) => (
+                                <div key={idx} className="flex flex-col items-center justify-center space-y-2 text-white px-4">
+                                    <div className="bg-brand-orange/25 p-3 rounded-full mb-2">
+                                        {stat.icon}
+                                    </div>
+                                    {isStatsLoading ? (
+                                        <>
+                                            <Skeleton className="h-10 w-24 bg-white/25" />
+                                            <Skeleton className="h-5 w-36 bg-white/20" />
+                                        </>
+                                    ) : (
+                                        <>
+                                            <div className="text-4xl font-extrabold">{stat.value}</div>
+                                            <div className="text-white/90 font-medium">{stat.label}</div>
+                                        </>
+                                    )}
                                 </div>
-                                <div className="text-4xl font-extrabold">{stat.value}</div>
-                                <div className="text-white/90 font-medium">{stat.label}</div>
-                            </div>
-                        ))}
-                    </div>
+                            ))}
+                        </div>
+                    )}
                 </div>
             </section>
 

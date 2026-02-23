@@ -683,6 +683,269 @@ const blogPosts = [
   },
 ];
 
+const testimonials = [
+  {
+    id: 'testimonial-01-nigar-hesenli',
+    name: 'Nigar Həsənli',
+    roleAz: 'Pasiyent',
+    roleEn: 'Patient',
+    roleRu: 'Пациент',
+    commentAz:
+      'Ultramed-dəki diqqət və peşəkarlıq həqiqətən təsiredicidir. Həkimin yanaşmasından çox razı qaldım.',
+    commentEn:
+      'The care and professionalism at Ultramed are truly impressive. I was very satisfied with the doctor\'s approach.',
+    commentRu:
+      'Внимание и профессионализм в Ultramed действительно впечатляют. Я осталась очень довольна подходом врача.',
+    rating: 5,
+  },
+  {
+    id: 'testimonial-02-samir-eliyev',
+    name: 'Samir Əliyev',
+    roleAz: 'Pasiyent yaxını',
+    roleEn: 'Patient relative',
+    roleRu: 'Родственник пациента',
+    commentAz:
+      'Anamın müalicəsi zamanı komanda bütün suallarımızı səbrlə cavablandırdı. Klinika təmiz, proseslər isə çox yaxşı təşkil olunmuşdu.',
+    commentEn:
+      'During my mother\'s treatment, the team patiently answered all our questions. The clinic was clean and processes were very well organized.',
+    commentRu:
+      'Во время лечения моей мамы команда терпеливо отвечала на все наши вопросы. Клиника была чистой, а процессы отлично организованы.',
+    rating: 5,
+  },
+  {
+    id: 'testimonial-03-aysel-memmedova',
+    name: 'Aysel Məmmədova',
+    roleAz: 'Pasiyent',
+    roleEn: 'Patient',
+    roleRu: 'Пациент',
+    commentAz:
+      'Qəbul prosesi çox rahat keçdi və laboratoriya nəticələri vaxtında çatdırıldı. Bu klinikanı təkrar seçərdim.',
+    commentEn:
+      'The admission process was very smooth and lab results were delivered on time. I would choose this clinic again.',
+    commentRu:
+      'Процесс приема прошел очень комфортно, а результаты лаборатории были предоставлены вовремя. Я бы снова выбрала эту клинику.',
+    rating: 5,
+  },
+  {
+    id: 'testimonial-04-rasim-huseynov',
+    name: 'Rasim Hüseynov',
+    roleAz: 'Pasiyent',
+    roleEn: 'Patient',
+    roleRu: 'Пациент',
+    commentAz:
+      'Kardiologiya şöbəsində mükəmməl xidmət aldım. Müalicə planı mənə çox aydın şəkildə izah edildi.',
+    commentEn:
+      'I received excellent service in the cardiology department. The treatment plan was explained to me very clearly.',
+    commentRu:
+      'В кардиологическом отделении я получил отличный сервис. План лечения был объяснен мне очень понятно.',
+    rating: 5,
+  },
+];
+
+const contentPages = [
+  {
+    slug: 'testimonials',
+    titleAz: 'Pasiyent Rəyləri',
+    titleEn: 'Patient Testimonials',
+    titleRu: 'Отзывы пациентов',
+    descriptionAz:
+      'Pasiyent məmnuniyyəti bizim əsas prioritetimizdir. Aşağıdakı rəylər real təcrübələri əks etdirir.',
+    descriptionEn:
+      'Patient satisfaction is our top priority. The testimonials below reflect real treatment experiences.',
+    descriptionRu:
+      'Удовлетворенность пациентов является нашим главным приоритетом. Ниже представлены отзывы, основанные на реальном опыте.',
+    sectionsAz: [],
+    sectionsEn: [],
+    sectionsRu: [],
+  },
+  {
+    slug: 'privacy-policy',
+    titleAz: 'Məxfilik Siyasəti',
+    titleEn: 'Privacy Policy',
+    titleRu: 'Политика конфиденциальности',
+    descriptionAz:
+      'Bu siyasət pasiyent məlumatlarının necə toplanması, işlənməsi və qorunmasını izah edir.',
+    descriptionEn:
+      'This policy explains how patient data is collected, processed, and protected.',
+    descriptionRu:
+      'Эта политика объясняет, как собираются, обрабатываются и защищаются данные пациентов.',
+    sectionsAz: [
+      {
+        title: '1. Topladığımız məlumatlar',
+        content:
+          'Qəbula yazılmaq və tibbi xidmət göstərmək üçün ad, soyad, əlaqə məlumatları, təvəllüd və tibbi keçmiş kimi məlumatları toplayırıq.',
+      },
+      {
+        title: '2. Məlumatların istifadə məqsədi',
+        content:
+          'Toplanan məlumatlar müalicə prosesləri, görüşlərin planlaşdırılması, analiz nəticələrinin idarə edilməsi və xidmət keyfiyyətinin monitorinqi üçün istifadə olunur.',
+      },
+      {
+        title: '3. Üçüncü tərəflərlə paylaşma',
+        content:
+          'Qanunla tələb olunan hallar istisna olmaqla, məlumatlarınız sizin razılığınız olmadan üçüncü tərəflərlə paylaşılmır.',
+      },
+      {
+        title: '4. Təhlükəsizlik tədbirləri',
+        content:
+          'Məlumatlar qorunan infrastrukturda saxlanılır və yalnız səlahiyyətli işçilər tərəfindən əldə edilə bilər.',
+      },
+      {
+        title: '5. Əlaqə',
+        content:
+          'Məxfiliklə bağlı suallarınız üçün privacy@ultramed.az ünvanına müraciət edə bilərsiniz.',
+      },
+    ],
+    sectionsEn: [
+      {
+        title: '1. Data we collect',
+        content:
+          'To schedule appointments and provide medical services, we collect information such as first and last name, contact details, date of birth, and medical history.',
+      },
+      {
+        title: '2. Purpose of data usage',
+        content:
+          'Collected data is used for treatment workflows, appointment scheduling, lab result management, and service quality monitoring.',
+      },
+      {
+        title: '3. Sharing with third parties',
+        content:
+          'Except where required by law, your data is not shared with third parties without your consent.',
+      },
+      {
+        title: '4. Security measures',
+        content:
+          'Data is stored in protected infrastructure and can only be accessed by authorized personnel.',
+      },
+      {
+        title: '5. Contact',
+        content:
+          'For privacy-related questions, please contact privacy@ultramed.az.',
+      },
+    ],
+    sectionsRu: [
+      {
+        title: '1. Какие данные мы собираем',
+        content:
+          'Для записи на прием и оказания медицинских услуг мы собираем такие данные, как имя, фамилия, контактная информация, дата рождения и медицинский анамнез.',
+      },
+      {
+        title: '2. Цель использования данных',
+        content:
+          'Собранные данные используются для процессов лечения, планирования приемов, управления результатами анализов и мониторинга качества услуг.',
+      },
+      {
+        title: '3. Передача третьим лицам',
+        content:
+          'За исключением случаев, предусмотренных законом, ваши данные не передаются третьим лицам без вашего согласия.',
+      },
+      {
+        title: '4. Меры безопасности',
+        content:
+          'Данные хранятся в защищенной инфраструктуре и доступны только уполномоченным сотрудникам.',
+      },
+      {
+        title: '5. Контакты',
+        content:
+          'По вопросам конфиденциальности обращайтесь на privacy@ultramed.az.',
+      },
+    ],
+  },
+  {
+    slug: 'terms-of-service',
+    titleAz: 'İstifadə Şərtləri',
+    titleEn: 'Terms of Service',
+    titleRu: 'Условия использования',
+    descriptionAz:
+      'Bu şərtlər Ultramed platformasının istifadə qaydalarını və tərəflərin öhdəliklərini müəyyən edir.',
+    descriptionEn:
+      'These terms define the rules for using the Ultramed platform and the obligations of the parties.',
+    descriptionRu:
+      'Данные условия определяют правила использования платформы Ultramed и обязательства сторон.',
+    sectionsAz: [
+      {
+        title: '1. Ümumi müddəalar',
+        content:
+          'Veb-saytdan istifadə etməklə siz bu şərtlərlə razılaşırsınız. Şərtlər zərurət yarandıqda yenilənə bilər.',
+      },
+      {
+        title: '2. Qəbula yazılma',
+        content:
+          'Onlayn qeydiyyat zamanı daxil edilən məlumatların dəqiqliyi pasiyentin məsuliyyətidir.',
+      },
+      {
+        title: '3. Məsuliyyətin məhdudlaşdırılması',
+        content:
+          'Veb-saytdakı məlumatlar məlumatlandırma xarakteri daşıyır və peşəkar tibbi məsləhəti əvəz etmir.',
+      },
+      {
+        title: '4. Müəllif hüquqları',
+        content:
+          'Veb-saytdakı mətnlər, dizayn və media elementləri Ultramed və onun tərəfdaşlarının müəllif hüquqları ilə qorunur.',
+      },
+      {
+        title: '5. Tətbiq olunan hüquq',
+        content:
+          'Hər hansı mübahisələr Azərbaycan Respublikasının qanunvericiliyinə uyğun olaraq həll edilir.',
+      },
+    ],
+    sectionsEn: [
+      {
+        title: '1. General provisions',
+        content:
+          'By using this website, you agree to these terms. The terms may be updated when necessary.',
+      },
+      {
+        title: '2. Appointment booking',
+        content:
+          'The patient is responsible for the accuracy of information entered during online registration.',
+      },
+      {
+        title: '3. Limitation of liability',
+        content:
+          'Information on the website is for informational purposes and does not replace professional medical advice.',
+      },
+      {
+        title: '4. Copyright',
+        content:
+          'Texts, design, and media elements on the website are protected by the copyrights of Ultramed and its partners.',
+      },
+      {
+        title: '5. Governing law',
+        content:
+          'Any disputes are resolved in accordance with the legislation of the Republic of Azerbaijan.',
+      },
+    ],
+    sectionsRu: [
+      {
+        title: '1. Общие положения',
+        content:
+          'Используя сайт, вы соглашаетесь с настоящими условиями. Условия могут обновляться при необходимости.',
+      },
+      {
+        title: '2. Запись на прием',
+        content:
+          'Пациент несет ответственность за точность данных, введенных при онлайн-регистрации.',
+      },
+      {
+        title: '3. Ограничение ответственности',
+        content:
+          'Информация на сайте носит ознакомительный характер и не заменяет профессиональную медицинскую консультацию.',
+      },
+      {
+        title: '4. Авторские права',
+        content:
+          'Тексты, дизайн и медиа-элементы сайта защищены авторскими правами Ultramed и его партнеров.',
+      },
+      {
+        title: '5. Применимое право',
+        content:
+          'Любые споры разрешаются в соответствии с законодательством Азербайджанской Республики.',
+      },
+    ],
+  },
+];
+
 const homeStats = [
   { id: 'patients', value: '15,000+', sortOrder: 1 },
   { id: 'doctors', value: '50+', sortOrder: 2 },
@@ -727,6 +990,26 @@ async function seedBlog() {
       where: { id: post.id },
       update: post,
       create: post,
+    });
+  }
+}
+
+async function seedTestimonials() {
+  for (const testimonial of testimonials) {
+    await prisma.testimonial.upsert({
+      where: { id: testimonial.id },
+      update: testimonial,
+      create: testimonial,
+    });
+  }
+}
+
+async function seedContentPages() {
+  for (const page of contentPages) {
+    await prisma.contentPage.upsert({
+      where: { slug: page.slug },
+      update: page,
+      create: page,
     });
   }
 }
@@ -793,6 +1076,8 @@ async function main() {
   await seedServices();
   await seedDoctors();
   await seedBlog();
+  await seedTestimonials();
+  await seedContentPages();
   await seedContact();
   await seedHomeStats();
   console.log('Database seeding complete.');

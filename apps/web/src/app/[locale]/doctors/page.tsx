@@ -7,10 +7,12 @@ import { useTranslations } from 'next-intl';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Skeleton } from '@/components/ui/skeleton';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Calendar, HeartPulse, Languages, Mail, MapPin, Phone, Search, Stethoscope, UserRound } from 'lucide-react';
 import Image from 'next/image';
-import { getDoctorById, getDoctors, type DoctorDetailItem, type DoctorListItem } from '@/lib/api';
+import TemporaryUnavailable from '@/components/feedback/TemporaryUnavailable';
+import { getDoctorById, getDoctors, isBackendUnavailableError, type DoctorDetailItem, type DoctorListItem } from '@/lib/api';
 
 function normalizeLocale(localeRaw: string | undefined): 'az' | 'en' | 'ru' {
     if (localeRaw === 'en' || localeRaw === 'ru') {
@@ -28,6 +30,7 @@ export default function DoctorsPage() {
     const [refreshKey, setRefreshKey] = useState(0);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [isUnavailable, setIsUnavailable] = useState(false);
     const [doctors, setDoctors] = useState<DoctorListItem[]>([]);
 
     const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
@@ -42,6 +45,7 @@ export default function DoctorsPage() {
         async function loadDoctors() {
             setIsLoading(true);
             setError(null);
+            setIsUnavailable(false);
 
             try {
                 const data = await getDoctors(locale);
@@ -50,6 +54,10 @@ export default function DoctorsPage() {
                 }
             } catch (fetchError) {
                 if (!isCancelled) {
+                    if (isBackendUnavailableError(fetchError)) {
+                        setIsUnavailable(true);
+                        return;
+                    }
                     const message = fetchError instanceof Error ? fetchError.message : t('fetchFailedDescription');
                     setError(message);
                 }
@@ -144,6 +152,16 @@ export default function DoctorsPage() {
         await openProfileModal(selectedDoctorId);
     };
 
+    if (isUnavailable && doctors.length === 0) {
+        return (
+            <div className="min-h-[70vh] bg-brand-cream/60 px-6 py-12">
+                <div className="container mx-auto max-w-4xl">
+                    <TemporaryUnavailable onRetry={() => setRefreshKey((key) => key + 1)} />
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className="flex flex-col min-h-screen">
             <section className="bg-brand-cream py-16 lg:py-24 relative overflow-hidden">
@@ -173,9 +191,22 @@ export default function DoctorsPage() {
             <section className="py-20 bg-white flex-grow border-t border-slate-100">
                 <div className="container mx-auto px-6">
                     {isLoading && doctors.length === 0 ? (
-                        <div className="text-center py-20 bg-slate-50 rounded-3xl border border-slate-100">
-                            <h3 className="text-xl font-semibold text-slate-900 mb-2">{t('loadingTitle')}</h3>
-                            <p className="text-slate-500">{t('loadingDescription')}</p>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                            {Array.from({ length: 6 }).map((_, index) => (
+                                <Card key={index} className="overflow-hidden border-slate-100 bg-white rounded-2xl">
+                                    <Skeleton className="aspect-[4/3] w-full rounded-none" />
+                                    <CardContent className="space-y-3 pt-6">
+                                        <Skeleton className="h-4 w-2/3" />
+                                        <Skeleton className="h-4 w-1/2" />
+                                        <Skeleton className="h-4 w-full" />
+                                        <Skeleton className="h-4 w-4/5" />
+                                    </CardContent>
+                                    <CardFooter className="grid grid-cols-2 gap-3 border-t border-slate-100 bg-slate-50/70">
+                                        <Skeleton className="h-10 w-full" />
+                                        <Skeleton className="h-10 w-full" />
+                                    </CardFooter>
+                                </Card>
+                            ))}
                         </div>
                     ) : error && doctors.length === 0 ? (
                         <div className="text-center py-20 bg-slate-50 rounded-3xl border border-slate-100">

@@ -18,9 +18,12 @@ import {
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Skeleton } from '@/components/ui/skeleton';
+import TemporaryUnavailable from '@/components/feedback/TemporaryUnavailable';
 import {
     getServiceById,
     getServices,
+    isBackendUnavailableError,
     type ServiceDetailItem,
     type ServiceListItem,
 } from '@/lib/api';
@@ -88,6 +91,7 @@ export default function ServicesPage() {
     const [refreshKey, setRefreshKey] = useState(0);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [isUnavailable, setIsUnavailable] = useState(false);
     const [services, setServices] = useState<ServiceListItem[]>([]);
 
     const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
@@ -102,6 +106,7 @@ export default function ServicesPage() {
         async function loadServices() {
             setIsLoading(true);
             setError(null);
+            setIsUnavailable(false);
 
             try {
                 const data = await getServices(locale);
@@ -110,6 +115,10 @@ export default function ServicesPage() {
                 }
             } catch (fetchError) {
                 if (!isCancelled) {
+                    if (isBackendUnavailableError(fetchError)) {
+                        setIsUnavailable(true);
+                        return;
+                    }
                     const message = fetchError instanceof Error ? fetchError.message : t('fetchFailedTitle');
                     setError(message);
                 }
@@ -176,6 +185,16 @@ export default function ServicesPage() {
         await openDetailModal(selectedServiceId);
     };
 
+    if (isUnavailable && services.length === 0) {
+        return (
+            <div className="min-h-[70vh] bg-brand-cream/60 px-6 py-12">
+                <div className="container mx-auto max-w-4xl">
+                    <TemporaryUnavailable onRetry={() => setRefreshKey((key) => key + 1)} />
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className="flex flex-col min-h-screen">
             <section className="bg-brand-blue-dark text-white py-16 md:py-20 lg:py-24 relative overflow-hidden">
@@ -193,8 +212,23 @@ export default function ServicesPage() {
             <section className="py-20 bg-slate-50 flex-grow">
                 <div className="container mx-auto px-6">
                     {isLoading && services.length === 0 ? (
-                        <div className="text-center py-20 bg-white rounded-2xl border border-slate-100">
-                            <h3 className="text-xl font-semibold text-slate-900 mb-2">{t('loadingTitle')}</h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+                            {Array.from({ length: 8 }).map((_, index) => (
+                                <Card key={index} className="border-slate-100 bg-white">
+                                    <CardHeader>
+                                        <Skeleton className="mb-4 h-16 w-16 rounded-2xl" />
+                                        <Skeleton className="h-6 w-3/4" />
+                                    </CardHeader>
+                                    <CardContent className="space-y-2">
+                                        <Skeleton className="h-4 w-full" />
+                                        <Skeleton className="h-4 w-[92%]" />
+                                        <Skeleton className="h-4 w-[78%]" />
+                                    </CardContent>
+                                    <CardFooter className="border-t border-slate-100">
+                                        <Skeleton className="h-4 w-24" />
+                                    </CardFooter>
+                                </Card>
+                            ))}
                         </div>
                     ) : error && services.length === 0 ? (
                         <div className="text-center py-20 bg-white rounded-2xl border border-slate-100">

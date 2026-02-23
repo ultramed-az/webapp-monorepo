@@ -42,6 +42,31 @@ export type BlogListItem = {
     date: string;
 };
 
+export type TestimonialItem = {
+    id: string;
+    name: string;
+    role: string;
+    quote: string;
+    rating: number;
+};
+
+export type TestimonialsPageResponse = {
+    title: string;
+    description: string;
+    items: TestimonialItem[];
+};
+
+export type ContentSectionItem = {
+    title: string;
+    content: string;
+};
+
+export type ContentPageResponse = {
+    title: string;
+    description: string;
+    sections: ContentSectionItem[];
+};
+
 export type ContactItem = {
     label: string;
     value: string;
@@ -83,6 +108,59 @@ export type ServiceDetailItem = {
 };
 
 const API_BASE_URL = (process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:5555').replace(/\/$/, '');
+const REQUEST_TIMEOUT_MS = 6000;
+
+export class ApiRequestError extends Error {
+    status: number;
+    url: string;
+
+    constructor(status: number, url: string, message?: string) {
+        super(message ?? `Request failed with status ${status}: ${url}`);
+        this.name = 'ApiRequestError';
+        this.status = status;
+        this.url = url;
+    }
+}
+
+export class BackendUnavailableError extends ApiRequestError {
+    constructor(url: string, message?: string, status = 503) {
+        super(status, url, message ?? `Backend is temporarily unavailable: ${url}`);
+        this.name = 'BackendUnavailableError';
+    }
+}
+
+function isUnavailableStatus(status: number): boolean {
+    return status === 502 || status === 503 || status === 504;
+}
+
+async function fetchWithTimeout(url: string): Promise<Response> {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+
+    try {
+        return await fetch(url, {
+            cache: 'no-store',
+            signal: controller.signal,
+        });
+    } catch (error) {
+        const message = error instanceof Error ? error.message : undefined;
+        throw new BackendUnavailableError(url, message);
+    } finally {
+        clearTimeout(timeoutId);
+    }
+}
+
+async function checkBackendHealth(): Promise<void> {
+    const healthUrl = `${API_BASE_URL}/health`;
+    const response = await fetchWithTimeout(healthUrl);
+
+    if (!response.ok) {
+        if (isUnavailableStatus(response.status) || response.status >= 500) {
+            throw new BackendUnavailableError(healthUrl, undefined, response.status);
+        }
+        throw new ApiRequestError(response.status, healthUrl);
+    }
+}
 
 function toLocale(locale: string | undefined): SupportedLocale {
     if (locale === 'en' || locale === 'ru') {
@@ -104,12 +182,21 @@ async function request<T>(path: string, query?: Record<string, string | undefine
     const queryString = params.toString();
     const url = `${API_BASE_URL}${path}${queryString ? `?${queryString}` : ''}`;
 
-    const response = await fetch(url, { cache: 'no-store' });
+    await checkBackendHealth();
+
+    const response = await fetchWithTimeout(url);
     if (!response.ok) {
-        throw new Error(`Request failed with status ${response.status}: ${url}`);
+        if (isUnavailableStatus(response.status)) {
+            throw new BackendUnavailableError(url, undefined, response.status);
+        }
+        throw new ApiRequestError(response.status, url);
     }
 
     return response.json() as Promise<T>;
+}
+
+export function isBackendUnavailableError(error: unknown): error is BackendUnavailableError {
+    return error instanceof BackendUnavailableError;
 }
 
 export async function getDoctors(locale: string | undefined): Promise<DoctorListItem[]> {
@@ -122,6 +209,18 @@ export async function getDoctorById(id: string, locale: string | undefined): Pro
 
 export async function getBlogPosts(locale: string | undefined): Promise<BlogListItem[]> {
     return request<BlogListItem[]>('/blog', { locale: toLocale(locale) });
+}
+
+export async function getTestimonialsPage(locale: string | undefined): Promise<TestimonialsPageResponse> {
+    return request<TestimonialsPageResponse>('/content/testimonials', { locale: toLocale(locale) });
+}
+
+export async function getPrivacyPolicyPage(locale: string | undefined): Promise<ContentPageResponse> {
+    return request<ContentPageResponse>('/content/privacy-policy', { locale: toLocale(locale) });
+}
+
+export async function getTermsOfServicePage(locale: string | undefined): Promise<ContentPageResponse> {
+    return request<ContentPageResponse>('/content/terms-of-service', { locale: toLocale(locale) });
 }
 
 export async function getContactInfo(locale: string | undefined): Promise<ContactInfoResponse> {

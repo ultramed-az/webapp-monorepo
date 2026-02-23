@@ -34,7 +34,7 @@ services:
       db:
         condition: service_healthy
     restart: unless-stopped
-    command: pnpm --filter @ultramed/api dev
+    command: sh -lc "pnpm db:generate && pnpm --filter @ultramed/api dev"
 
   web:
     build:

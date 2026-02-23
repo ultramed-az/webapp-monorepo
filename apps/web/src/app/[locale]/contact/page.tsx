@@ -8,8 +8,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { Skeleton } from '@/components/ui/skeleton';
 import { MapPin, Phone, Mail, Clock, Send, MessageSquare } from 'lucide-react';
-import { getContactInfo, type ContactInfoResponse } from '@/lib/api';
+import TemporaryUnavailable from '@/components/feedback/TemporaryUnavailable';
+import { getContactInfo, isBackendUnavailableError, type ContactInfoResponse } from '@/lib/api';
 
 function isWhatsAppValue(value: string): boolean {
     return value.toLowerCase().includes('wa.me');
@@ -37,6 +39,7 @@ export default function ContactPage() {
     const [refreshKey, setRefreshKey] = useState(0);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [isUnavailable, setIsUnavailable] = useState(false);
     const fallbackContact = useMemo<ContactInfoResponse>(
         () => ({
             address: t('fallback.address'),
@@ -67,6 +70,7 @@ export default function ContactPage() {
         async function loadContactInfo() {
             setIsLoading(true);
             setError(null);
+            setIsUnavailable(false);
             setContactInfo(fallbackContact);
 
             try {
@@ -76,6 +80,10 @@ export default function ContactPage() {
                 }
             } catch (fetchError) {
                 if (!isCancelled) {
+                    if (isBackendUnavailableError(fetchError)) {
+                        setIsUnavailable(true);
+                        return;
+                    }
                     const message = fetchError instanceof Error ? fetchError.message : t('fetchFailedDescription');
                     setError(message);
                 }
@@ -98,6 +106,16 @@ export default function ContactPage() {
         setIsSubmitted(true);
         e.currentTarget.reset();
     };
+
+    if (isUnavailable) {
+        return (
+            <div className="min-h-[70vh] bg-brand-cream/60 px-6 py-12">
+                <div className="container mx-auto max-w-4xl">
+                    <TemporaryUnavailable onRetry={() => setRefreshKey((key) => key + 1)} />
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="flex flex-col min-h-screen">
@@ -135,6 +153,12 @@ export default function ContactPage() {
                         {/* Contact Information Cards */}
                         <div className="lg:col-span-5 space-y-6">
                             <h2 className="text-2xl font-bold text-slate-900 mb-6">{t('contactMethodsTitle')}</h2>
+                            {isLoading && (
+                                <div className="mb-4 space-y-2">
+                                    <Skeleton className="h-4 w-1/2" />
+                                    <Skeleton className="h-4 w-2/3" />
+                                </div>
+                            )}
 
                             <Card className="border-slate-100 shadow-sm hover:shadow-md transition-shadow bg-brand-blue-soft/60">
                                 <CardContent className="p-6 flex items-start">
@@ -143,12 +167,22 @@ export default function ContactPage() {
                                     </div>
                                     <div>
                                         <h3 className="font-semibold text-slate-900 mb-1">{t('addressTitle')}</h3>
-                                        <p className="text-slate-600 text-sm leading-relaxed">
-                                            {contactInfo.address}
-                                        </p>
-                                        <p className="text-xs text-slate-500 mt-2">
-                                            {t('coordinatesLabel')}: {contactInfo.map.latitude.toFixed(6)}, {contactInfo.map.longitude.toFixed(6)}
-                                        </p>
+                                        {isLoading ? (
+                                            <div className="space-y-2">
+                                                <Skeleton className="h-4 w-full" />
+                                                <Skeleton className="h-4 w-4/5" />
+                                                <Skeleton className="h-3 w-3/4" />
+                                            </div>
+                                        ) : (
+                                            <>
+                                                <p className="text-slate-600 text-sm leading-relaxed">
+                                                    {contactInfo.address}
+                                                </p>
+                                                <p className="text-xs text-slate-500 mt-2">
+                                                    {t('coordinatesLabel')}: {contactInfo.map.latitude.toFixed(6)}, {contactInfo.map.longitude.toFixed(6)}
+                                                </p>
+                                            </>
+                                        )}
                                     </div>
                                 </CardContent>
                             </Card>
@@ -160,25 +194,34 @@ export default function ContactPage() {
                                     </div>
                                     <div>
                                         <h3 className="font-semibold text-slate-900 mb-3">{t('phoneTitle')}</h3>
-                                        <div className="space-y-2">
-                                            {contactInfo.phones.map((phone) => (
-                                                <div key={`${phone.label}-${phone.value}`}>
-                                                    <p className="text-slate-600 text-sm mb-1">{phone.label}</p>
-                                                    {toPhoneHref(phone.value) ? (
-                                                        <a
-                                                            href={toPhoneHref(phone.value) ?? '#'}
-                                                            target={isWhatsAppValue(phone.value) ? '_blank' : undefined}
-                                                            rel={isWhatsAppValue(phone.value) ? 'noreferrer' : undefined}
-                                                            className={`font-semibold text-base transition-colors ${isWhatsAppValue(phone.value) ? 'text-brand-blue hover:text-brand-blue-dark' : 'text-brand-orange-dark hover:text-brand-orange'}`}
-                                                        >
-                                                            {phone.value.replace(/^https?:\/\//, '')}
-                                                        </a>
-                                                    ) : (
-                                                        <p className="font-semibold text-base text-brand-orange-dark">{phone.value}</p>
-                                                    )}
-                                                </div>
-                                            ))}
-                                        </div>
+                                        {isLoading ? (
+                                            <div className="space-y-3">
+                                                <Skeleton className="h-4 w-1/3" />
+                                                <Skeleton className="h-4 w-1/2" />
+                                                <Skeleton className="h-4 w-1/3" />
+                                                <Skeleton className="h-4 w-2/3" />
+                                            </div>
+                                        ) : (
+                                            <div className="space-y-2">
+                                                {contactInfo.phones.map((phone) => (
+                                                    <div key={`${phone.label}-${phone.value}`}>
+                                                        <p className="text-slate-600 text-sm mb-1">{phone.label}</p>
+                                                        {toPhoneHref(phone.value) ? (
+                                                            <a
+                                                                href={toPhoneHref(phone.value) ?? '#'}
+                                                                target={isWhatsAppValue(phone.value) ? '_blank' : undefined}
+                                                                rel={isWhatsAppValue(phone.value) ? 'noreferrer' : undefined}
+                                                                className={`font-semibold text-base transition-colors ${isWhatsAppValue(phone.value) ? 'text-brand-blue hover:text-brand-blue-dark' : 'text-brand-orange-dark hover:text-brand-orange'}`}
+                                                            >
+                                                                {phone.value.replace(/^https?:\/\//, '')}
+                                                            </a>
+                                                        ) : (
+                                                            <p className="font-semibold text-base text-brand-orange-dark">{phone.value}</p>
+                                                        )}
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        )}
                                     </div>
                                 </CardContent>
                             </Card>
@@ -190,13 +233,20 @@ export default function ContactPage() {
                                             <Clock className="h-6 w-6" />
                                         </div>
                                         <h3 className="font-semibold text-slate-900 mb-2">{t('workingHoursTitle')}</h3>
-                                        <div className="space-y-1">
-                                            {contactInfo.workingHours.map((hour) => (
-                                                <p key={`${hour.label}-${hour.value}`} className="text-slate-600 text-sm">
-                                                    {hour.label}: {hour.value}
-                                                </p>
-                                            ))}
-                                        </div>
+                                        {isLoading ? (
+                                            <div className="space-y-2 w-full">
+                                                <Skeleton className="h-4 w-full" />
+                                                <Skeleton className="h-4 w-5/6" />
+                                            </div>
+                                        ) : (
+                                            <div className="space-y-1">
+                                                {contactInfo.workingHours.map((hour) => (
+                                                    <p key={`${hour.label}-${hour.value}`} className="text-slate-600 text-sm">
+                                                        {hour.label}: {hour.value}
+                                                    </p>
+                                                ))}
+                                            </div>
+                                        )}
                                     </CardContent>
                                 </Card>
 
@@ -206,17 +256,24 @@ export default function ContactPage() {
                                             <Mail className="h-6 w-6" />
                                         </div>
                                         <h3 className="font-semibold text-slate-900 mb-2">{t('emailTitle')}</h3>
-                                        <div className="space-y-1">
-                                            {contactInfo.emails.map((email) => (
-                                                <a
-                                                    key={`${email.label}-${email.value}`}
-                                                    href={`mailto:${email.value}`}
-                                                    className="text-slate-600 text-sm hover:text-brand-blue transition-colors break-all"
-                                                >
-                                                    {email.value}
-                                                </a>
-                                            ))}
-                                        </div>
+                                        {isLoading ? (
+                                            <div className="space-y-2 w-full">
+                                                <Skeleton className="h-4 w-full" />
+                                                <Skeleton className="h-4 w-4/5" />
+                                            </div>
+                                        ) : (
+                                            <div className="space-y-1">
+                                                {contactInfo.emails.map((email) => (
+                                                    <a
+                                                        key={`${email.label}-${email.value}`}
+                                                        href={`mailto:${email.value}`}
+                                                        className="text-slate-600 text-sm hover:text-brand-blue transition-colors break-all"
+                                                    >
+                                                        {email.value}
+                                                    </a>
+                                                ))}
+                                            </div>
+                                        )}
                                     </CardContent>
                                 </Card>
                             </div>

@@ -307,87 +307,12 @@
       }
     ]
   },
-  "TestimonialsPage": {
-    "title": "Pasiyent Rəyləri",
-    "description": "Pasiyent məmnuniyyəti bizim əsas prioritetimizdir. Aşağıdakı rəylər real təcrübələri əks etdirir.",
-    "items": [
-      {
-        "name": "Nigar Həsənli",
-        "role": "Pasiyent",
-        "quote": "Ultramed-dəki diqqət və peşəkarlıq həqiqətən təsiredicidir. Həkimin yanaşmasından çox razı qaldım."
-      },
-      {
-        "name": "Samir Əliyev",
-        "role": "Pasiyent yaxını",
-        "quote": "Anamın müalicəsi zamanı komanda bütün suallarımızı səbrlə cavablandırdı. Klinika təmiz, proseslər isə çox yaxşı təşkil olunmuşdu."
-      },
-      {
-        "name": "Aysel Məmmədova",
-        "role": "Pasiyent",
-        "quote": "Qəbul prosesi çox rahat keçdi və laboratoriya nəticələri vaxtında çatdırıldı. Bu klinikanı təkrar seçərdim."
-      },
-      {
-        "name": "Rasim Hüseynov",
-        "role": "Pasiyent",
-        "quote": "Kardiologiya şöbəsində mükəmməl xidmət aldım. Müalicə planı mənə çox aydın şəkildə izah edildi."
-      }
-    ]
-  },
-  "PrivacyPolicyPage": {
-    "title": "Məxfilik Siyasəti",
-    "description": "Bu siyasət pasiyent məlumatlarının necə toplanması, işlənməsi və qorunmasını izah edir.",
-    "sections": [
-      {
-        "title": "1. Topladığımız məlumatlar",
-        "content": "Qəbula yazılmaq və tibbi xidmət göstərmək üçün ad, soyad, əlaqə məlumatları, təvəllüd və tibbi keçmiş kimi məlumatları toplayırıq."
-      },
-      {
-        "title": "2. Məlumatların istifadə məqsədi",
-        "content": "Toplanan məlumatlar müalicə prosesləri, görüşlərin planlaşdırılması, analiz nəticələrinin idarə edilməsi və xidmət keyfiyyətinin monitorinqi üçün istifadə olunur."
-      },
-      {
-        "title": "3. Üçüncü tərəflərlə paylaşma",
-        "content": "Qanunla tələb olunan hallar istisna olmaqla, məlumatlarınız sizin razılığınız olmadan üçüncü tərəflərlə paylaşılmır."
-      },
-      {
-        "title": "4. Təhlükəsizlik tədbirləri",
-        "content": "Məlumatlar qorunan infrastrukturda saxlanılır və yalnız səlahiyyətli işçilər tərəfindən əldə edilə bilər."
-      },
-      {
-        "title": "5. Əlaqə",
-        "content": "Məxfiliklə bağlı suallarınız üçün privacy@ultramed.az ünvanına müraciət edə bilərsiniz."
-      }
-    ]
-  },
-  "TermsPage": {
-    "title": "İstifadə Şərtləri",
-    "description": "Bu şərtlər Ultramed platformasının istifadə qaydalarını və tərəflərin öhdəliklərini müəyyən edir.",
-    "sections": [
-      {
-        "title": "1. Ümumi müddəalar",
-        "content": "Veb-saytdan istifadə etməklə siz bu şərtlərlə razılaşırsınız. Şərtlər zərurət yarandıqda yenilənə bilər."
-      },
-      {
-        "title": "2. Qəbula yazılma",
-        "content": "Onlayn qeydiyyat zamanı daxil edilən məlumatların dəqiqliyi pasiyentin məsuliyyətidir."
-      },
-      {
-        "title": "3. Məsuliyyətin məhdudlaşdırılması",
-        "content": "Veb-saytdakı məlumatlar məlumatlandırma xarakteri daşıyır və peşəkar tibbi məsləhəti əvəz etmir."
-      },
-      {
-        "title": "4. Müəllif hüquqları",
-        "content": "Veb-saytdakı mətnlər, dizayn və media elementləri Ultramed və onun tərəfdaşlarının müəllif hüquqları ilə qorunur."
-      },
-      {
-        "title": "5. Tətbiq olunan hüquq",
-        "content": "Hər hansı mübahisələr Azərbaycan Respublikasının qanunvericiliyinə uyğun olaraq həll edilir."
-      }
-    ]
-  },
   "ErrorPages": {
     "notFoundTitle": "Səhifə tapılmadı",
     "notFoundDescription": "Axtardığınız səhifə mövcud deyil və ya silinib. Ana səhifəyə qayıda bilərsiniz.",
+    "notFoundHelpBadge": "Sürətli keçidlər",
+    "notFoundHelpTitle": "Sizə lazım ola biləcək bölmələr",
+    "notFoundHelpDescription": "Axtardığınız məlumat fərqli səhifədə ola bilər. Aşağıdakı bölmələrdən davam edin.",
     "backHome": "Ana səhifəyə qayıt",
     "genericTitle": "Xəta baş verdi",
     "genericDescription": "Gözlənilməz texniki xəta baş verdi. Zəhmət olmasa, yenidən cəhd edin.",
@@ -395,7 +320,9 @@
     "home": "Ana səhifə",
     "internalTitle": "Daxili server xətası",
     "internalDescription": "Sistemdə gözlənilməz bir problem baş verdi. Bir neçə dəqiqədən sonra yenidən cəhd edin.",
-    "contactPage": "Əlaqə səhifəsi"
+    "contactPage": "Əlaqə səhifəsi",
+    "temporarilyUnavailableTitle": "Xidmət müvəqqəti əlçatan deyil",
+    "temporarilyUnavailableDescription": "Backend servis hazırda cavab vermir. Bir neçə dəqiqə sonra yenidən cəhd edin."
   },
   "HealthPage": {
     "title": "Frontend Vəziyyəti",
