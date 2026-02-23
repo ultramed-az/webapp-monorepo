@@ -21,10 +21,19 @@ model Service {
   titleAz    String
   titleEn    String
   titleRu    String
+  summaryAz  String   @db.Text
+  summaryEn  String   @db.Text
+  summaryRu  String   @db.Text
   contentAz  String   @db.Text
   contentEn  String   @db.Text
   contentRu  String   @db.Text
+  highlightsAz Json?
+  highlightsEn Json?
+  highlightsRu Json?
+  iconKey    String?
   image      String?
+  sortOrder  Int      @default(0)
+  isPublished Boolean @default(true)
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 }

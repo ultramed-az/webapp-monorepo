@@ -117,10 +117,10 @@ export default function Navbar() {
                         <Image
                             src="/logo.png"
                             alt="Ultramed"
-                            width={180}
-                            height={52}
+                            width={150}
+                            height={150}
                             priority
-                            className="h-10 w-auto md:h-11 transition-opacity group-hover:opacity-90"
+                            className="transition-opacity group-hover:opacity-90"
                         />
                     </Link>
 

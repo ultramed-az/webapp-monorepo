@@ -46,6 +46,24 @@ export type HomeStatItem = {
     value: string;
 };
 
+export type ServiceListItem = {
+    id: string;
+    title: string;
+    summary: string;
+    iconKey: string | null;
+    image: string | null;
+};
+
+export type ServiceDetailItem = {
+    id: string;
+    title: string;
+    summary: string;
+    content: string;
+    highlights: string[];
+    iconKey: string | null;
+    image: string | null;
+};
+
 const API_BASE_URL = (process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:5555').replace(/\/$/, '');
 
 function toLocale(locale: string | undefined): SupportedLocale {
@@ -92,3 +110,10 @@ export async function getHomeStats(): Promise<HomeStatItem[]> {
     return request<HomeStatItem[]>('/home/stats');
 }
 
+export async function getServices(locale: string | undefined): Promise<ServiceListItem[]> {
+    return request<ServiceListItem[]>('/services', { locale: toLocale(locale) });
+}
+
+export async function getServiceById(id: string, locale: string | undefined): Promise<ServiceDetailItem | null> {
+    return request<ServiceDetailItem | null>(`/services/${id}`, { locale: toLocale(locale) });
+}

@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, Put, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Put, Delete, Query } from '@nestjs/common';
 import { ServicesService } from './services.service';
 
 @Controller('services')
@@ -6,13 +6,13 @@ export class ServicesController {
     constructor(private readonly servicesService: ServicesService) { }
 
     @Get()
-    findAll() {
-        return this.servicesService.findAll();
+    findAll(@Query('locale') locale = 'az') {
+        return this.servicesService.findAll(locale);
     }
 
     @Get(':id')
-    findOne(@Param('id') id: string) {
-        return this.servicesService.findOne(id);
+    findOne(@Param('id') id: string, @Query('locale') locale = 'az') {
+        return this.servicesService.findOne(id, locale);
     }
 
     @Post()

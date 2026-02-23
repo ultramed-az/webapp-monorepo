@@ -3,6 +3,217 @@ const { PrismaClient } = require('@prisma/client');
 
 const prisma = new PrismaClient();
 
+const services = [
+  {
+    id: 'svc-kardiologiya',
+    titleAz: 'Kardiologiya',
+    titleEn: 'Cardiology',
+    titleRu: 'Кардиология',
+    summaryAz:
+      'Ürək-damar sisteminin xəstəliklərinin diaqnostikası, müalicəsi və profilaktikası üçün kompleks xidmət.',
+    summaryEn:
+      'Comprehensive diagnostic, treatment, and preventive services for cardiovascular diseases.',
+    summaryRu:
+      'Комплексные услуги по диагностике, лечению и профилактике сердечно-сосудистых заболеваний.',
+    contentAz:
+      'Kardiologiya şöbəmizdə arterial hipertenziya, aritmiya, ürək çatışmazlığı və koronar arteriya xəstəliyi kimi problemlərin müasir protokollar əsasında müalicəsi həyata keçirilir.\n\nPasiyentlər üçün EKQ, EXO-KQ, Holter monitorinqi və stress test daxil olmaqla geniş diaqnostik paket təqdim edilir. Müalicə planı risk faktorları, həyat tərzi və yanaşı xəstəliklər nəzərə alınaraq fərdi şəkildə qurulur.',
+    contentEn:
+      'Our cardiology unit treats hypertension, arrhythmia, heart failure, and coronary artery disease according to modern protocols.\n\nPatients receive a complete diagnostic package including ECG, echocardiography, Holter monitoring, and stress testing. Each treatment plan is personalized based on risk profile, lifestyle, and comorbidities.',
+    contentRu:
+      'В кардиологическом отделении проводится лечение артериальной гипертензии, аритмий, сердечной недостаточности и ишемической болезни сердца по современным протоколам.\n\nПациентам доступен полный диагностический пакет: ЭКГ, ЭхоКГ, Холтер-мониторинг и стресс-тест. План лечения формируется индивидуально с учетом факторов риска, образа жизни и сопутствующих заболеваний.',
+    highlightsAz: ['EKQ və EXO-KQ', '24 saat Holter monitorinqi', 'Fərdi risk analizi'],
+    highlightsEn: ['ECG and echocardiography', '24-hour Holter monitoring', 'Personalized risk analysis'],
+    highlightsRu: ['ЭКГ и ЭхоКГ', 'Холтер-мониторинг 24 часа', 'Индивидуальная оценка рисков'],
+    iconKey: 'heartPulse',
+    image:
+      'https://images.unsplash.com/photo-1559757148-5c350d0d3c56?q=80&w=2400&auto=format&fit=crop',
+    sortOrder: 1,
+    isPublished: true,
+  },
+  {
+    id: 'svc-nevrologiya',
+    titleAz: 'Nevrologiya',
+    titleEn: 'Neurology',
+    titleRu: 'Неврология',
+    summaryAz:
+      'Mərkəzi və periferik sinir sistemi xəstəliklərinin diaqnostikası və mərhələli müalicəsi.',
+    summaryEn:
+      'Diagnosis and staged treatment of central and peripheral nervous system disorders.',
+    summaryRu:
+      'Диагностика и этапное лечение заболеваний центральной и периферической нервной системы.',
+    contentAz:
+      'Nevrologiya şöbəsində baş ağrıları, miqren, epilepsiya, nevropatiyalar və yuxu pozuntuları üzrə konsultasiya və müalicə aparılır.\n\nDiaqnostik proses nevroloji müayinə, klinik analiz və görüntüləmə nəticələrinin birgə dəyərləndirilməsinə əsaslanır. Məqsəd simptomların sürətli idarə olunması və uzunmüddətli nəzarətin təmin edilməsidir.',
+    contentEn:
+      'Our neurology department provides consultation and treatment for headaches, migraine, epilepsy, neuropathies, and sleep disorders.\n\nDiagnostics combine neurological examination, lab findings, and imaging results for evidence-based decisions. The goal is fast symptom control and sustainable long-term management.',
+    contentRu:
+      'Неврологическое отделение проводит консультации и лечение при головных болях, мигрени, эпилепсии, нейропатиях и нарушениях сна.\n\nДиагностика основана на сочетании неврологического осмотра, лабораторных и визуализационных данных. Наша цель — быстрое купирование симптомов и долгосрочный контроль состояния.',
+    highlightsAz: ['Miqren və baş ağrısı klinikası', 'Epilepsiya nəzarət proqramı', 'Yuxu pozuntularının idarəsi'],
+    highlightsEn: ['Headache and migraine clinic', 'Epilepsy follow-up program', 'Sleep disorder management'],
+    highlightsRu: ['Клиника головной боли и мигрени', 'Программа наблюдения при эпилепсии', 'Контроль нарушений сна'],
+    iconKey: 'brain',
+    image:
+      'https://images.unsplash.com/photo-1550831107-1553da8c8464?q=80&w=2400&auto=format&fit=crop',
+    sortOrder: 2,
+    isPublished: true,
+  },
+  {
+    id: 'svc-stomatologiya',
+    titleAz: 'Stomatologiya',
+    titleEn: 'Dentistry',
+    titleRu: 'Стоматология',
+    summaryAz:
+      'Terapevtik, cərrahi və estetik stomatoloji xidmətlər bir mərkəzdə.',
+    summaryEn:
+      'Therapeutic, surgical, and aesthetic dental care delivered in one center.',
+    summaryRu:
+      'Терапевтическая, хирургическая и эстетическая стоматология в одном центре.',
+    contentAz:
+      'Stomatologiya şöbəmiz kariyesin müalicəsi, kanal terapiyası, ortodontik korreksiya və implantoloji həllər təklif edir.\n\nAğız boşluğunun ümumi vəziyyətinə əsasən mərhələli müalicə planı hazırlanır. Xidmətlər sterilizasiya protokollarına tam uyğun aparılır və pasiyent rahatlığı prioritet tutulur.',
+    contentEn:
+      'Our dental unit offers caries treatment, endodontic therapy, orthodontic correction, and implant solutions.\n\nA phased treatment plan is developed based on full oral assessment. Procedures follow strict sterilization standards, with patient comfort as a core priority.',
+    contentRu:
+      'Стоматологическое отделение предлагает лечение кариеса, эндодонтическую терапию, ортодонтическую коррекцию и имплантологические решения.\n\nПошаговый план лечения составляется после полной оценки состояния полости рта. Все процедуры проводятся по строгим стандартам стерилизации с акцентом на комфорт пациента.',
+    highlightsAz: ['Müasir implantologiya', 'Ortodontik planlama', 'Estetik bərpa'],
+    highlightsEn: ['Modern implantology', 'Orthodontic planning', 'Aesthetic restoration'],
+    highlightsRu: ['Современная имплантология', 'Ортодонтическое планирование', 'Эстетическая реставрация'],
+    iconKey: 'shieldCheck',
+    image:
+      'https://images.unsplash.com/photo-1609840114035-3c981b782dfe?q=80&w=2400&auto=format&fit=crop',
+    sortOrder: 3,
+    isPublished: true,
+  },
+  {
+    id: 'svc-laboratoriya',
+    titleAz: 'Klinik Laboratoriya',
+    titleEn: 'Clinical Laboratory',
+    titleRu: 'Клиническая лаборатория',
+    summaryAz:
+      'Qan, sidik və digər bioloji nümunələr üçün yüksək dəqiqlikli laborator diaqnostika.',
+    summaryEn:
+      'High-precision laboratory diagnostics for blood, urine, and other biological samples.',
+    summaryRu:
+      'Высокоточная лабораторная диагностика крови, мочи и других биологических материалов.',
+    contentAz:
+      'Laboratoriya şöbəsində biokimyəvi, hematoloji, immunoloji və hormonal analizlər sürətli dövr ərzində icra olunur.\n\nAnalizlər avtomatlaşdırılmış sistemlərdə aparılır və nəticələr klinik qərarverməni sürətləndirmək üçün həkimlərə operativ ötürülür. Keyfiyyətə nəzarət daxili və xarici standartlarla dəstəklənir.',
+    contentEn:
+      'The laboratory performs biochemical, hematological, immunological, and hormonal tests with short turnaround times.\n\nAssays run on automated systems, and results are delivered quickly to support clinical decisions. Quality assurance is maintained through internal and external controls.',
+    contentRu:
+      'Лаборатория выполняет биохимические, гематологические, иммунологические и гормональные исследования с короткими сроками готовности.\n\nАнализы выполняются на автоматизированных системах, а результаты оперативно передаются врачам. Контроль качества обеспечивается внутренними и внешними стандартами.',
+    highlightsAz: ['Biokimya və hematologiya', 'Hormonal panel', 'Sürətli nəticə dövriyyəsi'],
+    highlightsEn: ['Biochemistry and hematology', 'Hormonal panel', 'Fast turnaround'],
+    highlightsRu: ['Биохимия и гематология', 'Гормональные панели', 'Быстрая выдача результатов'],
+    iconKey: 'activity',
+    image:
+      'https://images.unsplash.com/photo-1579154204601-01588f351e67?q=80&w=2400&auto=format&fit=crop',
+    sortOrder: 4,
+    isPublished: true,
+  },
+  {
+    id: 'svc-pediatriya',
+    titleAz: 'Pediatriya',
+    titleEn: 'Pediatrics',
+    titleRu: 'Педиатрия',
+    summaryAz:
+      'Yenidoğulmuşlardan yeniyetmələrə qədər uşaqlar üçün profilaktik və müalicəvi xidmətlər.',
+    summaryEn:
+      'Preventive and therapeutic care for children from newborn age to adolescence.',
+    summaryRu:
+      'Профилактическая и лечебная помощь детям от периода новорожденности до подросткового возраста.',
+    contentAz:
+      'Pediatriya şöbəsi uşaqların fiziki inkişafının izlənməsi, peyvənd planı və kəskin xəstəliklərin vaxtında müalicəsini təmin edir.\n\nMüayinələr valideynlərlə birgə planlanır, qidalanma və gündəlik rejim üzrə tövsiyələr verilir. Uşağın yaşına uyğun fərdi yanaşma əsas prinsipdir.',
+    contentEn:
+      'Our pediatrics department supports growth monitoring, vaccination planning, and timely treatment of acute childhood illnesses.\n\nVisits are structured together with parents, including guidance on nutrition and daily routines. Age-appropriate individualized care is our core approach.',
+    contentRu:
+      'Педиатрическое отделение обеспечивает мониторинг развития ребенка, план вакцинации и своевременное лечение острых заболеваний.\n\nПриемы проводятся с участием родителей, с рекомендациями по питанию и режиму дня. Ключевой принцип — индивидуальный подход с учетом возраста.',
+    highlightsAz: ['Peyvənd təqvimi nəzarəti', 'İnkişaf monitorinqi', 'Valideyn məsləhəti'],
+    highlightsEn: ['Vaccination schedule control', 'Growth monitoring', 'Parent counseling'],
+    highlightsRu: ['Контроль календаря вакцинации', 'Мониторинг развития', 'Консультации для родителей'],
+    iconKey: 'baby',
+    image:
+      'https://images.unsplash.com/photo-1600959907703-125ba1374a12?q=80&w=2400&auto=format&fit=crop',
+    sortOrder: 5,
+    isPublished: true,
+  },
+  {
+    id: 'svc-oftalmologiya',
+    titleAz: 'Oftalmologiya',
+    titleEn: 'Ophthalmology',
+    titleRu: 'Офтальмология',
+    summaryAz:
+      'Göz xəstəliklərinin erkən diaqnostikası, refraksiya dəyərləndirilməsi və müalicəsi.',
+    summaryEn:
+      'Early diagnosis, refraction assessment, and treatment of eye disorders.',
+    summaryRu:
+      'Ранняя диагностика, оценка рефракции и лечение заболеваний глаз.',
+    contentAz:
+      'Oftalmologiya şöbəsində görmə zəifliyi, qlaukoma, katarakta və digər göz patologiyaları üçün müasir diaqnostik xidmətlər təqdim edilir.\n\nAparat müayinələri nəticəsində dəqiq diaqnoz qoyulur və medikamentoz, optik və ya cərrahi yönümlü müalicə strategiyası müəyyən edilir.',
+    contentEn:
+      'The ophthalmology unit provides modern diagnostics for visual impairment, glaucoma, cataract, and other eye pathologies.\n\nInstrument-based assessment enables accurate diagnosis and selection of medical, optical, or surgical treatment pathways.',
+    contentRu:
+      'В офтальмологическом отделении доступны современные методы диагностики при снижении зрения, глаукоме, катаракте и других патологиях глаза.\n\nАппаратные исследования позволяют поставить точный диагноз и выбрать медикаментозную, оптическую или хирургическую тактику лечения.',
+    highlightsAz: ['Refraksiya və göz dibi müayinəsi', 'Qlaukoma skrininqi', 'Katarakta dəyərləndirməsi'],
+    highlightsEn: ['Refraction and fundus exam', 'Glaucoma screening', 'Cataract evaluation'],
+    highlightsRu: ['Рефракция и осмотр глазного дна', 'Скрининг глаукомы', 'Оценка катаракты'],
+    iconKey: 'eye',
+    image:
+      'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?q=80&w=2400&auto=format&fit=crop',
+    sortOrder: 6,
+    isPublished: true,
+  },
+  {
+    id: 'svc-cerrahiyye',
+    titleAz: 'Ümumi Cərrahiyyə',
+    titleEn: 'General Surgery',
+    titleRu: 'Общая хирургия',
+    summaryAz:
+      'Kiçik invaziv və açıq cərrahi prosedurlar üçün təhlükəsiz və planlı cərrahiyyə xidməti.',
+    summaryEn:
+      'Safe and structured surgical care including minimally invasive and open procedures.',
+    summaryRu:
+      'Безопасная и плановая хирургическая помощь, включая малоинвазивные и открытые операции.',
+    contentAz:
+      'Ümumi cərrahiyyə şöbəsi qarın boşluğu, yumşaq toxuma və digər ümumi cərrahi patologiyaların diaqnostikası və əməliyyatını həyata keçirir.\n\nƏməliyyatdan əvvəl qiymətləndirmə, anestezioloji hazırlıq və əməliyyatdan sonrakı nəzarət vahid protokol əsasında icra olunur.',
+    contentEn:
+      'The general surgery department handles diagnostics and operative care for abdominal, soft tissue, and other common surgical conditions.\n\nPre-operative evaluation, anesthesia preparation, and post-operative follow-up are managed under a unified protocol.',
+    contentRu:
+      'Отделение общей хирургии проводит диагностику и оперативное лечение абдоминальных, мягкотканных и других распространенных хирургических патологий.\n\nПредоперационная оценка, анестезиологическая подготовка и послеоперационное наблюдение выполняются по единому протоколу.',
+    highlightsAz: ['Laparoskopik yanaşma', 'Əməliyyat öncəsi risk dəyərləndirməsi', 'Postoperativ nəzarət'],
+    highlightsEn: ['Laparoscopic approach', 'Pre-op risk assessment', 'Post-operative follow-up'],
+    highlightsRu: ['Лапароскопический подход', 'Предоперационная оценка рисков', 'Послеоперационное наблюдение'],
+    iconKey: 'syringe',
+    image:
+      'https://images.unsplash.com/photo-1516549655169-df83a0774514?q=80&w=2400&auto=format&fit=crop',
+    sortOrder: 7,
+    isPublished: true,
+  },
+  {
+    id: 'svc-travmatologiya',
+    titleAz: 'Travmatologiya',
+    titleEn: 'Traumatology',
+    titleRu: 'Травматология',
+    summaryAz:
+      'Sümük-oynaq travmalarının diaqnostikası, konservativ və cərrahi müalicəsi.',
+    summaryEn:
+      'Diagnostic, conservative, and surgical treatment of bone and joint trauma.',
+    summaryRu:
+      'Диагностика, консервативное и хирургическое лечение травм костей и суставов.',
+    contentAz:
+      'Travmatologiya şöbəsi sınıq, çıxıq, bağ zədələri və digər dayaq-hərəkət sistemi travmaları üçün təcili və planlı yardım göstərir.\n\nMüalicə konservativ immobilizasiya, fizioterapiya və lazım olduqda cərrahi korreksiya ilə aparılır. Məqsəd ağrının azaldılması və funksiyanın tez bərpasıdır.',
+    contentEn:
+      'Our traumatology team provides urgent and planned care for fractures, dislocations, ligament injuries, and other musculoskeletal trauma.\n\nManagement includes conservative immobilization, physiotherapy, and surgical correction when indicated. The objective is pain reduction and rapid functional recovery.',
+    contentRu:
+      'Травматологическое отделение оказывает экстренную и плановую помощь при переломах, вывихах, повреждениях связок и других травмах опорно-двигательного аппарата.\n\nЛечение включает консервативную иммобилизацию, физиотерапию и при необходимости хирургическую коррекцию. Цель — уменьшение боли и быстрое восстановление функции.',
+    highlightsAz: ['Sınıq və çıxıq müalicəsi', 'Ortopedik konsultasiya', 'Reabilitasiya planı'],
+    highlightsEn: ['Fracture and dislocation care', 'Orthopedic consultation', 'Rehabilitation planning'],
+    highlightsRu: ['Лечение переломов и вывихов', 'Ортопедическая консультация', 'План реабилитации'],
+    iconKey: 'bone',
+    image:
+      'https://images.unsplash.com/photo-1538108149393-fbbd81895907?q=80&w=2400&auto=format&fit=crop',
+    sortOrder: 8,
+    isPublished: true,
+  },
+];
+
 const doctors = [
   {
     id: 'doc-ali-veliyev',
@@ -298,6 +509,16 @@ async function seedAdmin() {
   });
 }
 
+async function seedServices() {
+  for (const service of services) {
+    await prisma.service.upsert({
+      where: { id: service.id },
+      update: service,
+      create: service,
+    });
+  }
+}
+
 async function seedDoctors() {
   for (const doctor of doctors) {
     await prisma.doctor.upsert({
@@ -400,6 +621,7 @@ async function seedHomeStats() {
 async function main() {
   console.log('Seeding database...');
   await seedAdmin();
+  await seedServices();
   await seedDoctors();
   await seedBlog();
   await seedContact();
