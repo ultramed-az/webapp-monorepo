@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import TemporaryUnavailable from '@/components/feedback/TemporaryUnavailable';
+import { Link } from '@/i18n/routing';
 import { HeartPulse, Stethoscope, Clock, ShieldCheck, ArrowRight, Activity, Users } from 'lucide-react';
 import { getHomeStats, isBackendUnavailableError } from '@/lib/api';
 
@@ -120,11 +121,15 @@ export default function HomePage() {
                                 {t('heroDescription', { default: 'Ultramed klinikası olaraq sağlamlığınız üçün ən qabaqcıl texnologiyalar və peşəkar komandamızla xidmətinizdəyik.' })}
                             </p>
                             <div className="flex flex-col sm:flex-row gap-4">
-                                <Button size="lg" className="bg-brand-orange hover:bg-brand-orange-dark text-white px-8 h-14 text-lg rounded-full">
-                                    {t('bookAppointment', { default: 'Onlayn Qəbul' })}
+                                <Button asChild size="lg" className="bg-brand-orange hover:bg-brand-orange-dark text-white px-8 h-14 text-lg rounded-full">
+                                    <Link href="/contact">
+                                        {t('bookAppointment', { default: 'Onlayn Qəbul' })}
+                                    </Link>
                                 </Button>
-                                <Button size="lg" variant="outline" className="border-brand-blue text-brand-blue hover:bg-brand-blue-soft px-8 h-14 text-lg rounded-full">
-                                    {t('ourServices', { default: 'Xidmətlərimiz' })} <ArrowRight className="ml-2 h-5 w-5" />
+                                <Button asChild size="lg" variant="outline" className="border-brand-blue text-brand-blue hover:bg-brand-blue-soft px-8 h-14 text-lg rounded-full">
+                                    <Link href="/services">
+                                        {t('ourServices', { default: 'Xidmətlərimiz' })} <ArrowRight className="ml-2 h-5 w-5" />
+                                    </Link>
                                 </Button>
                             </div>
                         </div>
@@ -212,11 +217,15 @@ export default function HomePage() {
                             {t('ctaDesc', { default: 'Vaxt itirmədən həkim qəbuluna yazılın və peşəkar komandamızın xidmətindən yararlanın.' })}
                         </p>
                         <div className="flex flex-col sm:flex-row justify-center gap-4">
-                            <Button size="lg" className="bg-brand-orange hover:bg-brand-orange-dark text-white px-8 h-14 text-lg rounded-full">
-                                {t('bookAppointment', { default: 'Qəbul yazılmaq' })}
+                            <Button asChild size="lg" className="bg-brand-orange hover:bg-brand-orange-dark text-white px-8 h-14 text-lg rounded-full">
+                                <Link href="/contact">
+                                    {t('bookAppointment', { default: 'Qəbul yazılmaq' })}
+                                </Link>
                             </Button>
-                            <Button size="lg" variant="outline" className="border-brand-blue text-brand-blue hover:bg-brand-blue-soft px-8 h-14 text-lg rounded-full">
-                                {t('contactUs', { default: 'Bizimlə Əlaqə' })}
+                            <Button asChild size="lg" variant="outline" className="border-brand-blue text-brand-blue hover:bg-brand-blue-soft px-8 h-14 text-lg rounded-full">
+                                <Link href="/contact">
+                                    {t('contactUs', { default: 'Bizimlə Əlaqə' })}
+                                </Link>
                             </Button>
                         </div>
                     </div>

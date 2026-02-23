@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
+import { Link } from '@/i18n/routing';
 import {
     Activity,
     ArrowRight,
@@ -293,17 +294,19 @@ export default function ServicesPage() {
                     </p>
                     <div className="flex flex-col sm:flex-row justify-center gap-4">
                         <Button
+                            asChild
                             size="lg"
                             className="bg-brand-orange hover:bg-brand-orange-dark text-white rounded-full h-14 px-8 text-base"
                         >
-                            {t('ctaPrimaryButton')}
+                            <Link href="/contact">{t('ctaPrimaryButton')}</Link>
                         </Button>
                         <Button
+                            asChild
                             size="lg"
                             variant="outline"
                             className="border-brand-blue text-brand-blue hover:bg-brand-blue-soft rounded-full h-14 px-8 text-base"
                         >
-                            {t('ctaSecondaryButton')}
+                            <Link href="/contact">{t('ctaSecondaryButton')}</Link>
                         </Button>
                     </div>
                 </div>

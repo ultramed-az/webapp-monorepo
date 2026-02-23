@@ -25,6 +25,7 @@ export default function BlogPage() {
     const [isUnavailable, setIsUnavailable] = useState(false);
     const [posts, setPosts] = useState<BlogListItem[]>([]);
     const [selectedCategory, setSelectedCategory] = useState<string>(ALL_CATEGORIES);
+    const [visibleCount, setVisibleCount] = useState(6);
 
     useEffect(() => {
         let isCancelled = false;
@@ -78,6 +79,11 @@ export default function BlogPage() {
 
     const featuredPost = filteredPosts.find((post) => post.featured) || filteredPosts[0];
     const normalPosts = filteredPosts.filter((post) => post.id !== featuredPost?.id);
+    const visiblePosts = normalPosts.slice(0, visibleCount);
+
+    useEffect(() => {
+        setVisibleCount(6);
+    }, [selectedCategory, locale]);
 
     const formattedDate = (isoDate: string) => {
         const dateLocale = locale === 'en' ? 'en-US' : locale === 'ru' ? 'ru-RU' : 'az-AZ';
@@ -235,7 +241,7 @@ export default function BlogPage() {
 
                             {/* Normal Posts Grid */}
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                                {normalPosts.map((post) => (
+                                {visiblePosts.map((post) => (
                                     <Link href={`/blog/${post.id}`} key={post.id} className="group flex flex-col h-full">
                                         <Card className="flex flex-col h-full bg-white border-slate-100 hover:shadow-xl transition-all duration-300 rounded-2xl overflow-hidden group-hover:-translate-y-1">
                                             <div className="relative h-56 w-full overflow-hidden bg-slate-100">
@@ -269,9 +275,13 @@ export default function BlogPage() {
                                 ))}
                             </div>
 
-                            {filteredPosts.length > 0 && (
+                            {normalPosts.length > visibleCount && (
                                 <div className="text-center pt-8">
-                                    <Button variant="outline" className="border-slate-300 text-slate-700 px-8 rounded-full h-12">
+                                    <Button
+                                        variant="outline"
+                                        className="border-slate-300 text-slate-700 px-8 rounded-full h-12"
+                                        onClick={() => setVisibleCount((count) => count + 6)}
+                                    >
                                         {t('loadMore')}
                                     </Button>
                                 </div>

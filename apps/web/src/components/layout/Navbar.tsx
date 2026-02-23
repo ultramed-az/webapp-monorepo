@@ -212,11 +212,19 @@ export default function Navbar() {
 
                     {/* Desktop Actions */}
                     <div className="hidden lg:flex items-center space-x-4">
-                        <Button variant="ghost" size="icon" className="text-slate-600 hover:text-brand-orange">
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            className="text-slate-600 hover:text-brand-orange"
+                            onClick={() => router.push('/blog')}
+                            aria-label={t('blog', { default: 'Bloq' })}
+                        >
                             <Search className="w-5 h-5" />
                         </Button>
-                        <Button className="bg-brand-orange hover:bg-brand-orange-dark text-white rounded-full px-6">
-                            {t('bookAppointment', { default: 'Qəbul yazılmaq' })}
+                        <Button asChild className="bg-brand-orange hover:bg-brand-orange-dark text-white rounded-full px-6">
+                            <Link href="/contact">
+                                {t('bookAppointment', { default: 'Qəbul yazılmaq' })}
+                            </Link>
                         </Button>
                     </div>
 
@@ -254,8 +262,10 @@ export default function Navbar() {
                                                 </Button>
                                             ))}
                                         </div>
-                                        <Button className="w-full bg-brand-orange hover:bg-brand-orange-dark text-white">
-                                            {t('bookAppointment', { default: 'Qəbul yazılmaq' })}
+                                        <Button asChild className="w-full bg-brand-orange hover:bg-brand-orange-dark text-white">
+                                            <Link href="/contact">
+                                                {t('bookAppointment', { default: 'Qəbul yazılmaq' })}
+                                            </Link>
                                         </Button>
                                     </div>
                                 </div>
