@@ -235,6 +235,10 @@ export async function getBlogPosts(locale: string | undefined): Promise<BlogList
     return request<BlogListItem[]>('/blog', { locale: toLocale(locale) });
 }
 
+export async function getBlogPostById(id: string, locale: string | undefined): Promise<BlogListItem | null> {
+    return request<BlogListItem | null>(`/blog/${id}`, { locale: toLocale(locale) });
+}
+
 export async function getTestimonialsPage(locale: string | undefined): Promise<TestimonialsPageResponse> {
     return request<TestimonialsPageResponse>('/content/testimonials', { locale: toLocale(locale) });
 }
