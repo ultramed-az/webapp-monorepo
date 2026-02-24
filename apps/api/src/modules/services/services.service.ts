@@ -1,5 +1,7 @@
 import { Injectable } from '@nestjs/common';
+import { Prisma } from '@ultramed/database';
 import { PrismaService } from '../../prisma/prisma.service';
+import { CreateServiceDto, UpdateServiceDto } from './dto/service.dto';
 
 @Injectable()
 export class ServicesService {
@@ -51,12 +53,30 @@ export class ServicesService {
         };
     }
 
-    async create(data: any) {
-        return this.prisma.service.create({ data });
+    async create(data: CreateServiceDto) {
+        const { highlightsAz, highlightsEn, highlightsRu, ...rest } = data;
+
+        const payload: Prisma.ServiceCreateInput = {
+            ...rest,
+            highlightsAz: this.toNullableJsonArray(highlightsAz),
+            highlightsEn: this.toNullableJsonArray(highlightsEn),
+            highlightsRu: this.toNullableJsonArray(highlightsRu),
+        };
+
+        return this.prisma.service.create({ data: payload });
     }
 
-    async update(id: string, data: any) {
-        return this.prisma.service.update({ where: { id }, data });
+    async update(id: string, data: UpdateServiceDto) {
+        const { highlightsAz, highlightsEn, highlightsRu, ...rest } = data;
+
+        const payload: Prisma.ServiceUpdateInput = {
+            ...rest,
+            highlightsAz: this.toNullableJsonArray(highlightsAz),
+            highlightsEn: this.toNullableJsonArray(highlightsEn),
+            highlightsRu: this.toNullableJsonArray(highlightsRu),
+        };
+
+        return this.prisma.service.update({ where: { id }, data: payload });
     }
 
     async remove(id: string) {
@@ -122,5 +142,19 @@ export class ServicesService {
         }
 
         return raw.filter((item): item is string => typeof item === 'string');
+    }
+
+    private toNullableJsonArray(
+        value: string[] | null | undefined,
+    ): Prisma.InputJsonValue | Prisma.NullableJsonNullValueInput | undefined {
+        if (value === undefined) {
+            return undefined;
+        }
+
+        if (value === null) {
+            return Prisma.JsonNull;
+        }
+
+        return value as Prisma.InputJsonValue;
     }
 }

@@ -10,6 +10,7 @@ import {
 } from '@nestjs/common';
 import { AdminAuthGuard } from '../admin/admin-auth.guard';
 import { HomeService } from './home.service';
+import { parseCreateHomeStatDto, parseUpdateHomeStatDto } from './dto/home.dto';
 
 @Controller('home')
 export class HomeController {
@@ -22,13 +23,15 @@ export class HomeController {
 
     @UseGuards(AdminAuthGuard)
     @Post('stats')
-    createStat(@Body() data: any) {
+    createStat(@Body() body: unknown) {
+        const data = parseCreateHomeStatDto(body);
         return this.homeService.createStat(data);
     }
 
     @UseGuards(AdminAuthGuard)
     @Put('stats/:id')
-    updateStat(@Param('id') id: string, @Body() data: any) {
+    updateStat(@Param('id') id: string, @Body() body: unknown) {
+        const data = parseUpdateHomeStatDto(body);
         return this.homeService.updateStat(id, data);
     }
 

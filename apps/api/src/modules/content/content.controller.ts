@@ -11,6 +11,12 @@ import {
 } from '@nestjs/common';
 import { AdminAuthGuard } from '../admin/admin-auth.guard';
 import { ContentService } from './content.service';
+import {
+  parseCreateContentPageDto,
+  parseCreateTestimonialDto,
+  parseUpdateContentPageDto,
+  parseUpdateTestimonialDto,
+} from './dto/content.dto';
 
 @Controller('content')
 export class ContentController {
@@ -51,13 +57,15 @@ export class ContentController {
 
   @UseGuards(AdminAuthGuard)
   @Post('testimonials')
-  createTestimonial(@Body() data: any) {
+  createTestimonial(@Body() body: unknown) {
+    const data = parseCreateTestimonialDto(body);
     return this.contentService.createTestimonial(data);
   }
 
   @UseGuards(AdminAuthGuard)
   @Put('testimonials/:id')
-  updateTestimonial(@Param('id') id: string, @Body() data: any) {
+  updateTestimonial(@Param('id') id: string, @Body() body: unknown) {
+    const data = parseUpdateTestimonialDto(body);
     return this.contentService.updateTestimonial(id, data);
   }
 
@@ -69,13 +77,15 @@ export class ContentController {
 
   @UseGuards(AdminAuthGuard)
   @Post('pages')
-  createPage(@Body() data: any) {
+  createPage(@Body() body: unknown) {
+    const data = parseCreateContentPageDto(body);
     return this.contentService.createPage(data);
   }
 
   @UseGuards(AdminAuthGuard)
   @Put('pages/:slug')
-  updatePage(@Param('slug') slug: string, @Body() data: any) {
+  updatePage(@Param('slug') slug: string, @Body() body: unknown) {
+    const data = parseUpdateContentPageDto(body);
     return this.contentService.updatePage(slug, data);
   }
 

@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
+import { CreateHomeStatDto, UpdateHomeStatDto } from './dto/home.dto';
 
 @Injectable()
 export class HomeService {
@@ -16,13 +17,13 @@ export class HomeService {
         }));
     }
 
-    async createStat(data: any) {
+    async createStat(data: CreateHomeStatDto) {
         return this.prisma.homeStat.create({
             data,
         });
     }
 
-    async updateStat(id: string, data: any) {
+    async updateStat(id: string, data: UpdateHomeStatDto) {
         return this.prisma.homeStat.update({
             where: { id },
             data,

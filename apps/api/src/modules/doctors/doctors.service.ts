@@ -1,5 +1,7 @@
 import { Injectable } from '@nestjs/common';
+import { Prisma } from '@ultramed/database';
 import { PrismaService } from '../../prisma/prisma.service';
+import { CreateDoctorDto, UpdateDoctorDto } from './dto/doctor.dto';
 
 @Injectable()
 export class DoctorsService {
@@ -67,14 +69,78 @@ export class DoctorsService {
         };
     }
 
-    async create(data: any) {
-        return this.prisma.doctor.create({ data });
+    async create(data: CreateDoctorDto) {
+        const {
+            scheduleAz,
+            scheduleEn,
+            scheduleRu,
+            languagesAz,
+            languagesEn,
+            languagesRu,
+            proceduresAz,
+            proceduresEn,
+            proceduresRu,
+            tagsAz,
+            tagsEn,
+            tagsRu,
+            ...rest
+        } = data;
+
+        const payload: Prisma.DoctorCreateInput = {
+            ...rest,
+            scheduleAz: this.toNullableJsonArray(scheduleAz),
+            scheduleEn: this.toNullableJsonArray(scheduleEn),
+            scheduleRu: this.toNullableJsonArray(scheduleRu),
+            languagesAz: this.toNullableJsonArray(languagesAz),
+            languagesEn: this.toNullableJsonArray(languagesEn),
+            languagesRu: this.toNullableJsonArray(languagesRu),
+            proceduresAz: this.toNullableJsonArray(proceduresAz),
+            proceduresEn: this.toNullableJsonArray(proceduresEn),
+            proceduresRu: this.toNullableJsonArray(proceduresRu),
+            tagsAz: this.toNullableJsonArray(tagsAz),
+            tagsEn: this.toNullableJsonArray(tagsEn),
+            tagsRu: this.toNullableJsonArray(tagsRu),
+        };
+
+        return this.prisma.doctor.create({ data: payload });
     }
 
-    async update(id: string, data: any) {
+    async update(id: string, data: UpdateDoctorDto) {
+        const {
+            scheduleAz,
+            scheduleEn,
+            scheduleRu,
+            languagesAz,
+            languagesEn,
+            languagesRu,
+            proceduresAz,
+            proceduresEn,
+            proceduresRu,
+            tagsAz,
+            tagsEn,
+            tagsRu,
+            ...rest
+        } = data;
+
+        const payload: Prisma.DoctorUpdateInput = {
+            ...rest,
+            scheduleAz: this.toNullableJsonArray(scheduleAz),
+            scheduleEn: this.toNullableJsonArray(scheduleEn),
+            scheduleRu: this.toNullableJsonArray(scheduleRu),
+            languagesAz: this.toNullableJsonArray(languagesAz),
+            languagesEn: this.toNullableJsonArray(languagesEn),
+            languagesRu: this.toNullableJsonArray(languagesRu),
+            proceduresAz: this.toNullableJsonArray(proceduresAz),
+            proceduresEn: this.toNullableJsonArray(proceduresEn),
+            proceduresRu: this.toNullableJsonArray(proceduresRu),
+            tagsAz: this.toNullableJsonArray(tagsAz),
+            tagsEn: this.toNullableJsonArray(tagsEn),
+            tagsRu: this.toNullableJsonArray(tagsRu),
+        };
+
         return this.prisma.doctor.update({
             where: { id },
-            data,
+            data: payload,
         });
     }
 
@@ -193,5 +259,19 @@ export class DoctorsService {
         }
 
         return [];
+    }
+
+    private toNullableJsonArray(
+        value: string[] | null | undefined,
+    ): Prisma.InputJsonValue | Prisma.NullableJsonNullValueInput | undefined {
+        if (value === undefined) {
+            return undefined;
+        }
+
+        if (value === null) {
+            return Prisma.JsonNull;
+        }
+
+        return value as Prisma.InputJsonValue;
     }
 }

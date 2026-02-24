@@ -12,7 +12,7 @@ RUN pnpm install --frozen-lockfile
 
 COPY . .
 
-RUN npx prisma generate --schema=packages/database/prisma/schema.prisma
+RUN pnpm --filter @ultramed/database exec prisma generate --schema=prisma/schema.prisma
 RUN pnpm --filter @ultramed/api build
 
 FROM node:20-alpine

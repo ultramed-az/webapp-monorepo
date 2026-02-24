@@ -11,6 +11,7 @@ import {
 } from '@nestjs/common';
 import { AdminAuthGuard } from '../admin/admin-auth.guard';
 import { FaqService } from './faq.service';
+import { parseCreateFaqDto, parseUpdateFaqDto } from './dto/faq.dto';
 
 @Controller('faq')
 export class FaqController {
@@ -40,13 +41,15 @@ export class FaqController {
 
   @UseGuards(AdminAuthGuard)
   @Post()
-  create(@Body() data: any) {
+  create(@Body() body: unknown) {
+    const data = parseCreateFaqDto(body);
     return this.faqService.create(data);
   }
 
   @UseGuards(AdminAuthGuard)
   @Put(':id')
-  update(@Param('id') id: string, @Body() data: any) {
+  update(@Param('id') id: string, @Body() body: unknown) {
+    const data = parseUpdateFaqDto(body);
     return this.faqService.update(id, data);
   }
 

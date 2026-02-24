@@ -11,6 +11,7 @@ import {
 } from '@nestjs/common';
 import { AdminAuthGuard } from '../admin/admin-auth.guard';
 import { BlogService } from './blog.service';
+import { parseCreateBlogPostDto, parseUpdateBlogPostDto } from './dto/blog.dto';
 
 @Controller('blog')
 export class BlogController {
@@ -40,13 +41,15 @@ export class BlogController {
 
     @UseGuards(AdminAuthGuard)
     @Post()
-    create(@Body() data: any) {
+    create(@Body() body: unknown) {
+        const data = parseCreateBlogPostDto(body);
         return this.blogService.create(data);
     }
 
     @UseGuards(AdminAuthGuard)
     @Put(':id')
-    update(@Param('id') id: string, @Body() data: any) {
+    update(@Param('id') id: string, @Body() body: unknown) {
+        const data = parseUpdateBlogPostDto(body);
         return this.blogService.update(id, data);
     }
 

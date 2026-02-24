@@ -1,5 +1,11 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
+import {
+  CreateContentPageDto,
+  CreateTestimonialDto,
+  UpdateContentPageDto,
+  UpdateTestimonialDto,
+} from './dto/content.dto';
 
 type SupportedLocale = 'az' | 'en' | 'ru';
 type SectionItem = { title: string; content: string };
@@ -61,11 +67,11 @@ export class ContentService {
     return this.getSectionPage('terms-of-service', localeRaw);
   }
 
-  async createTestimonial(data: any) {
+  async createTestimonial(data: CreateTestimonialDto) {
     return this.prisma.testimonial.create({ data });
   }
 
-  async updateTestimonial(id: string, data: any) {
+  async updateTestimonial(id: string, data: UpdateTestimonialDto) {
     return this.prisma.testimonial.update({
       where: { id },
       data,
@@ -78,11 +84,11 @@ export class ContentService {
     });
   }
 
-  async createPage(data: any) {
+  async createPage(data: CreateContentPageDto) {
     return (this.prisma as any).contentPage.create({ data });
   }
 
-  async updatePage(slug: string, data: any) {
+  async updatePage(slug: string, data: UpdateContentPageDto) {
     return (this.prisma as any).contentPage.update({
       where: { slug },
       data,

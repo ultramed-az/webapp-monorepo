@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
+import { CreateFaqDto, UpdateFaqDto } from './dto/faq.dto';
 
 type SupportedLocale = 'az' | 'en' | 'ru';
 
@@ -49,11 +50,11 @@ export class FaqService {
     };
   }
 
-  async create(data: any) {
+  async create(data: CreateFaqDto) {
     return this.prisma.faq.create({ data });
   }
 
-  async update(id: string, data: any) {
+  async update(id: string, data: UpdateFaqDto) {
     return this.prisma.faq.update({
       where: { id },
       data,

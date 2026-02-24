@@ -38,12 +38,12 @@ services:
       NODE_ENV: "${NODE_ENV}"
     volumes:
       - .:/app
-      - /app/node_modules
+      - api_node_modules:/app/node_modules
     depends_on:
       db:
         condition: service_healthy
     restart: unless-stopped
-    command: sh -lc "pnpm db:generate && pnpm --filter @ultramed/api dev"
+    command: sh -lc "CI=true pnpm install --frozen-lockfile && pnpm db:generate && pnpm --filter @ultramed/api dev"
 
   web:
     build:
@@ -60,8 +60,10 @@ services:
       FRONTEND_PORT: "${FRONTEND_PORT}"
     volumes:
       - .:/app
-      - /app/node_modules
-    command: pnpm --filter @ultramed/web dev
+      - web_node_modules:/app/node_modules
+    command: sh -lc "CI=true pnpm install --frozen-lockfile && pnpm --filter @ultramed/web dev"
 
 volumes:
   mysql_data_dev:
+  api_node_modules:
+  web_node_modules:

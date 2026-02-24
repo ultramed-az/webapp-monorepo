@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
+import { CreateGalleryDto, UpdateGalleryDto } from './dto/gallery.dto';
 
 type SupportedLocale = 'az' | 'en' | 'ru';
 
@@ -49,11 +50,11 @@ export class GalleryService {
     };
   }
 
-  async create(data: any) {
+  async create(data: CreateGalleryDto) {
     return this.prisma.gallery.create({ data });
   }
 
-  async update(id: string, data: any) {
+  async update(id: string, data: UpdateGalleryDto) {
     return this.prisma.gallery.update({
       where: { id },
       data,

@@ -11,6 +11,7 @@ import {
 } from '@nestjs/common';
 import { AdminAuthGuard } from '../admin/admin-auth.guard';
 import { GalleryService } from './gallery.service';
+import { parseCreateGalleryDto, parseUpdateGalleryDto } from './dto/gallery.dto';
 
 @Controller('gallery')
 export class GalleryController {
@@ -40,13 +41,15 @@ export class GalleryController {
 
   @UseGuards(AdminAuthGuard)
   @Post()
-  create(@Body() data: any) {
+  create(@Body() body: unknown) {
+    const data = parseCreateGalleryDto(body);
     return this.galleryService.create(data);
   }
 
   @UseGuards(AdminAuthGuard)
   @Put(':id')
-  update(@Param('id') id: string, @Body() data: any) {
+  update(@Param('id') id: string, @Body() body: unknown) {
+    const data = parseUpdateGalleryDto(body);
     return this.galleryService.update(id, data);
   }
 
