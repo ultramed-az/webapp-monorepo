@@ -11,6 +11,7 @@ import { Calendar, User, Tag, ArrowRight, BookOpen } from 'lucide-react';
 import Image from 'next/image';
 import TemporaryUnavailable from '@/components/feedback/TemporaryUnavailable';
 import { getBlogPosts, isBackendUnavailableError, type BlogListItem } from '@/lib/api';
+import { shouldBypassImageOptimization } from '@/lib/image';
 
 const ALL_CATEGORIES = '__all__';
 
@@ -78,6 +79,7 @@ export default function BlogPage() {
     }, [posts, selectedCategory]);
 
     const featuredPost = filteredPosts.find((post) => post.featured) || filteredPosts[0];
+    const featuredImageSrc = featuredPost?.image || '/logo.png';
     const normalPosts = filteredPosts.filter((post) => post.id !== featuredPost?.id);
     const visiblePosts = normalPosts.slice(0, visibleCount);
 
@@ -203,9 +205,10 @@ export default function BlogPage() {
                                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center bg-slate-50 rounded-[2rem] p-6 sm:p-8 lg:p-12 transition-all hover:shadow-xl border border-slate-100">
                                         <div className="relative h-[300px] lg:h-[400px] rounded-3xl overflow-hidden order-2 lg:order-1 shadow-md">
                                             <Image
-                                                src={featuredPost.image || '/logo.png'}
+                                                src={featuredImageSrc}
                                                 alt={featuredPost.title}
                                                 fill
+                                                unoptimized={shouldBypassImageOptimization(featuredImageSrc)}
                                                 className="object-cover group-hover:scale-105 transition-transform duration-700"
                                             />
                                             <div className="absolute top-4 left-4 bg-white/90 backdrop-blur text-brand-blue font-bold text-xs px-3 py-1.5 rounded-full shadow-sm">
@@ -241,14 +244,17 @@ export default function BlogPage() {
 
                             {/* Normal Posts Grid */}
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                                {visiblePosts.map((post) => (
+                                {visiblePosts.map((post) => {
+                                    const postImageSrc = post.image || '/logo.png';
+                                    return (
                                     <Link href={`/blog/${post.id}`} key={post.id} className="group flex flex-col h-full">
                                         <Card className="flex flex-col h-full bg-white border-slate-100 hover:shadow-xl transition-all duration-300 rounded-2xl overflow-hidden group-hover:-translate-y-1">
                                             <div className="relative h-56 w-full overflow-hidden bg-slate-100">
                                                 <Image
-                                                    src={post.image || '/logo.png'}
+                                                    src={postImageSrc}
                                                     alt={post.title}
                                                     fill
+                                                    unoptimized={shouldBypassImageOptimization(postImageSrc)}
                                                     className="object-cover group-hover:scale-110 transition-transform duration-700"
                                                 />
                                                 <div className="absolute top-4 left-4 bg-brand-blue text-white font-semibold text-xs px-3 py-1.5 rounded-full shadow-md">
@@ -272,7 +278,8 @@ export default function BlogPage() {
                                             </CardContent>
                                         </Card>
                                     </Link>
-                                ))}
+                                    );
+                                })}
                             </div>
 
                             {normalPosts.length > visibleCount && (

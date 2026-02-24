@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import Image from 'next/image';
+import { shouldBypassImageOptimization } from '@/lib/image';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -336,7 +337,13 @@ export default function BlogPage() {
                       <TableCell>
                         {item.image ? (
                           <div className="h-10 w-14 relative rounded overflow-hidden border border-slate-200">
-                            <Image src={item.image} alt={item.titleAz} fill className="object-cover" />
+                            <Image
+                              src={item.image}
+                              alt={item.titleAz}
+                              fill
+                              unoptimized={shouldBypassImageOptimization(item.image)}
+                              className="object-cover"
+                            />
                           </div>
                         ) : (
                           <span className="text-xs text-slate-500">Yoxdur</span>

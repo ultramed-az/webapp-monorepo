@@ -51,18 +51,12 @@ export class AdminController {
     @Req() request: Request,
     @Res({ passthrough: true }) response: Response,
   ) {
-    const xForwardedFor = request.headers['x-forwarded-for'];
-    const forwardedIp =
-      typeof xForwardedFor === 'string'
-        ? xForwardedFor.split(',')[0]?.trim()
-        : null;
+    const requestContext = this.adminService.getRequestContext(request);
+    this.adminService.assertValidMutationOrigin(requestContext);
 
     const session = await this.adminService.login(body.email, body.password, {
-      ipAddress: forwardedIp ?? request.ip ?? null,
-      userAgent:
-        typeof request.headers['user-agent'] === 'string'
-          ? request.headers['user-agent']
-          : null,
+      ipAddress: requestContext.ipAddress,
+      userAgent: requestContext.userAgent,
     });
 
     response.cookie(
@@ -88,6 +82,15 @@ export class AdminController {
   }
 
   @UseGuards(AdminAuthGuard)
+  @Get('sessions')
+  listSessions(@Req() request: AuthenticatedAdminRequest) {
+    return this.adminService.listAdminSessions(
+      request.admin.id,
+      request.admin.sessionId,
+    );
+  }
+
+  @UseGuards(AdminAuthGuard)
   @HttpCode(HttpStatus.OK)
   @Post('logout')
   async logout(
@@ -105,6 +108,30 @@ export class AdminController {
     );
 
     return { success: true };
+  }
+
+  @UseGuards(AdminAuthGuard)
+  @HttpCode(HttpStatus.OK)
+  @Post('logout-all')
+  async logoutAll(
+    @Req() request: AuthenticatedAdminRequest,
+    @Res({ passthrough: true }) response: Response,
+  ) {
+    await this.adminService.logoutAll(request.admin.id);
+    response.clearCookie(
+      this.adminService.getAuthCookieName(),
+      this.adminService.getAuthCookieOptions(new Date(0)),
+    );
+    return { success: true };
+  }
+
+  @UseGuards(AdminAuthGuard)
+  @Delete('sessions/:id')
+  revokeSession(
+    @Req() request: AuthenticatedAdminRequest,
+    @Param('id') sessionId: string,
+  ) {
+    return this.adminService.revokeAdminSession(request.admin.id, sessionId);
   }
 
   @UseGuards(AdminAuthGuard)

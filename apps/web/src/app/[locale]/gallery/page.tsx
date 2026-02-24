@@ -9,6 +9,7 @@ import { Card } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import TemporaryUnavailable from '@/components/feedback/TemporaryUnavailable';
 import { getGalleryItems, isBackendUnavailableError, type GalleryItem } from '@/lib/api';
+import { shouldBypassImageOptimization } from '@/lib/image';
 
 export default function GalleryPage() {
   const t = useTranslations('GalleryPage');
@@ -100,16 +101,19 @@ export default function GalleryPage() {
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {items.map((item) => (
+              {items.map((item) => {
+                const imageSrc = item.imageUrl;
+                return (
                 <Card
                   key={item.id}
                   className="overflow-hidden rounded-2xl border-slate-200 shadow-sm hover:shadow-xl transition-shadow"
                 >
                   <div className="relative aspect-[4/3]">
                     <Image
-                      src={item.imageUrl}
+                      src={imageSrc}
                       alt={item.caption || 'Gallery image'}
                       fill
+                      unoptimized={shouldBypassImageOptimization(imageSrc)}
                       className="object-cover"
                     />
                   </div>
@@ -117,7 +121,8 @@ export default function GalleryPage() {
                     <h2 className="text-base font-semibold text-slate-900">{item.caption}</h2>
                   </div>
                 </Card>
-              ))}
+                );
+              })}
             </div>
           )}
         </div>

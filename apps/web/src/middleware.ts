@@ -23,15 +23,20 @@ function getLocaleFromPathname(pathname: string): string {
     return routing.defaultLocale;
 }
 
-async function hasValidAdminSession(token: string): Promise<boolean> {
+async function hasValidAdminSession(token: string, request: NextRequest): Promise<boolean> {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), AUTH_CHECK_TIMEOUT_MS);
+    const userAgent = request.headers.get('user-agent');
 
     try {
         const response = await fetch(`${API_BASE_URL}/admin/session`, {
             method: 'GET',
             headers: {
                 cookie: `${ADMIN_AUTH_COOKIE}=${token}`,
+                ...(userAgent ? { 'user-agent': userAgent } : {}),
+                ...(userAgent
+                    ? { 'x-ultramed-client-user-agent': userAgent }
+                    : {}),
             },
             cache: 'no-store',
             signal: controller.signal,
@@ -66,7 +71,7 @@ export default async function middleware(request: NextRequest) {
             return buildAdminLoginRedirect(request);
         }
 
-        const isValid = await hasValidAdminSession(authToken);
+        const isValid = await hasValidAdminSession(authToken, request);
         if (!isValid) {
             return buildAdminLoginRedirect(request);
         }

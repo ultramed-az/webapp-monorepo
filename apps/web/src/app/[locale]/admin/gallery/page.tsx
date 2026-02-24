@@ -23,6 +23,7 @@ import {
   updateAdminGalleryItem,
   uploadAdminMedia,
 } from '@/lib/admin-api';
+import { shouldBypassImageOptimization } from '@/lib/image';
 
 type FormState = {
   imageUrl: string;
@@ -249,6 +250,7 @@ export default function AdminGalleryPage() {
                       src={item.imageUrl}
                       alt={item.captionAz ?? 'Gallery image'}
                       fill
+                      unoptimized={shouldBypassImageOptimization(item.imageUrl)}
                       className="object-cover"
                     />
                   </div>
@@ -318,7 +320,13 @@ export default function AdminGalleryPage() {
 
               {form.imageUrl ? (
                 <div className="relative h-52 w-full overflow-hidden rounded-lg border border-slate-200 bg-slate-100">
-                  <Image src={form.imageUrl} alt="Preview" fill className="object-cover" />
+                  <Image
+                    src={form.imageUrl}
+                    alt="Preview"
+                    fill
+                    unoptimized={shouldBypassImageOptimization(form.imageUrl)}
+                    className="object-cover"
+                  />
                 </div>
               ) : null}
 

@@ -18,6 +18,15 @@ export type AdminSessionResponse = {
   admin: AdminIdentity;
 };
 
+export type AdminSessionItem = {
+  id: string;
+  createdAt: string;
+  expiresAt: string;
+  ipAddress: string | null;
+  userAgent: string | null;
+  isCurrent: boolean;
+};
+
 export type AdminServiceRecord = {
   id: string;
   titleAz: string;
@@ -239,6 +248,22 @@ export async function logoutAdmin(): Promise<void> {
 
 export async function getAdminSession(): Promise<AdminSessionResponse> {
   return request<AdminSessionResponse>('/admin/session');
+}
+
+export async function getAdminSessions(): Promise<AdminSessionItem[]> {
+  return request<AdminSessionItem[]>('/admin/sessions');
+}
+
+export async function logoutAllAdmin(): Promise<void> {
+  await request('/admin/logout-all', {
+    method: 'POST',
+  });
+}
+
+export async function revokeAdminSession(sessionId: string): Promise<{ success: boolean }> {
+  return request<{ success: boolean }>(`/admin/sessions/${sessionId}`, {
+    method: 'DELETE',
+  });
 }
 
 export async function uploadAdminMedia(file: File): Promise<AdminMediaUploadResponse> {

@@ -13,6 +13,7 @@ import { Calendar, HeartPulse, Languages, Mail, MapPin, Phone, Search, Stethosco
 import Image from 'next/image';
 import TemporaryUnavailable from '@/components/feedback/TemporaryUnavailable';
 import { getDoctorById, getDoctors, isBackendUnavailableError, type DoctorDetailItem, type DoctorListItem } from '@/lib/api';
+import { shouldBypassImageOptimization } from '@/lib/image';
 
 function normalizeLocale(localeRaw: string | undefined): 'az' | 'en' | 'ru' {
     if (localeRaw === 'en' || localeRaw === 'ru') {
@@ -106,6 +107,7 @@ export default function DoctorsPage() {
         () => (selectedDoctorId ? doctorDetailsById[selectedDoctorId] : null),
         [doctorDetailsById, selectedDoctorId],
     );
+    const selectedDoctorImageSrc = selectedDoctorDetail?.image ?? selectedDoctor?.image ?? '/logo.png';
 
     const phoneHref = useMemo(() => {
         if (!selectedDoctorDetail?.phone) {
@@ -237,13 +239,16 @@ export default function DoctorsPage() {
                         </div>
                     ) : (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                            {filteredDoctors.map((doctor) => (
+                            {filteredDoctors.map((doctor) => {
+                                const imageSrc = doctor.image || '/logo.png';
+                                return (
                                 <Card key={doctor.id} className="overflow-hidden border-slate-100 hover:shadow-xl transition-all duration-300 group flex flex-col bg-white rounded-2xl">
                                     <div className="aspect-[4/3] bg-slate-100 relative overflow-hidden">
                                         <Image
-                                            src={doctor.image || '/logo.png'}
+                                            src={imageSrc}
                                             alt={doctor.name}
                                             fill
+                                            unoptimized={shouldBypassImageOptimization(imageSrc)}
                                             className="object-cover object-top group-hover:scale-105 transition-transform duration-500"
                                         />
                                         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
@@ -290,7 +295,8 @@ export default function DoctorsPage() {
                                         </div>
                                     </CardFooter>
                                 </Card>
-                            ))}
+                                );
+                            })}
                         </div>
                     )}
                 </div>
@@ -301,9 +307,10 @@ export default function DoctorsPage() {
                     {(selectedDoctorDetail || selectedDoctor) && (
                         <div className="relative h-64 w-full bg-slate-100">
                             <Image
-                                src={selectedDoctorDetail?.image ?? selectedDoctor?.image ?? '/logo.png'}
+                                src={selectedDoctorImageSrc}
                                 alt={selectedDoctorDetail?.name ?? selectedDoctor?.name ?? t('doctorAlt')}
                                 fill
+                                unoptimized={shouldBypassImageOptimization(selectedDoctorImageSrc)}
                                 className="object-cover object-top"
                             />
                             <div className="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-slate-900/25 to-transparent"></div>

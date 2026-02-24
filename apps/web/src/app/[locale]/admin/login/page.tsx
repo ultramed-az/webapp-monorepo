@@ -12,6 +12,18 @@ import { Loader2 } from 'lucide-react';
 import Image from 'next/image';
 import { loginAdmin } from '@/lib/admin-api';
 
+function isSafeAdminNextPath(nextPath: string | null): nextPath is string {
+    if (!nextPath) {
+        return false;
+    }
+
+    if (!nextPath.startsWith('/') || nextPath.startsWith('//')) {
+        return false;
+    }
+
+    return /^\/(?:(az|en|ru)\/)?admin(\/|$)/.test(nextPath);
+}
+
 export default function AdminLoginPage() {
     const t = useTranslations('Admin');
     const router = useRouter();
@@ -31,8 +43,8 @@ export default function AdminLoginPage() {
         try {
             await loginAdmin(email, password);
             const nextPath = searchParams.get('next');
-            if (nextPath && nextPath.startsWith('/admin')) {
-                window.location.href = nextPath;
+            if (isSafeAdminNextPath(nextPath)) {
+                window.location.assign(nextPath);
                 return;
             }
             router.push('/admin/dashboard');

@@ -82,6 +82,7 @@
     "privacyPolicy": "Privacy Policy",
     "terms": "Terms of Service",
     "logout": "Logout",
+    "logoutAll": "Logout all sessions",
     "search": "Search...",
     "openMenu": "Open menu",
     "profile": "Profile"

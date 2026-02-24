@@ -13,7 +13,7 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
-import { logoutAdmin } from '@/lib/admin-api';
+import { logoutAdmin, logoutAllAdmin } from '@/lib/admin-api';
 
 type HeaderProps = {
     onMenuClick?: () => void;
@@ -25,6 +25,16 @@ export default function Header({ onMenuClick }: HeaderProps) {
 
     const handleLogout = async () => {
         await logoutAdmin();
+        router.push('/admin/login');
+        router.refresh();
+    };
+
+    const handleLogoutAll = async () => {
+        const accepted = window.confirm('Bütün aktiv sessiyalar sonlandırılsın?');
+        if (!accepted) {
+            return;
+        }
+        await logoutAllAdmin();
         router.push('/admin/login');
         router.refresh();
     };
@@ -78,6 +88,12 @@ export default function Header({ onMenuClick }: HeaderProps) {
                         <DropdownMenuItem className="cursor-pointer">
                             <User className="mr-2 h-4 w-4" />
                             <span>{t('profile', { default: 'Profile' })}</span>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                            className="cursor-pointer text-slate-700 focus:text-slate-700"
+                            onClick={handleLogoutAll}
+                        >
+                            {t('logoutAll', { default: 'Logout all sessions' })}
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem

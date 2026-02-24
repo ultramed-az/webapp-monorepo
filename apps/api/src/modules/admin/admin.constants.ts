@@ -2,3 +2,6 @@ export const ADMIN_AUTH_COOKIE = 'ultramed_admin_token';
 export const DEFAULT_ADMIN_SESSION_TTL_HOURS = 12;
 export const DEFAULT_LOGIN_MAX_ATTEMPTS = 5;
 export const DEFAULT_LOGIN_LOCK_WINDOW_MINUTES = 10;
+export const DEFAULT_ADMIN_MAX_ACTIVE_SESSIONS = 3;
+export const DEFAULT_ADMIN_REQUIRE_ORIGIN_FOR_MUTATIONS = true;
+export const DEFAULT_ADMIN_ENFORCE_IP_BINDING = false;

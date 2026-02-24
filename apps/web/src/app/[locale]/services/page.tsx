@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
+import Image from 'next/image';
 import { Link } from '@/i18n/routing';
 import {
     Activity,
@@ -28,6 +29,7 @@ import {
     type ServiceDetailItem,
     type ServiceListItem,
 } from '@/lib/api';
+import { shouldBypassImageOptimization } from '@/lib/image';
 
 type IconConfig = {
     Icon: LucideIcon;
@@ -149,6 +151,7 @@ export default function ServicesPage() {
         () => (selectedServiceId ? serviceDetailsById[selectedServiceId] : null),
         [serviceDetailsById, selectedServiceId],
     );
+    const selectedServiceImageSrc = selectedServiceDetail?.image ?? selectedService?.image ?? null;
 
     const openDetailModal = async (serviceId: string) => {
         setSelectedServiceId(serviceId);
@@ -248,6 +251,8 @@ export default function ServicesPage() {
                             {services.map((service) => {
                                 const iconConfig = service.iconKey ? ICON_MAP[service.iconKey] ?? FALLBACK_ICON : FALLBACK_ICON;
                                 const ServiceIcon = iconConfig.Icon;
+                                const hasImage = Boolean(service.image);
+                                const imageSrc = service.image ?? '/logo.png';
 
                                 return (
                                     <Card
@@ -255,6 +260,18 @@ export default function ServicesPage() {
                                         className="border-slate-200 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col h-full bg-white group"
                                     >
                                         <CardHeader>
+                                            {hasImage ? (
+                                                <div className="-mx-6 -mt-6 mb-6 relative aspect-[16/10] overflow-hidden rounded-t-xl bg-slate-100">
+                                                    <Image
+                                                        src={imageSrc}
+                                                        alt={service.title}
+                                                        fill
+                                                        unoptimized={shouldBypassImageOptimization(imageSrc)}
+                                                        className="object-cover transition-transform duration-500 group-hover:scale-105"
+                                                    />
+                                                    <div className="absolute inset-0 bg-gradient-to-t from-slate-900/50 via-transparent to-transparent" />
+                                                </div>
+                                            ) : null}
                                             <div
                                                 className={`${iconConfig.backgroundClassName} w-16 h-16 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300`}
                                             >
@@ -314,6 +331,18 @@ export default function ServicesPage() {
 
             <Dialog open={isDetailModalOpen} onOpenChange={setIsDetailModalOpen}>
                 <DialogContent className="sm:max-w-2xl max-h-[85vh] overflow-y-auto">
+                    {selectedServiceImageSrc ? (
+                        <div className="-mx-6 -mt-6 mb-5 relative h-56 overflow-hidden rounded-t-lg bg-slate-100">
+                            <Image
+                                src={selectedServiceImageSrc}
+                                alt={selectedServiceDetail?.title ?? selectedService?.title ?? t('modalTitleFallback')}
+                                fill
+                                unoptimized={shouldBypassImageOptimization(selectedServiceImageSrc)}
+                                className="object-cover"
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-t from-slate-900/40 via-transparent to-transparent" />
+                        </div>
+                    ) : null}
                     <DialogHeader>
                         <DialogTitle className="text-2xl text-slate-900">
                             {selectedServiceDetail?.title ?? selectedService?.title ?? t('modalTitleFallback')}

@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ForbiddenException,
   HttpException,
   HttpStatus,
   Injectable,
@@ -17,6 +18,9 @@ import { join, relative } from 'path';
 import { PrismaService } from '../../prisma/prisma.service';
 import {
   ADMIN_AUTH_COOKIE,
+  DEFAULT_ADMIN_ENFORCE_IP_BINDING,
+  DEFAULT_ADMIN_MAX_ACTIVE_SESSIONS,
+  DEFAULT_ADMIN_REQUIRE_ORIGIN_FOR_MUTATIONS,
   DEFAULT_ADMIN_SESSION_TTL_HOURS,
   DEFAULT_LOGIN_LOCK_WINDOW_MINUTES,
   DEFAULT_LOGIN_MAX_ATTEMPTS,
@@ -25,6 +29,11 @@ import {
 type LoginContext = {
   ipAddress: string | null;
   userAgent: string | null;
+};
+
+export type RequestContext = LoginContext & {
+  origin: string | null;
+  method: string;
 };
 
 type AuthSessionPayload = {
@@ -48,6 +57,46 @@ export class AdminService {
 
   constructor(private readonly prisma: PrismaService) {}
 
+  getRequestContext(request: Request): RequestContext {
+    const forwardedUserAgentHeader = request.headers['x-ultramed-client-user-agent'];
+    const userAgentHeader =
+      typeof forwardedUserAgentHeader === 'string' && forwardedUserAgentHeader.trim().length > 0
+        ? forwardedUserAgentHeader
+        : request.headers['user-agent'];
+    return {
+      ipAddress: this.extractIpAddress(request),
+      userAgent:
+        typeof userAgentHeader === 'string' && userAgentHeader.trim().length > 0
+          ? userAgentHeader.trim()
+          : null,
+      origin: this.extractOrigin(request),
+      method: request.method ?? 'GET',
+    };
+  }
+
+  assertValidMutationOrigin(context: RequestContext): void {
+    if (!this.isMutationMethod(context.method)) {
+      return;
+    }
+
+    if (!this.getRequireOriginForMutations()) {
+      return;
+    }
+
+    const allowedOrigins = this.getAllowedOrigins();
+    if (allowedOrigins.size === 0) {
+      return;
+    }
+
+    if (!context.origin) {
+      throw new ForbiddenException('Origin header is required for this operation');
+    }
+
+    if (!allowedOrigins.has(context.origin)) {
+      throw new ForbiddenException('Request origin is not allowed');
+    }
+  }
+
   async login(
     emailRaw: string,
     passwordRaw: string,
@@ -61,6 +110,7 @@ export class AdminService {
     const password = passwordRaw?.trim();
     const attemptKey = this.getAttemptKey(email, context.ipAddress);
 
+    this.pruneLoginAttempts();
     this.assertLoginNotRateLimited(attemptKey);
     this.assertCredentialsShape(email, password);
 
@@ -98,6 +148,8 @@ export class AdminService {
       },
     });
 
+    await this.enforceMaxActiveSessions(admin.id, session.id);
+
     const token = sign(
       {
         sub: admin.id,
@@ -107,6 +159,8 @@ export class AdminService {
       this.getJwtSecret(),
       {
         expiresIn: Math.floor(sessionTtlMs / 1000),
+        issuer: this.getJwtIssuer(),
+        audience: this.getJwtAudience(),
       },
     );
 
@@ -120,7 +174,7 @@ export class AdminService {
     };
   }
 
-  async validateSessionToken(token: string) {
+  async validateSessionToken(token: string, context?: LoginContext) {
     const payload = this.parseSessionPayload(token);
 
     const session = await this.prisma.adminSession.findFirst({
@@ -144,14 +198,75 @@ export class AdminService {
     }
 
     if (session.expiresAt.getTime() <= Date.now()) {
-      await this.prisma.adminSession.updateMany({
-        where: { id: session.id, revokedAt: null },
-        data: { revokedAt: new Date() },
-      });
+      await this.revokeSessionById(session.id);
       throw new UnauthorizedException('Admin session expired');
     }
 
+    const incomingUserAgent = this.normalizeNullableText(context?.userAgent);
+    const sessionUserAgent = this.normalizeNullableText(session.userAgent);
+    if (incomingUserAgent && sessionUserAgent && incomingUserAgent !== sessionUserAgent) {
+      await this.revokeSessionById(session.id);
+      throw new UnauthorizedException('Session fingerprint mismatch');
+    }
+
+    if (this.getEnforceIpBinding()) {
+      const incomingIp = this.normalizeNullableText(context?.ipAddress);
+      const sessionIp = this.normalizeNullableText(session.ipAddress);
+      if (incomingIp && sessionIp && incomingIp !== sessionIp) {
+        await this.revokeSessionById(session.id);
+        throw new UnauthorizedException('Session IP mismatch');
+      }
+    }
+
     return session;
+  }
+
+  async listAdminSessions(adminId: string, currentSessionId: string) {
+    const sessions = await this.prisma.adminSession.findMany({
+      where: {
+        adminId,
+        revokedAt: null,
+        expiresAt: { gt: new Date() },
+      },
+      orderBy: [{ createdAt: 'desc' }],
+    });
+
+    return sessions.map((session) => ({
+      id: session.id,
+      createdAt: session.createdAt.toISOString(),
+      expiresAt: session.expiresAt.toISOString(),
+      ipAddress: session.ipAddress,
+      userAgent: session.userAgent,
+      isCurrent: session.id === currentSessionId,
+    }));
+  }
+
+  async revokeAdminSession(adminId: string, sessionId: string) {
+    const targetSession = await this.prisma.adminSession.findFirst({
+      where: {
+        id: sessionId,
+        adminId,
+        revokedAt: null,
+      },
+    });
+
+    if (!targetSession) {
+      throw new NotFoundException('Session not found');
+    }
+
+    await this.revokeSessionById(sessionId);
+    return { success: true };
+  }
+
+  async logoutAll(adminId: string, exceptSessionId?: string): Promise<void> {
+    await this.prisma.adminSession.updateMany({
+      where: {
+        adminId,
+        revokedAt: null,
+        id: exceptSessionId ? { not: exceptSessionId } : undefined,
+      },
+      data: { revokedAt: new Date() },
+    });
   }
 
   async logout(token: string): Promise<void> {
@@ -280,6 +395,8 @@ export class AdminService {
     try {
       const decoded = verify(token, this.getJwtSecret(), {
         ignoreExpiration: options?.ignoreExpiration ?? false,
+        issuer: this.getJwtIssuer(),
+        audience: this.getJwtAudience(),
       });
 
       if (!decoded || typeof decoded !== 'object') {
@@ -301,6 +418,76 @@ export class AdminService {
     } catch {
       throw new UnauthorizedException('Invalid or expired admin session token');
     }
+  }
+
+  private extractIpAddress(request: Request): string | null {
+    const xForwardedFor = request.headers['x-forwarded-for'];
+    const shouldUseForwarded = this.getTrustProxy();
+    const forwardedIp =
+      shouldUseForwarded && typeof xForwardedFor === 'string'
+        ? xForwardedFor.split(',')[0]?.trim()
+        : null;
+
+    const ip = forwardedIp || request.ip || request.socket?.remoteAddress || null;
+    return this.normalizeNullableText(ip);
+  }
+
+  private extractOrigin(request: Request): string | null {
+    const originHeader = request.headers.origin;
+    if (typeof originHeader === 'string' && originHeader.trim().length > 0) {
+      return this.toOrigin(originHeader);
+    }
+
+    const refererHeader = request.headers.referer;
+    if (typeof refererHeader === 'string' && refererHeader.trim().length > 0) {
+      return this.toOrigin(refererHeader);
+    }
+
+    return null;
+  }
+
+  private toOrigin(rawUrl: string): string | null {
+    try {
+      return new URL(rawUrl).origin;
+    } catch {
+      return null;
+    }
+  }
+
+  private isMutationMethod(methodRaw: string): boolean {
+    const method = methodRaw.toUpperCase();
+    return method === 'POST' || method === 'PUT' || method === 'PATCH' || method === 'DELETE';
+  }
+
+  private getAllowedOrigins(): Set<string> {
+    const fromEnv = [
+      process.env.FRONTEND_ORIGIN,
+      process.env.NEXT_PUBLIC_FRONTEND_ORIGIN,
+      process.env.NEXT_PUBLIC_APP_URL,
+    ];
+    const defaultLocalhost = `http://localhost:${process.env.FRONTEND_PORT ?? '3333'}`;
+    const candidates = [...fromEnv, defaultLocalhost];
+
+    const normalized = candidates
+      .map((item) => (typeof item === 'string' ? item.trim() : ''))
+      .filter((item) => item.length > 0)
+      .map((item) => this.toOrigin(item))
+      .filter((item): item is string => Boolean(item));
+
+    return new Set(normalized);
+  }
+
+  private normalizeNullableText(value: string | null | undefined): string | null {
+    if (typeof value !== 'string') {
+      return null;
+    }
+
+    const normalized = value.trim();
+    if (!normalized) {
+      return null;
+    }
+
+    return normalized.slice(0, 512);
   }
 
   private getAttemptKey(email: string, ipAddress: string | null): string {
@@ -345,8 +532,7 @@ export class AdminService {
   private markFailedLogin(attemptKey: string): void {
     const now = Date.now();
     const existingState = this.loginAttempts.get(attemptKey);
-    const lockWindowMs =
-      this.getLoginLockWindowMinutes() * 60 * 1000;
+    const lockWindowMs = this.getLoginLockWindowMinutes() * 60 * 1000;
 
     if (!existingState || now - existingState.firstAttemptAtMs > lockWindowMs) {
       this.loginAttempts.set(attemptKey, {
@@ -369,6 +555,67 @@ export class AdminService {
 
   private clearFailedLogins(attemptKey: string): void {
     this.loginAttempts.delete(attemptKey);
+  }
+
+  private pruneLoginAttempts(): void {
+    if (this.loginAttempts.size === 0) {
+      return;
+    }
+
+    const now = Date.now();
+    const lockWindowMs = this.getLoginLockWindowMinutes() * 60 * 1000;
+
+    for (const [attemptKey, state] of this.loginAttempts.entries()) {
+      const isExpired = now - state.firstAttemptAtMs > lockWindowMs;
+      const isBlockFinished = !state.blockedUntilMs || state.blockedUntilMs <= now;
+      if (isExpired && isBlockFinished) {
+        this.loginAttempts.delete(attemptKey);
+      }
+    }
+  }
+
+  private async revokeSessionById(sessionId: string): Promise<void> {
+    await this.prisma.adminSession.updateMany({
+      where: {
+        id: sessionId,
+        revokedAt: null,
+      },
+      data: { revokedAt: new Date() },
+    });
+  }
+
+  private async enforceMaxActiveSessions(adminId: string, currentSessionId: string): Promise<void> {
+    const maxSessions = this.getMaxActiveSessions();
+    const activeSessions = await this.prisma.adminSession.findMany({
+      where: {
+        adminId,
+        revokedAt: null,
+        expiresAt: { gt: new Date() },
+      },
+      orderBy: [{ createdAt: 'desc' }],
+      select: { id: true },
+    });
+
+    if (activeSessions.length <= maxSessions) {
+      return;
+    }
+
+    const sessionsToRevoke = activeSessions
+      .slice(maxSessions)
+      .map((session) => session.id)
+      .filter((sessionId) => sessionId !== currentSessionId);
+
+    if (sessionsToRevoke.length === 0) {
+      return;
+    }
+
+    await this.prisma.adminSession.updateMany({
+      where: {
+        id: { in: sessionsToRevoke },
+        revokedAt: null,
+      },
+      data: { revokedAt: new Date() },
+    });
   }
 
   private getSessionTtlMs(): number {
@@ -406,6 +653,50 @@ export class AdminService {
       return DEFAULT_LOGIN_LOCK_WINDOW_MINUTES;
     }
     return minutes;
+  }
+
+  private getMaxActiveSessions(): number {
+    const maxSessions = Number.parseInt(
+      process.env.ADMIN_MAX_ACTIVE_SESSIONS ??
+        String(DEFAULT_ADMIN_MAX_ACTIVE_SESSIONS),
+      10,
+    );
+    if (!Number.isFinite(maxSessions) || maxSessions < 1 || maxSessions > 20) {
+      return DEFAULT_ADMIN_MAX_ACTIVE_SESSIONS;
+    }
+    return maxSessions;
+  }
+
+  private getRequireOriginForMutations(): boolean {
+    const flag = process.env.ADMIN_REQUIRE_ORIGIN_FOR_MUTATIONS;
+    if (typeof flag !== 'string') {
+      return DEFAULT_ADMIN_REQUIRE_ORIGIN_FOR_MUTATIONS;
+    }
+    return flag === '1' || flag.toLowerCase() === 'true';
+  }
+
+  private getEnforceIpBinding(): boolean {
+    const flag = process.env.ADMIN_ENFORCE_IP_BINDING;
+    if (typeof flag !== 'string') {
+      return DEFAULT_ADMIN_ENFORCE_IP_BINDING;
+    }
+    return flag === '1' || flag.toLowerCase() === 'true';
+  }
+
+  private getTrustProxy(): boolean {
+    const flag = process.env.TRUST_PROXY;
+    if (typeof flag !== 'string') {
+      return false;
+    }
+    return flag === '1' || flag.toLowerCase() === 'true';
+  }
+
+  private getJwtIssuer(): string {
+    return process.env.JWT_ISSUER?.trim() || 'ultramed-admin-api';
+  }
+
+  private getJwtAudience(): string {
+    return process.env.JWT_AUDIENCE?.trim() || 'ultramed-admin';
   }
 
   private getJwtSecret(): string {

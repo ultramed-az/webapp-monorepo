@@ -23,13 +23,18 @@ export class AdminAuthGuard implements CanActivate {
     const request = context
       .switchToHttp()
       .getRequest<AuthenticatedAdminRequest>();
+    const requestContext = this.adminService.getRequestContext(request);
+    this.adminService.assertValidMutationOrigin(requestContext);
     const token = this.adminService.extractToken(request);
 
     if (!token) {
       throw new UnauthorizedException('Authentication required');
     }
 
-    const session = await this.adminService.validateSessionToken(token);
+    const session = await this.adminService.validateSessionToken(token, {
+      ipAddress: requestContext.ipAddress,
+      userAgent: requestContext.userAgent,
+    });
     request.admin = {
       id: session.admin.id,
       email: session.admin.email,
