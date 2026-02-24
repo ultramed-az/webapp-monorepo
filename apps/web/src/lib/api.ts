@@ -137,12 +137,14 @@ const REQUEST_TIMEOUT_MS = 6000;
 export class ApiRequestError extends Error {
     status: number;
     url: string;
+    code?: string;
 
-    constructor(status: number, url: string, message?: string) {
+    constructor(status: number, url: string, message?: string, code?: string) {
         super(message ?? `Request failed with status ${status}: ${url}`);
         this.name = 'ApiRequestError';
         this.status = status;
         this.url = url;
+        this.code = code;
     }
 }
 
@@ -172,6 +174,37 @@ async function fetchWithTimeout(url: string): Promise<Response> {
     } finally {
         clearTimeout(timeoutId);
     }
+}
+
+type ApiErrorPayload = {
+    message?: string | string[];
+    code?: string;
+    error?: {
+        message?: string | string[];
+        code?: string;
+    };
+};
+
+function extractApiError(payload: unknown): { message?: string; code?: string } {
+    if (!payload || typeof payload !== 'object') {
+        return {};
+    }
+
+    const value = payload as ApiErrorPayload;
+    const messageCandidate = value.message ?? value.error?.message;
+    const code = value.code ?? value.error?.code;
+
+    let message: string | undefined;
+    if (Array.isArray(messageCandidate)) {
+        const list = messageCandidate.filter((item): item is string => typeof item === 'string');
+        if (list.length > 0) {
+            message = list.join(', ');
+        }
+    } else if (typeof messageCandidate === 'string' && messageCandidate.length > 0) {
+        message = messageCandidate;
+    }
+
+    return { message, code };
 }
 
 async function checkBackendHealth(): Promise<void> {
@@ -210,10 +243,19 @@ async function request<T>(path: string, query?: Record<string, string | undefine
 
     const response = await fetchWithTimeout(url);
     if (!response.ok) {
-        if (isUnavailableStatus(response.status)) {
-            throw new BackendUnavailableError(url, undefined, response.status);
+        let payload: unknown = null;
+        try {
+            payload = await response.json();
+        } catch {
+            payload = null;
         }
-        throw new ApiRequestError(response.status, url);
+
+        const parsedError = extractApiError(payload);
+
+        if (isUnavailableStatus(response.status)) {
+            throw new BackendUnavailableError(url, parsedError.message, response.status);
+        }
+        throw new ApiRequestError(response.status, url, parsedError.message, parsedError.code);
     }
 
     return response.json() as Promise<T>;

@@ -4,6 +4,7 @@ import { mkdirSync } from 'fs';
 import express from 'express';
 import { join } from 'path';
 import { AppModule } from './app.module';
+import { GlobalExceptionFilter } from './common/filters/global-exception.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -21,6 +22,7 @@ async function bootstrap() {
   });
 
   app.use(cookieParser());
+  app.useGlobalFilters(new GlobalExceptionFilter());
 
   const uploadRoot = join(process.cwd(), 'uploads');
   mkdirSync(uploadRoot, { recursive: true });

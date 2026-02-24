@@ -197,13 +197,28 @@ function toErrorMessage(payload: unknown, fallback: string): string {
     return fallback;
   }
 
-  const message = (payload as { message?: string | string[] }).message;
+  const normalized = payload as {
+    message?: string | string[];
+    error?: {
+      message?: string | string[];
+      code?: string;
+    };
+    code?: string;
+  };
+
+  const message = normalized.message ?? normalized.error?.message;
   if (Array.isArray(message)) {
     return message.join(', ');
   }
   if (typeof message === 'string') {
     return message;
   }
+
+  const code = normalized.code ?? normalized.error?.code;
+  if (typeof code === 'string' && code.length > 0) {
+    return `${fallback}: ${code}`;
+  }
+
   return fallback;
 }
 
