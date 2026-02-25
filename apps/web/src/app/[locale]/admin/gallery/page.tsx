@@ -16,9 +16,11 @@ import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
 import { FileEdit, Loader2, Plus, Search, Trash2, Upload } from 'lucide-react';
 import {
+  type AdminMediaRecord,
   type AdminGalleryRecord,
   createAdminGalleryItem,
   deleteAdminGalleryItem,
+  getAdminMedia,
   getAdminGalleryItems,
   updateAdminGalleryItem,
   uploadAdminMedia,
@@ -27,6 +29,7 @@ import { shouldBypassImageOptimization } from '@/lib/image';
 
 type FormState = {
   imageUrl: string;
+  mediaId: string;
   captionAz: string;
   captionEn: string;
   captionRu: string;
@@ -34,6 +37,7 @@ type FormState = {
 
 const EMPTY_FORM: FormState = {
   imageUrl: '',
+  mediaId: '',
   captionAz: '',
   captionEn: '',
   captionRu: '',
@@ -42,6 +46,7 @@ const EMPTY_FORM: FormState = {
 function toFormState(item: AdminGalleryRecord): FormState {
   return {
     imageUrl: item.imageUrl,
+    mediaId: item.mediaId ?? item.media?.id ?? '',
     captionAz: item.captionAz ?? '',
     captionEn: item.captionEn ?? '',
     captionRu: item.captionRu ?? '',
@@ -56,6 +61,7 @@ export default function AdminGalleryPage() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<AdminGalleryRecord | null>(null);
   const [form, setForm] = useState<FormState>(EMPTY_FORM);
+  const [mediaLibrary, setMediaLibrary] = useState<AdminMediaRecord[]>([]);
 
   const [uploading, setUploading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -76,6 +82,11 @@ export default function AdminGalleryPage() {
     );
   }, [items, searchTerm]);
 
+  const selectedMedia = useMemo(
+    () => mediaLibrary.find((media) => media.id === form.mediaId) ?? null,
+    [form.mediaId, mediaLibrary],
+  );
+
   const loadItems = async () => {
     setLoading(true);
     setErrorMessage(null);
@@ -90,8 +101,18 @@ export default function AdminGalleryPage() {
     }
   };
 
+  const loadMedia = async () => {
+    try {
+      const data = await getAdminMedia(100);
+      setMediaLibrary(data);
+    } catch {
+      // Keep form usable even if media list request fails.
+    }
+  };
+
   useEffect(() => {
     void loadItems();
+    void loadMedia();
   }, []);
 
   const openCreateDialog = () => {
@@ -138,14 +159,34 @@ export default function AdminGalleryPage() {
       setForm((prev) => ({
         ...prev,
         imageUrl: media.url,
+        mediaId: media.id,
       }));
       setSuccessMessage('Şəkil yükləndi.');
+      await loadMedia();
     } catch (error) {
       setErrorMessage(error instanceof Error ? error.message : 'Şəkil yüklənmədi.');
     } finally {
       setUploading(false);
       event.target.value = '';
     }
+  };
+
+  const handleMediaSelect = (value: string) => {
+    if (!value) {
+      setForm((prev) => ({ ...prev, mediaId: '' }));
+      return;
+    }
+
+    const media = mediaLibrary.find((item) => item.id === value);
+    if (!media) {
+      return;
+    }
+
+    setForm((prev) => ({
+      ...prev,
+      mediaId: media.id,
+      imageUrl: media.cdnUrl,
+    }));
   };
 
   const handleSubmit = async (event: React.FormEvent) => {
@@ -155,15 +196,17 @@ export default function AdminGalleryPage() {
     setSuccessMessage(null);
 
     const imageUrl = form.imageUrl.trim();
-    if (!imageUrl) {
+    const mediaId = form.mediaId.trim();
+    if (!imageUrl && !mediaId) {
       setSubmitting(false);
-      setErrorMessage('Şəkil URL boş ola bilməz.');
+      setErrorMessage('Şəkil URL və ya media seçimi mütləqdir.');
       return;
     }
 
     const captionAz = form.captionAz.trim();
     const payload: Partial<AdminGalleryRecord> = {
-      imageUrl,
+      ...(imageUrl ? { imageUrl } : {}),
+      mediaId: mediaId || null,
       captionAz: captionAz || null,
       captionEn: form.captionEn.trim() || captionAz || null,
       captionRu: form.captionRu.trim() || captionAz || null,
@@ -301,7 +344,11 @@ export default function AdminGalleryPage() {
                   placeholder="Şəkil URL"
                   value={form.imageUrl}
                   onChange={(event) =>
-                    setForm((prev) => ({ ...prev, imageUrl: event.target.value }))
+                    setForm((prev) => ({
+                      ...prev,
+                      imageUrl: event.target.value,
+                      mediaId: '',
+                    }))
                   }
                   required
                 />
@@ -317,6 +364,24 @@ export default function AdminGalleryPage() {
                   />
                 </label>
               </div>
+
+              <select
+                className="h-9 rounded-md border border-slate-200 bg-white px-3 text-sm"
+                value={form.mediaId}
+                onChange={(event) => handleMediaSelect(event.target.value)}
+              >
+                <option value="">Media secin (opsional)</option>
+                {mediaLibrary.map((media) => (
+                  <option key={media.id} value={media.id}>
+                    {media.originalName}
+                  </option>
+                ))}
+              </select>
+              {selectedMedia ? (
+                <p className="text-xs text-slate-500">
+                  Secili media: {selectedMedia.originalName} ({selectedMedia.mimeType})
+                </p>
+              ) : null}
 
               {form.imageUrl ? (
                 <div className="relative h-52 w-full overflow-hidden rounded-lg border border-slate-200 bg-slate-100">

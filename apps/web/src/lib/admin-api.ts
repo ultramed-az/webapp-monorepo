@@ -27,6 +27,12 @@ export type AdminSessionItem = {
   isCurrent: boolean;
 };
 
+export type AdminMediaSummary = {
+  id: string;
+  cdnUrl: string;
+  mimeType: string;
+};
+
 export type AdminServiceRecord = {
   id: string;
   titleAz: string;
@@ -43,6 +49,8 @@ export type AdminServiceRecord = {
   highlightsRu: string[] | null;
   iconKey: string | null;
   image: string | null;
+  mediaId: string | null;
+  media: AdminMediaSummary | null;
   sortOrder: number;
   isPublished: boolean;
   createdAt: string;
@@ -84,6 +92,8 @@ export type AdminDoctorRecord = {
   tagsAz: string[] | null;
   tagsEn: string[] | null;
   tagsRu: string[] | null;
+  mediaId: string | null;
+  media: AdminMediaSummary | null;
   sortOrder: number;
   isPublished: boolean;
   createdAt: string;
@@ -106,6 +116,8 @@ export type AdminBlogRecord = {
   categoryEn: string | null;
   categoryRu: string | null;
   image: string | null;
+  mediaId: string | null;
+  media: AdminMediaSummary | null;
   published: boolean;
   featured: boolean;
   views: number;
@@ -165,6 +177,8 @@ export type AdminFaqRecord = {
 export type AdminGalleryRecord = {
   id: string;
   imageUrl: string;
+  mediaId: string | null;
+  media: AdminMediaSummary | null;
   captionAz: string | null;
   captionEn: string | null;
   captionRu: string | null;

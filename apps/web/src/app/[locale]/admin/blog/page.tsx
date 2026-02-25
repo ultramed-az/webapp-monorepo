@@ -32,9 +32,11 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Skeleton } from '@/components/ui/skeleton';
 import { Plus, Search, MoreHorizontal, FileEdit, Trash2, Loader2, Upload } from 'lucide-react';
 import {
+  AdminMediaRecord,
   AdminBlogRecord,
   createAdminBlogPost,
   deleteAdminBlogPost,
+  getAdminMedia,
   getAdminBlogPosts,
   updateAdminBlogPost,
   uploadAdminMedia,
@@ -55,6 +57,7 @@ type FormState = {
   categoryEn: string;
   categoryRu: string;
   image: string;
+  mediaId: string;
   sortOrder: string;
   views: string;
   published: 'true' | 'false';
@@ -76,6 +79,7 @@ const EMPTY_FORM: FormState = {
   categoryEn: '',
   categoryRu: '',
   image: '',
+  mediaId: '',
   sortOrder: '0',
   views: '0',
   published: 'true',
@@ -98,6 +102,7 @@ function toFormState(record: AdminBlogRecord): FormState {
     categoryEn: record.categoryEn ?? '',
     categoryRu: record.categoryRu ?? '',
     image: record.image ?? '',
+    mediaId: record.mediaId ?? record.media?.id ?? '',
     sortOrder: String(record.sortOrder ?? 0),
     views: String(record.views ?? 0),
     published: record.published ? 'true' : 'false',
@@ -120,6 +125,7 @@ export default function BlogPage() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<AdminBlogRecord | null>(null);
   const [form, setForm] = useState<FormState>(EMPTY_FORM);
+  const [mediaLibrary, setMediaLibrary] = useState<AdminMediaRecord[]>([]);
 
   const [submitting, setSubmitting] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -140,6 +146,11 @@ export default function BlogPage() {
     );
   }, [items, searchTerm]);
 
+  const selectedMedia = useMemo(
+    () => mediaLibrary.find((media) => media.id === form.mediaId) ?? null,
+    [form.mediaId, mediaLibrary],
+  );
+
   const loadItems = async () => {
     setLoading(true);
     setErrorMessage(null);
@@ -153,8 +164,18 @@ export default function BlogPage() {
     }
   };
 
+  const loadMedia = async () => {
+    try {
+      const data = await getAdminMedia(100);
+      setMediaLibrary(data);
+    } catch {
+      // Keep form usable even if media list request fails.
+    }
+  };
+
   useEffect(() => {
     void loadItems();
+    void loadMedia();
   }, []);
 
   const openCreateDialog = () => {
@@ -199,14 +220,33 @@ export default function BlogPage() {
 
     try {
       const media = await uploadAdminMedia(file);
-      setForm((prev) => ({ ...prev, image: media.url }));
+      setForm((prev) => ({ ...prev, image: media.url, mediaId: media.id }));
       setSuccessMessage('Şəkil yükləndi.');
+      await loadMedia();
     } catch (error) {
       setErrorMessage(error instanceof Error ? error.message : 'Şəkil yüklənmədi.');
     } finally {
       setUploading(false);
       event.target.value = '';
     }
+  };
+
+  const handleMediaSelect = (value: string) => {
+    if (!value) {
+      setForm((prev) => ({ ...prev, mediaId: '' }));
+      return;
+    }
+
+    const media = mediaLibrary.find((item) => item.id === value);
+    if (!media) {
+      return;
+    }
+
+    setForm((prev) => ({
+      ...prev,
+      mediaId: media.id,
+      image: media.cdnUrl,
+    }));
   };
 
   const handleSubmit = async (event: React.FormEvent) => {
@@ -239,6 +279,7 @@ export default function BlogPage() {
       categoryEn: form.categoryEn.trim() || null,
       categoryRu: form.categoryRu.trim() || null,
       image: form.image.trim() || null,
+      mediaId: form.mediaId.trim() || null,
       sortOrder: Number.parseInt(form.sortOrder, 10) || 0,
       views: Number.parseInt(form.views, 10) || 0,
       published: form.published === 'true',
@@ -546,11 +587,36 @@ export default function BlogPage() {
                 </label>
               </div>
 
-              <Input
-                placeholder="Şəkil URL"
-                value={form.image}
-                onChange={(event) => setForm((prev) => ({ ...prev, image: event.target.value }))}
-              />
+              <div className="grid gap-3 md:grid-cols-2">
+                <Input
+                  placeholder="Şəkil URL"
+                  value={form.image}
+                  onChange={(event) =>
+                    setForm((prev) => ({
+                      ...prev,
+                      image: event.target.value,
+                      mediaId: '',
+                    }))
+                  }
+                />
+                <select
+                  className="h-9 rounded-md border border-slate-200 bg-white px-3 text-sm"
+                  value={form.mediaId}
+                  onChange={(event) => handleMediaSelect(event.target.value)}
+                >
+                  <option value="">Media secin (opsional)</option>
+                  {mediaLibrary.map((media) => (
+                    <option key={media.id} value={media.id}>
+                      {media.originalName}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              {selectedMedia ? (
+                <p className="text-xs text-slate-500">
+                  Secili media: {selectedMedia.originalName} ({selectedMedia.mimeType})
+                </p>
+              ) : null}
             </div>
 
             <DialogFooter>

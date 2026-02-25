@@ -38,9 +38,11 @@ import {
   Upload,
 } from 'lucide-react';
 import {
+  AdminMediaRecord,
   AdminDoctorRecord,
   createAdminDoctor,
   deleteAdminDoctor,
+  getAdminMedia,
   getAdminDoctors,
   updateAdminDoctor,
   uploadAdminMedia,
@@ -80,6 +82,7 @@ type FormState = {
   phone: string;
   email: string;
   image: string;
+  mediaId: string;
   sortOrder: string;
   isPublished: 'true' | 'false';
 };
@@ -118,6 +121,7 @@ const EMPTY_FORM: FormState = {
   phone: '',
   email: '',
   image: '',
+  mediaId: '',
   sortOrder: '0',
   isPublished: 'true',
 };
@@ -171,6 +175,7 @@ function toFormState(record: AdminDoctorRecord): FormState {
     phone: record.phone ?? '',
     email: record.email ?? '',
     image: record.image ?? '',
+    mediaId: record.mediaId ?? record.media?.id ?? '',
     sortOrder: String(record.sortOrder ?? 0),
     isPublished: record.isPublished ? 'true' : 'false',
   };
@@ -184,6 +189,7 @@ export default function DoctorsPage() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<AdminDoctorRecord | null>(null);
   const [form, setForm] = useState<FormState>(EMPTY_FORM);
+  const [mediaLibrary, setMediaLibrary] = useState<AdminMediaRecord[]>([]);
 
   const [submitting, setSubmitting] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -204,6 +210,11 @@ export default function DoctorsPage() {
     );
   }, [items, searchTerm]);
 
+  const selectedMedia = useMemo(
+    () => mediaLibrary.find((media) => media.id === form.mediaId) ?? null,
+    [form.mediaId, mediaLibrary],
+  );
+
   const loadDoctors = async () => {
     setLoading(true);
     setErrorMessage(null);
@@ -217,8 +228,18 @@ export default function DoctorsPage() {
     }
   };
 
+  const loadMedia = async () => {
+    try {
+      const data = await getAdminMedia(100);
+      setMediaLibrary(data);
+    } catch {
+      // Keep form usable even if media list request fails.
+    }
+  };
+
   useEffect(() => {
     void loadDoctors();
+    void loadMedia();
   }, []);
 
   const openCreateDialog = () => {
@@ -263,14 +284,33 @@ export default function DoctorsPage() {
 
     try {
       const media = await uploadAdminMedia(file);
-      setForm((prev) => ({ ...prev, image: media.url }));
+      setForm((prev) => ({ ...prev, image: media.url, mediaId: media.id }));
       setSuccessMessage('Şəkil yükləndi.');
+      await loadMedia();
     } catch (error) {
       setErrorMessage(error instanceof Error ? error.message : 'Şəkil yüklənmədi.');
     } finally {
       setUploading(false);
       event.target.value = '';
     }
+  };
+
+  const handleMediaSelect = (value: string) => {
+    if (!value) {
+      setForm((prev) => ({ ...prev, mediaId: '' }));
+      return;
+    }
+
+    const media = mediaLibrary.find((item) => item.id === value);
+    if (!media) {
+      return;
+    }
+
+    setForm((prev) => ({
+      ...prev,
+      mediaId: media.id,
+      image: media.cdnUrl,
+    }));
   };
 
   const handleSubmit = async (event: React.FormEvent) => {
@@ -324,6 +364,7 @@ export default function DoctorsPage() {
       phone: form.phone.trim() || null,
       email: form.email.trim() || null,
       image: form.image.trim() || null,
+      mediaId: form.mediaId.trim() || null,
       sortOrder: Number.parseInt(form.sortOrder, 10) || 0,
       isPublished: form.isPublished === 'true',
     };
@@ -714,7 +755,13 @@ export default function DoctorsPage() {
                 <Input
                   placeholder="Şəkil URL"
                   value={form.image}
-                  onChange={(event) => setForm((prev) => ({ ...prev, image: event.target.value }))}
+                  onChange={(event) =>
+                    setForm((prev) => ({
+                      ...prev,
+                      image: event.target.value,
+                      mediaId: '',
+                    }))
+                  }
                 />
                 <label className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-md border border-slate-200 px-3 py-2 text-sm">
                   <Upload className="h-4 w-4" />
@@ -727,6 +774,23 @@ export default function DoctorsPage() {
                   />
                 </label>
               </div>
+              <select
+                className="h-9 rounded-md border border-slate-200 bg-white px-3 text-sm"
+                value={form.mediaId}
+                onChange={(event) => handleMediaSelect(event.target.value)}
+              >
+                <option value="">Media secin (opsional)</option>
+                {mediaLibrary.map((media) => (
+                  <option key={media.id} value={media.id}>
+                    {media.originalName}
+                  </option>
+                ))}
+              </select>
+              {selectedMedia ? (
+                <p className="text-xs text-slate-500">
+                  Secili media: {selectedMedia.originalName} ({selectedMedia.mimeType})
+                </p>
+              ) : null}
             </div>
 
             <DialogFooter>

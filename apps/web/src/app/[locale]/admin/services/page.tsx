@@ -38,9 +38,11 @@ import {
   Upload,
 } from 'lucide-react';
 import {
+  AdminMediaRecord,
   AdminServiceRecord,
   createAdminService,
   deleteAdminService,
+  getAdminMedia,
   getAdminServices,
   updateAdminService,
   uploadAdminMedia,
@@ -61,6 +63,7 @@ type FormState = {
   highlightsRu: string;
   iconKey: string;
   image: string;
+  mediaId: string;
   sortOrder: string;
   isPublished: 'true' | 'false';
 };
@@ -80,6 +83,7 @@ const EMPTY_FORM: FormState = {
   highlightsRu: '',
   iconKey: '',
   image: '',
+  mediaId: '',
   sortOrder: '0',
   isPublished: 'true',
 };
@@ -115,6 +119,7 @@ function toFormState(record: AdminServiceRecord): FormState {
     highlightsRu: toLines(record.highlightsRu),
     iconKey: record.iconKey ?? '',
     image: record.image ?? '',
+    mediaId: record.mediaId ?? record.media?.id ?? '',
     sortOrder: String(record.sortOrder ?? 0),
     isPublished: record.isPublished ? 'true' : 'false',
   };
@@ -128,6 +133,7 @@ export default function ServicesPage() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<AdminServiceRecord | null>(null);
   const [form, setForm] = useState<FormState>(EMPTY_FORM);
+  const [mediaLibrary, setMediaLibrary] = useState<AdminMediaRecord[]>([]);
 
   const [submitting, setSubmitting] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -148,6 +154,11 @@ export default function ServicesPage() {
     );
   }, [items, searchTerm]);
 
+  const selectedMedia = useMemo(
+    () => mediaLibrary.find((media) => media.id === form.mediaId) ?? null,
+    [form.mediaId, mediaLibrary],
+  );
+
   const loadServices = async () => {
     setLoading(true);
     setErrorMessage(null);
@@ -161,8 +172,18 @@ export default function ServicesPage() {
     }
   };
 
+  const loadMedia = async () => {
+    try {
+      const data = await getAdminMedia(100);
+      setMediaLibrary(data);
+    } catch {
+      // Keep form usable even if media list request fails.
+    }
+  };
+
   useEffect(() => {
     void loadServices();
+    void loadMedia();
   }, []);
 
   const openCreateDialog = () => {
@@ -212,14 +233,33 @@ export default function ServicesPage() {
     setSuccessMessage(null);
     try {
       const media = await uploadAdminMedia(file);
-      setForm((prev) => ({ ...prev, image: media.url }));
-      setSuccessMessage('Şəkil yükləndi və URL formaya əlavə edildi.');
+      setForm((prev) => ({ ...prev, image: media.url, mediaId: media.id }));
+      setSuccessMessage('Şəkil yükləndi və media seçildi.');
+      await loadMedia();
     } catch (error) {
       setErrorMessage(error instanceof Error ? error.message : 'Şəkil yüklənmədi.');
     } finally {
       setUploading(false);
       event.target.value = '';
     }
+  };
+
+  const handleMediaSelect = (value: string) => {
+    if (!value) {
+      setForm((prev) => ({ ...prev, mediaId: '' }));
+      return;
+    }
+
+    const media = mediaLibrary.find((item) => item.id === value);
+    if (!media) {
+      return;
+    }
+
+    setForm((prev) => ({
+      ...prev,
+      mediaId: media.id,
+      image: media.cdnUrl,
+    }));
   };
 
   const handleSubmit = async (event: React.FormEvent) => {
@@ -257,6 +297,7 @@ export default function ServicesPage() {
       highlightsRu: highlightsRu.length > 0 ? highlightsRu : null,
       iconKey: form.iconKey.trim() || null,
       image: form.image.trim() || null,
+      mediaId: form.mediaId.trim() || null,
       sortOrder: Number.parseInt(form.sortOrder, 10) || 0,
       isPublished: form.isPublished === 'true',
     };
@@ -532,11 +573,36 @@ export default function ServicesPage() {
                 </div>
               </div>
 
-              <Input
-                placeholder="Şəkil URL"
-                value={form.image}
-                onChange={(event) => setForm((prev) => ({ ...prev, image: event.target.value }))}
-              />
+              <div className="grid gap-3 md:grid-cols-2">
+                <Input
+                  placeholder="Şəkil URL"
+                  value={form.image}
+                  onChange={(event) =>
+                    setForm((prev) => ({
+                      ...prev,
+                      image: event.target.value,
+                      mediaId: '',
+                    }))
+                  }
+                />
+                <select
+                  className="h-9 rounded-md border border-slate-200 bg-white px-3 text-sm"
+                  value={form.mediaId}
+                  onChange={(event) => handleMediaSelect(event.target.value)}
+                >
+                  <option value="">Media secin (opsional)</option>
+                  {mediaLibrary.map((media) => (
+                    <option key={media.id} value={media.id}>
+                      {media.originalName}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              {selectedMedia ? (
+                <p className="text-xs text-slate-500">
+                  Secili media: {selectedMedia.originalName} ({selectedMedia.mimeType})
+                </p>
+              ) : null}
             </div>
 
             <DialogFooter>
