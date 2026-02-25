@@ -24,9 +24,12 @@ export default function Header({ onMenuClick }: HeaderProps) {
     const router = useRouter();
 
     const handleLogout = async () => {
-        await logoutAdmin();
-        router.push('/admin/login');
-        router.refresh();
+        try {
+            await logoutAdmin();
+        } finally {
+            router.push('/admin/login');
+            router.refresh();
+        }
     };
 
     const handleLogoutAll = async () => {
@@ -34,9 +37,17 @@ export default function Header({ onMenuClick }: HeaderProps) {
         if (!accepted) {
             return;
         }
-        await logoutAllAdmin();
-        router.push('/admin/login');
-        router.refresh();
+
+        try {
+            await logoutAllAdmin();
+        } catch (error) {
+            if (error instanceof Error) {
+                window.alert(error.message);
+            }
+        } finally {
+            router.push('/admin/login');
+            router.refresh();
+        }
     };
 
     return (

@@ -29,10 +29,13 @@ export default function Sidebar({ mobile = false, onNavigate }: SidebarProps) {
     const router = useRouter();
 
     const handleLogout = async () => {
-        await logoutAdmin();
-        onNavigate?.();
-        router.push('/admin/login');
-        router.refresh();
+        try {
+            await logoutAdmin();
+        } finally {
+            onNavigate?.();
+            router.push('/admin/login');
+            router.refresh();
+        }
     };
 
     const menuItems = [

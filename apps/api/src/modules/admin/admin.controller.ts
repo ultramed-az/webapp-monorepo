@@ -1,10 +1,10 @@
 import {
-  BadRequestException,
   Body,
   Controller,
   Delete,
   Get,
   HttpCode,
+  HttpException,
   HttpStatus,
   Param,
   Post,
@@ -152,8 +152,13 @@ export class AdminController {
       fileFilter: (_request, file, callback) => {
         if (!ALLOWED_MIME_TYPES.has(file.mimetype)) {
           callback(
-            new BadRequestException(
-              'Unsupported file type. Allowed: JPG, PNG, WEBP, SVG, AVIF',
+            new HttpException(
+              {
+                code: 'MEDIA_UNSUPPORTED_FILE_TYPE',
+                message: 'Unsupported file type. Allowed: JPG, PNG, WEBP, SVG, AVIF',
+                details: { mimeType: file.mimetype },
+              },
+              HttpStatus.BAD_REQUEST,
             ),
             false,
           );
@@ -169,7 +174,14 @@ export class AdminController {
   )
   async uploadMedia(@UploadedFile() file?: Express.Multer.File) {
     if (!file) {
-      throw new BadRequestException('File is required');
+      throw new HttpException(
+        {
+          code: 'MEDIA_FILE_REQUIRED',
+          message: 'File is required',
+          details: null,
+        },
+        HttpStatus.BAD_REQUEST,
+      );
     }
 
     const media = await this.adminService.registerMedia(file);

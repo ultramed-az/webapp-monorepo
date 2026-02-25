@@ -1,8 +1,9 @@
 import {
   CanActivate,
   ExecutionContext,
+  HttpException,
+  HttpStatus,
   Injectable,
-  UnauthorizedException,
 } from '@nestjs/common';
 import { Request } from 'express';
 import { AdminService } from './admin.service';
@@ -28,7 +29,14 @@ export class AdminAuthGuard implements CanActivate {
     const token = this.adminService.extractToken(request);
 
     if (!token) {
-      throw new UnauthorizedException('Authentication required');
+      throw new HttpException(
+        {
+          code: 'AUTH_REQUIRED',
+          message: 'Authentication required',
+          details: null,
+        },
+        HttpStatus.UNAUTHORIZED,
+      );
     }
 
     const session = await this.adminService.validateSessionToken(token, {

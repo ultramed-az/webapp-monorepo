@@ -192,53 +192,307 @@ type AdminMediaUploadResponse = {
   size: number;
 };
 
-function toErrorMessage(payload: unknown, fallback: string): string {
-  if (!payload || typeof payload !== 'object') {
-    return fallback;
-  }
-
-  const normalized = payload as {
-    message?: string | string[];
-    error?: {
-      message?: string | string[];
-      code?: string;
-    };
+type AdminErrorPayload = {
+  statusCode?: number;
+  code?: string;
+  message?: string | string[];
+  details?: unknown;
+  requestId?: string;
+  error?: {
     code?: string;
+    message?: string | string[];
+    details?: unknown;
   };
+};
 
-  const message = normalized.message ?? normalized.error?.message;
+type ParsedAdminError = {
+  code?: string;
+  message?: string;
+  details?: unknown;
+  requestId?: string;
+};
+
+const AUTH_REAUTH_CODES = new Set([
+  'AUTH_REQUIRED',
+  'AUTH_SESSION_INVALID',
+  'AUTH_SESSION_EXPIRED',
+  'AUTH_SESSION_FINGERPRINT_MISMATCH',
+  'AUTH_SESSION_IP_MISMATCH',
+  'AUTH_TOKEN_INVALID',
+  'AUTH_TOKEN_MALFORMED',
+  'AUTH_TOKEN_EXPIRED',
+  'UNAUTHORIZED',
+]);
+
+let isReauthRedirectStarted = false;
+
+function normalizeMessage(message: string | string[] | undefined): string | undefined {
   if (Array.isArray(message)) {
-    return message.join(', ');
+    const list = message.filter((item): item is string => typeof item === 'string');
+    return list.length > 0 ? list.join(', ') : undefined;
   }
-  if (typeof message === 'string') {
+
+  if (typeof message === 'string' && message.length > 0) {
     return message;
   }
 
-  const code = normalized.code ?? normalized.error?.code;
-  if (typeof code === 'string' && code.length > 0) {
-    return `${fallback}: ${code}`;
+  return undefined;
+}
+
+function parseAdminError(payload: unknown): ParsedAdminError {
+  if (!payload || typeof payload !== 'object') {
+    return {};
   }
 
-  return fallback;
+  const value = payload as AdminErrorPayload;
+  return {
+    code: value.code ?? value.error?.code,
+    message: normalizeMessage(value.message ?? value.error?.message),
+    details: value.details ?? value.error?.details,
+    requestId: typeof value.requestId === 'string' ? value.requestId : undefined,
+  };
+}
+
+function readRetryAfterSeconds(details: unknown): number | undefined {
+  if (!details || typeof details !== 'object') {
+    return undefined;
+  }
+
+  const value = details as { retryAfterSeconds?: unknown };
+  const retryAfterSeconds = value.retryAfterSeconds;
+  if (typeof retryAfterSeconds === 'number' && Number.isFinite(retryAfterSeconds) && retryAfterSeconds > 0) {
+    return Math.ceil(retryAfterSeconds);
+  }
+
+  return undefined;
+}
+
+function mapAdminErrorMessage(
+  status: number,
+  parsed: ParsedAdminError,
+  fallback: string,
+): { message: string; shouldReauthenticate: boolean; isRetryable: boolean; retryAfterSeconds?: number } {
+  const code = parsed.code;
+  const retryAfterSeconds = readRetryAfterSeconds(parsed.details);
+
+  if (code === 'AUTH_INVALID_CREDENTIALS') {
+    return {
+      message: 'E-poct ve ya sifre yanlisdir.',
+      shouldReauthenticate: false,
+      isRetryable: false,
+    };
+  }
+
+  if (code === 'AUTH_LOGIN_RATE_LIMITED' || code === 'TOO_MANY_REQUESTS' || status === 429) {
+    return {
+      message:
+        retryAfterSeconds && retryAfterSeconds > 0
+          ? `Cox sayda ugursuz cehd edildi. ${retryAfterSeconds} saniye sonra yeniden yoxlayin.`
+          : 'Cox sayda ugursuz cehd edildi. Zehmet olmasa biraz sonra yeniden yoxlayin.',
+      shouldReauthenticate: false,
+      isRetryable: true,
+      retryAfterSeconds,
+    };
+  }
+
+  if (code === 'AUTH_ORIGIN_REQUIRED' || code === 'AUTH_ORIGIN_NOT_ALLOWED' || code === 'FORBIDDEN' || status === 403) {
+    return {
+      message:
+        parsed.message ?? 'Tehlukesizlik yoxlamasi ugursuz oldu. Sehifeni yenileyib yeniden cehd edin.',
+      shouldReauthenticate: false,
+      isRetryable: false,
+    };
+  }
+
+  if (code === 'MEDIA_UNSUPPORTED_FILE_TYPE') {
+    return {
+      message:
+        'Desteklenmeyen fayl novu. JPG, PNG, WEBP, SVG ve ya AVIF istifade edin.',
+      shouldReauthenticate: false,
+      isRetryable: false,
+    };
+  }
+
+  const shouldReauthenticate =
+    (typeof code === 'string' && AUTH_REAUTH_CODES.has(code)) ||
+    (status === 401 && code !== 'AUTH_INVALID_CREDENTIALS');
+
+  if (shouldReauthenticate) {
+    return {
+      message: 'Sessiya bitib ve ya etibarsizdir. Zehmet olmasa yeniden daxil olun.',
+      shouldReauthenticate: true,
+      isRetryable: false,
+    };
+  }
+
+  if (code === 'VALIDATION_ERROR' || code === 'BAD_REQUEST' || code === 'UNPROCESSABLE_ENTITY' || status === 400 || status === 422) {
+    return {
+      message: parsed.message ?? 'Gonderilen melumatlar duzgun deyil.',
+      shouldReauthenticate: false,
+      isRetryable: false,
+    };
+  }
+
+  if (status >= 500) {
+    return {
+      message:
+        parsed.message ??
+        'Server terefde muveqqeti problem var. Zehmet olmasa biraz sonra yeniden yoxlayin.',
+      shouldReauthenticate: false,
+      isRetryable: true,
+    };
+  }
+
+  return {
+    message: parsed.message ?? fallback,
+    shouldReauthenticate: false,
+    isRetryable: status >= 500,
+  };
+}
+
+export class AdminApiError extends Error {
+  readonly status: number;
+  readonly url: string;
+  readonly code?: string;
+  readonly details: unknown;
+  readonly requestId?: string;
+  readonly shouldReauthenticate: boolean;
+  readonly isRetryable: boolean;
+  readonly retryAfterSeconds?: number;
+
+  constructor(
+    status: number,
+    url: string,
+    options: {
+      message: string;
+      code?: string;
+      details?: unknown;
+      requestId?: string;
+      shouldReauthenticate?: boolean;
+      isRetryable?: boolean;
+      retryAfterSeconds?: number;
+    },
+  ) {
+    super(options.message);
+    this.name = 'AdminApiError';
+    this.status = status;
+    this.url = url;
+    this.code = options.code;
+    this.details = options.details ?? null;
+    this.requestId = options.requestId;
+    this.shouldReauthenticate = options.shouldReauthenticate ?? false;
+    this.isRetryable = options.isRetryable ?? false;
+    this.retryAfterSeconds = options.retryAfterSeconds;
+  }
+}
+
+export function isAdminApiError(error: unknown): error is AdminApiError {
+  return error instanceof AdminApiError;
+}
+
+export function shouldForceAdminReauth(error: unknown): boolean {
+  return isAdminApiError(error) && error.shouldReauthenticate;
+}
+
+export function getAdminRetryAfterSeconds(error: unknown): number | undefined {
+  if (!isAdminApiError(error)) {
+    return undefined;
+  }
+  return error.retryAfterSeconds;
+}
+
+function isAdminLoginPath(pathname: string): boolean {
+  return /^(\/(az|en|ru))?\/admin\/login(\/|$)/.test(pathname);
+}
+
+function buildAdminLoginPath(pathname: string): string {
+  const localeMatch = pathname.match(/^\/(az|en|ru)(?=\/|$)/);
+  const localePrefix = localeMatch ? `/${localeMatch[1]}` : '';
+  return `${localePrefix}/admin/login`;
+}
+
+function triggerReauthRedirect(error: AdminApiError): void {
+  if (!error.shouldReauthenticate || typeof window === 'undefined') {
+    return;
+  }
+
+  const pathname = window.location.pathname;
+  if (isAdminLoginPath(pathname) || isReauthRedirectStarted) {
+    return;
+  }
+
+  isReauthRedirectStarted = true;
+  const nextPath = `${window.location.pathname}${window.location.search}`;
+  const loginPath = buildAdminLoginPath(pathname);
+  const target = `${loginPath}?next=${encodeURIComponent(nextPath)}`;
+  window.location.assign(target);
+}
+
+function createAdminApiError(
+  status: number,
+  url: string,
+  payload: unknown,
+  fallback: string,
+): AdminApiError {
+  const parsed = parseAdminError(payload);
+  const mapped = mapAdminErrorMessage(status, parsed, fallback);
+
+  return new AdminApiError(status, url, {
+    message: mapped.message,
+    code: parsed.code,
+    details: parsed.details,
+    requestId: parsed.requestId,
+    shouldReauthenticate: mapped.shouldReauthenticate,
+    isRetryable: mapped.isRetryable,
+    retryAfterSeconds: mapped.retryAfterSeconds,
+  });
+}
+
+async function parseResponsePayload(response: Response): Promise<unknown> {
+  try {
+    return await response.json();
+  } catch {
+    return null;
+  }
+}
+
+function buildNetworkError(url: string, error: unknown): AdminApiError {
+  const details = error instanceof Error ? { reason: error.message } : null;
+  return new AdminApiError(503, url, {
+    code: 'NETWORK_ERROR',
+    message: 'Servere qosulmaq mumkun olmadi. Zehmet olmasa yeniden cehd edin.',
+    details,
+    shouldReauthenticate: false,
+    isRetryable: true,
+  });
 }
 
 async function request<T>(path: string, options: RequestOptions = {}): Promise<T> {
-  const response = await fetch(`${API_BASE_URL}${path}`, {
-    method: options.method ?? 'GET',
-    headers: options.body ? { 'Content-Type': 'application/json' } : undefined,
-    credentials: 'include',
-    body: options.body ? JSON.stringify(options.body) : undefined,
-  });
+  const url = `${API_BASE_URL}${path}`;
 
-  let payload: unknown = null;
+  let response: Response;
   try {
-    payload = await response.json();
-  } catch {
-    payload = null;
+    response = await fetch(url, {
+      method: options.method ?? 'GET',
+      headers: options.body ? { 'Content-Type': 'application/json' } : undefined,
+      credentials: 'include',
+      body: options.body ? JSON.stringify(options.body) : undefined,
+    });
+  } catch (error) {
+    throw buildNetworkError(url, error);
   }
 
+  const payload = await parseResponsePayload(response);
+
   if (!response.ok) {
-    throw new Error(toErrorMessage(payload, `Request failed (${response.status})`));
+    const adminError = createAdminApiError(
+      response.status,
+      url,
+      payload,
+      `Request failed (${response.status})`,
+    );
+    triggerReauthRedirect(adminError);
+    throw adminError;
   }
 
   return payload as T;
@@ -285,21 +539,29 @@ export async function uploadAdminMedia(file: File): Promise<AdminMediaUploadResp
   const formData = new FormData();
   formData.append('file', file);
 
-  const response = await fetch(`${API_BASE_URL}/admin/media/upload`, {
-    method: 'POST',
-    body: formData,
-    credentials: 'include',
-  });
-
-  let payload: unknown = null;
+  const url = `${API_BASE_URL}/admin/media/upload`;
+  let response: Response;
   try {
-    payload = await response.json();
-  } catch {
-    payload = null;
+    response = await fetch(url, {
+      method: 'POST',
+      body: formData,
+      credentials: 'include',
+    });
+  } catch (error) {
+    throw buildNetworkError(url, error);
   }
 
+  const payload = await parseResponsePayload(response);
+
   if (!response.ok) {
-    throw new Error(toErrorMessage(payload, `Upload failed (${response.status})`));
+    const adminError = createAdminApiError(
+      response.status,
+      url,
+      payload,
+      `Upload failed (${response.status})`,
+    );
+    triggerReauthRedirect(adminError);
+    throw adminError;
   }
 
   return payload as AdminMediaUploadResponse;

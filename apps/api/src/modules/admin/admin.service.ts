@@ -1,19 +1,14 @@
 import {
-  BadRequestException,
-  ForbiddenException,
   HttpException,
   HttpStatus,
   Injectable,
-  InternalServerErrorException,
-  NotFoundException,
-  UnauthorizedException,
 } from '@nestjs/common';
 import { compare } from 'bcryptjs';
 import { createHash } from 'crypto';
 import { existsSync } from 'fs';
 import { unlink } from 'fs/promises';
 import type { CookieOptions, Request } from 'express';
-import { sign, verify } from 'jsonwebtoken';
+import { sign, TokenExpiredError, verify } from 'jsonwebtoken';
 import { join, relative } from 'path';
 import { PrismaService } from '../../prisma/prisma.service';
 import {
@@ -89,11 +84,20 @@ export class AdminService {
     }
 
     if (!context.origin) {
-      throw new ForbiddenException('Origin header is required for this operation');
+      this.throwHttpError(
+        HttpStatus.FORBIDDEN,
+        'AUTH_ORIGIN_REQUIRED',
+        'Origin header is required for this operation',
+      );
     }
 
     if (!allowedOrigins.has(context.origin)) {
-      throw new ForbiddenException('Request origin is not allowed');
+      this.throwHttpError(
+        HttpStatus.FORBIDDEN,
+        'AUTH_ORIGIN_NOT_ALLOWED',
+        'Request origin is not allowed',
+        { origin: context.origin },
+      );
     }
   }
 
@@ -124,7 +128,11 @@ export class AdminService {
 
     if (!admin || !hasValidPassword) {
       this.markFailedLogin(attemptKey);
-      throw new UnauthorizedException('Invalid credentials');
+      this.throwHttpError(
+        HttpStatus.UNAUTHORIZED,
+        'AUTH_INVALID_CREDENTIALS',
+        'Invalid credentials',
+      );
     }
 
     this.clearFailedLogins(attemptKey);
@@ -194,19 +202,31 @@ export class AdminService {
     });
 
     if (!session) {
-      throw new UnauthorizedException('Invalid admin session');
+      this.throwHttpError(
+        HttpStatus.UNAUTHORIZED,
+        'AUTH_SESSION_INVALID',
+        'Invalid admin session',
+      );
     }
 
     if (session.expiresAt.getTime() <= Date.now()) {
       await this.revokeSessionById(session.id);
-      throw new UnauthorizedException('Admin session expired');
+      this.throwHttpError(
+        HttpStatus.UNAUTHORIZED,
+        'AUTH_SESSION_EXPIRED',
+        'Admin session expired',
+      );
     }
 
     const incomingUserAgent = this.normalizeNullableText(context?.userAgent);
     const sessionUserAgent = this.normalizeNullableText(session.userAgent);
     if (incomingUserAgent && sessionUserAgent && incomingUserAgent !== sessionUserAgent) {
       await this.revokeSessionById(session.id);
-      throw new UnauthorizedException('Session fingerprint mismatch');
+      this.throwHttpError(
+        HttpStatus.UNAUTHORIZED,
+        'AUTH_SESSION_FINGERPRINT_MISMATCH',
+        'Session fingerprint mismatch',
+      );
     }
 
     if (this.getEnforceIpBinding()) {
@@ -214,7 +234,11 @@ export class AdminService {
       const sessionIp = this.normalizeNullableText(session.ipAddress);
       if (incomingIp && sessionIp && incomingIp !== sessionIp) {
         await this.revokeSessionById(session.id);
-        throw new UnauthorizedException('Session IP mismatch');
+        this.throwHttpError(
+          HttpStatus.UNAUTHORIZED,
+          'AUTH_SESSION_IP_MISMATCH',
+          'Session IP mismatch',
+        );
       }
     }
 
@@ -231,7 +255,13 @@ export class AdminService {
       orderBy: [{ createdAt: 'desc' }],
     });
 
-    return sessions.map((session) => ({
+    return sessions.map((session: {
+      id: string;
+      createdAt: Date;
+      expiresAt: Date;
+      ipAddress: string | null;
+      userAgent: string | null;
+    }) => ({
       id: session.id,
       createdAt: session.createdAt.toISOString(),
       expiresAt: session.expiresAt.toISOString(),
@@ -251,7 +281,11 @@ export class AdminService {
     });
 
     if (!targetSession) {
-      throw new NotFoundException('Session not found');
+      this.throwHttpError(
+        HttpStatus.NOT_FOUND,
+        'AUTH_SESSION_NOT_FOUND',
+        'Session not found',
+      );
     }
 
     await this.revokeSessionById(sessionId);
@@ -319,7 +353,11 @@ export class AdminService {
 
   async registerMedia(file: Express.Multer.File) {
     if (!file?.path) {
-      throw new BadRequestException('File upload failed');
+      this.throwHttpError(
+        HttpStatus.BAD_REQUEST,
+        'MEDIA_UPLOAD_FAILED',
+        'File upload failed',
+      );
     }
 
     const storageKey = this.toStorageKey(file.path);
@@ -354,7 +392,7 @@ export class AdminService {
     });
 
     if (!media) {
-      throw new NotFoundException('Media not found');
+      this.throwHttpError(HttpStatus.NOT_FOUND, 'MEDIA_NOT_FOUND', 'Media not found');
     }
 
     const absolutePath = join(this.uploadRoot, media.storageKey);
@@ -400,12 +438,20 @@ export class AdminService {
       });
 
       if (!decoded || typeof decoded !== 'object') {
-        throw new UnauthorizedException('Invalid admin session token');
+        this.throwHttpError(
+          HttpStatus.UNAUTHORIZED,
+          'AUTH_TOKEN_INVALID',
+          'Invalid admin session token',
+        );
       }
 
       const payload = decoded as Partial<AuthSessionPayload>;
       if (!payload.sub || !payload.sid || !payload.email) {
-        throw new UnauthorizedException('Malformed admin session token');
+        this.throwHttpError(
+          HttpStatus.UNAUTHORIZED,
+          'AUTH_TOKEN_MALFORMED',
+          'Malformed admin session token',
+        );
       }
 
       return {
@@ -415,8 +461,24 @@ export class AdminService {
         iat: payload.iat,
         exp: payload.exp,
       };
-    } catch {
-      throw new UnauthorizedException('Invalid or expired admin session token');
+    } catch (error) {
+      if (error instanceof HttpException) {
+        throw error;
+      }
+
+      if (error instanceof TokenExpiredError) {
+        this.throwHttpError(
+          HttpStatus.UNAUTHORIZED,
+          'AUTH_TOKEN_EXPIRED',
+          'Admin session token expired',
+        );
+      }
+
+      this.throwHttpError(
+        HttpStatus.UNAUTHORIZED,
+        'AUTH_TOKEN_INVALID',
+        'Invalid admin session token',
+      );
     }
   }
 
@@ -500,15 +562,23 @@ export class AdminService {
 
   private assertCredentialsShape(email: string, password: string): void {
     if (!email || !password) {
-      throw new BadRequestException('Email and password are required');
+      this.throwHttpError(
+        HttpStatus.BAD_REQUEST,
+        'AUTH_CREDENTIALS_REQUIRED',
+        'Email and password are required',
+      );
     }
 
     if (!email.includes('@') || email.length > 180) {
-      throw new BadRequestException('Invalid email');
+      this.throwHttpError(HttpStatus.BAD_REQUEST, 'AUTH_INVALID_EMAIL', 'Invalid email');
     }
 
     if (password.length < 8 || password.length > 128) {
-      throw new BadRequestException('Invalid password');
+      this.throwHttpError(
+        HttpStatus.BAD_REQUEST,
+        'AUTH_INVALID_PASSWORD',
+        'Invalid password',
+      );
     }
   }
 
@@ -520,9 +590,15 @@ export class AdminService {
 
     const now = Date.now();
     if (state.blockedUntilMs > now) {
-      throw new HttpException(
-        'Too many failed login attempts. Please try again later.',
+      const retryAfterSeconds = Math.max(
+        1,
+        Math.ceil((state.blockedUntilMs - now) / 1000),
+      );
+      this.throwHttpError(
         HttpStatus.TOO_MANY_REQUESTS,
+        'AUTH_LOGIN_RATE_LIMITED',
+        'Too many failed login attempts. Please try again later.',
+        { retryAfterSeconds },
       );
     }
 
@@ -602,8 +678,8 @@ export class AdminService {
 
     const sessionsToRevoke = activeSessions
       .slice(maxSessions)
-      .map((session) => session.id)
-      .filter((sessionId) => sessionId !== currentSessionId);
+      .map((session: { id: string }) => session.id)
+      .filter((sessionId: string) => sessionId !== currentSessionId);
 
     if (sessionsToRevoke.length === 0) {
       return;
@@ -702,10 +778,28 @@ export class AdminService {
   private getJwtSecret(): string {
     const secret = process.env.JWT_SECRET;
     if (!secret || secret.length < 24) {
-      throw new InternalServerErrorException(
-        'JWT_SECRET must be set to a strong value (at least 24 chars)',
+      this.throwHttpError(
+        HttpStatus.INTERNAL_SERVER_ERROR,
+        'AUTH_CONFIG_INVALID',
+        'Server authentication configuration is invalid',
       );
     }
     return secret;
+  }
+
+  private throwHttpError(
+    statusCode: HttpStatus,
+    code: string,
+    message: string,
+    details: unknown = null,
+  ): never {
+    throw new HttpException(
+      {
+        code,
+        message,
+        details,
+      },
+      statusCode,
+    );
   }
 }

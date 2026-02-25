@@ -1,7 +1,6 @@
 'use client';
 
-import { useState } from 'react';
-import { useTranslations } from 'next-intl';
+import { useEffect, useState } from 'react';
 import { useRouter } from '@/i18n/routing';
 import { useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
@@ -10,7 +9,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Loader2 } from 'lucide-react';
 import Image from 'next/image';
-import { loginAdmin } from '@/lib/admin-api';
+import { getAdminRetryAfterSeconds, isAdminApiError, loginAdmin } from '@/lib/admin-api';
 
 function isSafeAdminNextPath(nextPath: string | null): nextPath is string {
     if (!nextPath) {
@@ -25,18 +24,33 @@ function isSafeAdminNextPath(nextPath: string | null): nextPath is string {
 }
 
 export default function AdminLoginPage() {
-    const t = useTranslations('Admin');
     const router = useRouter();
     const searchParams = useSearchParams();
     const [isLoading, setIsLoading] = useState(false);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
+    const [cooldownSeconds, setCooldownSeconds] = useState(0);
 
     // In a real app we would use react-hook-form + zod here
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
+    useEffect(() => {
+        if (cooldownSeconds <= 0) {
+            return;
+        }
+
+        const timer = window.setTimeout(() => {
+            setCooldownSeconds((value) => Math.max(0, value - 1));
+        }, 1000);
+
+        return () => window.clearTimeout(timer);
+    }, [cooldownSeconds]);
+
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
+        if (cooldownSeconds > 0) {
+            return;
+        }
         setIsLoading(true);
         setErrorMessage(null);
 
@@ -50,6 +64,15 @@ export default function AdminLoginPage() {
             router.push('/admin/dashboard');
             router.refresh();
         } catch (error) {
+            if (isAdminApiError(error)) {
+                const retryAfterSeconds = getAdminRetryAfterSeconds(error);
+                if (retryAfterSeconds && retryAfterSeconds > 0) {
+                    setCooldownSeconds(retryAfterSeconds);
+                }
+                setErrorMessage(error.message);
+                return;
+            }
+
             const message =
                 error instanceof Error
                     ? error.message
@@ -118,13 +141,15 @@ export default function AdminLoginPage() {
                         <Button
                             type="submit"
                             className="w-full h-11 bg-brand-orange hover:bg-brand-orange-dark text-white mt-6 rounded-lg text-sm font-medium transition-colors"
-                            disabled={isLoading}
+                            disabled={isLoading || cooldownSeconds > 0}
                         >
                             {isLoading ? (
                                 <>
                                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                                     Daxil olunur...
                                 </>
+                            ) : cooldownSeconds > 0 ? (
+                                `Yeniden cehd: ${cooldownSeconds}s`
                             ) : (
                                 "Sistemə daxil ol"
                             )}

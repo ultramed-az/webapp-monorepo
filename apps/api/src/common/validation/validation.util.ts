@@ -39,7 +39,11 @@ type ObjectArrayOptions = {
 };
 
 function fail(message: string): never {
-  throw new BadRequestException(`Validation failed: ${message}`);
+  throw new BadRequestException({
+    code: 'VALIDATION_ERROR',
+    message: `Validation failed: ${message}`,
+    details: null,
+  });
 }
 
 function hasOwn(record: UnknownRecord, key: string): boolean {
