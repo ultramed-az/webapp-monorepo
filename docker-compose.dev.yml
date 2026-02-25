@@ -43,7 +43,7 @@ services:
       db:
         condition: service_healthy
     restart: unless-stopped
-    command: sh -lc "CI=true pnpm install --frozen-lockfile && pnpm db:generate && pnpm --filter @ultramed/api dev"
+    command: sh -lc "CI=true pnpm install --frozen-lockfile && pnpm db:push && pnpm db:generate && pnpm --filter @ultramed/api dev"
 
   web:
     build:

@@ -199,6 +199,55 @@ describe('Phase A/4 admin CRUD + error contract (e2e)', () => {
     expectErrorContract(response.body as unknown, 400, 'VALIDATION_ERROR');
   });
 
+  it('returns MEDIA_REFERENCE_INVALID contract for unknown mediaId', async () => {
+    const suffix = randomSuffix();
+    const response = await agent
+      .post('/services')
+      .set('origin', ORIGIN)
+      .set('user-agent', USER_AGENT)
+      .send({
+        titleAz: `Service ${suffix}`,
+        summaryAz: `Summary ${suffix}`,
+        contentAz: `Content ${suffix}`,
+        mediaId: `media-missing-${suffix}`,
+      });
+
+    expect(response.status).toBe(400);
+    expectErrorContract(
+      response.body as unknown,
+      400,
+      'MEDIA_REFERENCE_INVALID',
+    );
+  });
+
+  it('supports create with mediaId fallback image on /services', async () => {
+    const suffix = randomSuffix();
+    const mediaId = 'media-service-svc-kardiologiya';
+
+    const createResponse = await agent
+      .post('/services')
+      .set('origin', ORIGIN)
+      .set('user-agent', USER_AGENT)
+      .send({
+        titleAz: `Service media ${suffix}`,
+        summaryAz: `Summary media ${suffix}`,
+        contentAz: `Content media ${suffix}`,
+        mediaId,
+      });
+
+    expect(createResponse.status).toBe(201);
+    const body = expectRecord(createResponse.body as unknown);
+    expect(body.mediaId).toBe(mediaId);
+    const media = expectRecord(body.media);
+    expect(body.image).toBe(media.cdnUrl);
+
+    const serviceId = readStringField(createResponse.body as unknown, 'id');
+    await agent
+      .delete(`/services/${serviceId}`)
+      .set('origin', ORIGIN)
+      .set('user-agent', USER_AGENT);
+  });
+
   it('supports CRUD smoke for /services', async () => {
     const suffix = randomSuffix();
     const createResponse = await agent

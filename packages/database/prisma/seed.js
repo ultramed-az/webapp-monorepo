@@ -1068,6 +1068,79 @@ const homeStats = [
   { id: 'years', value: '15+', sortOrder: 4 },
 ];
 
+function toSafeSegment(value) {
+  return String(value)
+    .toLowerCase()
+    .replace(/[^a-z0-9-]/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '');
+}
+
+function detectFileExtension(url) {
+  try {
+    const pathname = new URL(url).pathname;
+    const match = pathname.match(/\.([a-zA-Z0-9]+)$/);
+    if (!match) {
+      return 'jpg';
+    }
+
+    const extension = match[1].toLowerCase();
+    if (['jpg', 'jpeg', 'png', 'webp', 'svg', 'avif'].includes(extension)) {
+      return extension;
+    }
+  } catch {
+    // fallback handled below
+  }
+
+  return 'jpg';
+}
+
+function toMimeType(extension) {
+  const map = {
+    jpg: 'image/jpeg',
+    jpeg: 'image/jpeg',
+    png: 'image/png',
+    webp: 'image/webp',
+    svg: 'image/svg+xml',
+    avif: 'image/avif',
+  };
+
+  return map[extension] ?? 'image/jpeg';
+}
+
+async function upsertSeedMedia(entityType, entityId, url) {
+  if (!url || typeof url !== 'string' || url.trim().length === 0) {
+    return null;
+  }
+
+  const safeEntityType = toSafeSegment(entityType);
+  const safeEntityId = toSafeSegment(entityId);
+  const extension = detectFileExtension(url);
+  const mediaId = `media-${safeEntityType}-${safeEntityId}`;
+  const storageKey = `seed/${safeEntityType}/${safeEntityId}.${extension}`;
+
+  return prisma.media.upsert({
+    where: { id: mediaId },
+    update: {
+      originalName: `${safeEntityId}.${extension}`,
+      mimeType: toMimeType(extension),
+      size: 0,
+      provider: 'seed-external',
+      storageKey,
+      cdnUrl: url,
+    },
+    create: {
+      id: mediaId,
+      originalName: `${safeEntityId}.${extension}`,
+      mimeType: toMimeType(extension),
+      size: 0,
+      provider: 'seed-external',
+      storageKey,
+      cdnUrl: url,
+    },
+  });
+}
+
 async function seedAdmin() {
   const adminEmail = process.env.ADMIN_SEED_EMAIL ?? 'admin@ultramed.az';
   const adminPassword = process.env.ADMIN_SEED_PASSWORD ?? 'admin123';
@@ -1087,30 +1160,51 @@ async function seedAdmin() {
 
 async function seedServices() {
   for (const service of services) {
+    const media = await upsertSeedMedia('service', service.id, service.image);
+    const payload = {
+      ...service,
+      image: media?.cdnUrl ?? service.image ?? null,
+      mediaId: media?.id ?? null,
+    };
+
     await prisma.service.upsert({
       where: { id: service.id },
-      update: service,
-      create: service,
+      update: payload,
+      create: payload,
     });
   }
 }
 
 async function seedDoctors() {
   for (const doctor of doctors) {
+    const media = await upsertSeedMedia('doctor', doctor.id, doctor.image);
+    const payload = {
+      ...doctor,
+      image: media?.cdnUrl ?? doctor.image ?? null,
+      mediaId: media?.id ?? null,
+    };
+
     await prisma.doctor.upsert({
       where: { id: doctor.id },
-      update: doctor,
-      create: doctor,
+      update: payload,
+      create: payload,
     });
   }
 }
 
 async function seedBlog() {
   for (const post of blogPosts) {
+    const media = await upsertSeedMedia('blog', post.id, post.image);
+    const payload = {
+      ...post,
+      image: media?.cdnUrl ?? post.image ?? null,
+      mediaId: media?.id ?? null,
+    };
+
     await prisma.blogPost.upsert({
       where: { id: post.id },
-      update: post,
-      create: post,
+      update: payload,
+      create: payload,
     });
   }
 }
@@ -1147,10 +1241,17 @@ async function seedFaq() {
 
 async function seedGallery() {
   for (const item of galleryItems) {
+    const media = await upsertSeedMedia('gallery', item.id, item.imageUrl);
+    const payload = {
+      ...item,
+      imageUrl: media?.cdnUrl ?? item.imageUrl,
+      mediaId: media?.id ?? null,
+    };
+
     await prisma.gallery.upsert({
       where: { id: item.id },
-      update: item,
-      create: item,
+      update: payload,
+      create: payload,
     });
   }
 }

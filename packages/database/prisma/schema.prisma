@@ -40,6 +40,10 @@ model Media {
   provider     String   @default("local-cdn")
   storageKey   String   @unique
   cdnUrl       String
+  services     Service[]
+  doctors      Doctor[]
+  blogPosts    BlogPost[]
+  galleryItems Gallery[]
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 }
@@ -60,10 +64,14 @@ model Service {
   highlightsRu Json?
   iconKey    String?
   image      String?
+  mediaId    String?
+  media      Media?   @relation(fields: [mediaId], references: [id], onDelete: SetNull)
   sortOrder  Int      @default(0)
   isPublished Boolean @default(true)
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
+
+  @@index([mediaId])
 }
 
 model Doctor {
@@ -79,6 +87,8 @@ model Doctor {
   profileEn  String?  @db.Text
   profileRu  String?  @db.Text
   image      String?
+  mediaId    String?
+  media      Media?   @relation(fields: [mediaId], references: [id], onDelete: SetNull)
   specialty  String
   experience String?
   educationAz String?
@@ -105,6 +115,8 @@ model Doctor {
   isPublished Boolean @default(true)
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
+
+  @@index([mediaId])
 }
 
 model BlogPost {
@@ -123,6 +135,8 @@ model BlogPost {
   categoryEn String?
   categoryRu String?
   image      String?
+  mediaId    String?
+  media      Media?   @relation(fields: [mediaId], references: [id], onDelete: SetNull)
   published  Boolean  @default(false)
   featured   Boolean  @default(false)
   views      Int      @default(0)
@@ -130,6 +144,8 @@ model BlogPost {
   sortOrder  Int      @default(0)
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
+
+  @@index([mediaId])
 }
 
 model Testimonial {
@@ -161,11 +177,15 @@ model Faq {
 model Gallery {
   id          String   @id @default(uuid())
   imageUrl    String
+  mediaId     String?
+  media       Media?   @relation(fields: [mediaId], references: [id], onDelete: SetNull)
   captionAz   String?
   captionEn   String?
   captionRu   String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+
+  @@index([mediaId])
 }
 
 model ContactInfo {
