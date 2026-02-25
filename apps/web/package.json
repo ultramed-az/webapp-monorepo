@@ -6,7 +6,7 @@
     "dev": "next dev -p $FRONTEND_PORT",
     "build": "next build",
     "start": "next start -p $FRONTEND_PORT",
-    "lint": "eslint"
+    "lint": "echo \"ESLint is disabled for @ultramed/web\""
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",

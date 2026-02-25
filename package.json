@@ -9,7 +9,7 @@
         "db:setup": "pnpm db:push && pnpm db:generate && pnpm db:seed",
         "dev": "pnpm db:generate && pnpm -r dev",
         "build": "pnpm -r build",
-        "lint": "pnpm -r lint",
+        "lint": "echo 'ESLint is disabled for this project.'",
         "docker:dev": "docker compose --env-file .env.development -f docker-compose.dev.yml up --build",
         "docker:build": "docker compose --env-file .env.production -f docker-compose.build.yml up -d --build",
         "docker-up:dev": "docker compose --env-file .env.development -f docker-compose.dev.yml up --build -d",

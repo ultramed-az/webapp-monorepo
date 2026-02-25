@@ -34,3 +34,7 @@ yarn-error.log*
 # custom
 TODO.MD
 task.md
+
+# uploads
+uploads/
+apps/api/uploads/
