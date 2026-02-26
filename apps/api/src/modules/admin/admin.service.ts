@@ -2,6 +2,7 @@ import {
   HttpException,
   HttpStatus,
   Injectable,
+  Logger,
 } from '@nestjs/common';
 import { compare } from 'bcryptjs';
 import { createHash } from 'crypto';
@@ -19,6 +20,8 @@ import {
   DEFAULT_ADMIN_SESSION_TTL_HOURS,
   DEFAULT_LOGIN_LOCK_WINDOW_MINUTES,
   DEFAULT_LOGIN_MAX_ATTEMPTS,
+  DEFAULT_MEDIA_CLEANUP_BATCH_LIMIT,
+  DEFAULT_MEDIA_CLEANUP_GRACE_HOURS,
 } from './admin.constants';
 
 type LoginContext = {
@@ -45,8 +48,30 @@ type LoginAttemptState = {
   blockedUntilMs: number | null;
 };
 
+type MediaUsageSummary = {
+  services: number;
+  doctors: number;
+  blogPosts: number;
+  galleryItems: number;
+  total: number;
+};
+
+type MediaCleanupItem = {
+  id: string;
+  storageKey: string;
+  cdnUrl: string;
+  status:
+    | 'would_delete'
+    | 'deleted'
+    | 'skipped_in_use'
+    | 'deleted_file_missing'
+    | 'deleted_file_error';
+  reason?: string;
+};
+
 @Injectable()
 export class AdminService {
+  private readonly logger = new Logger(AdminService.name);
   private readonly loginAttempts = new Map<string, LoginAttemptState>();
   private readonly uploadRoot = join(process.cwd(), 'uploads');
 
@@ -374,37 +399,248 @@ export class AdminService {
     });
   }
 
-  async listMedia(limitRaw?: string) {
-    const parsedLimit = Number.parseInt(limitRaw ?? '30', 10);
-    const limit = Number.isFinite(parsedLimit)
-      ? Math.min(Math.max(parsedLimit, 1), 100)
-      : 30;
+  async listMedia(params?: {
+    limitRaw?: string;
+    orphanOnlyRaw?: string;
+    olderThanHoursRaw?: string;
+  }) {
+    const limit = this.parsePositiveIntWithinRange(params?.limitRaw, 30, 1, 100);
+    const orphanOnly = this.parseBooleanFlag(params?.orphanOnlyRaw);
+    const olderThanHours = this.parsePositiveIntWithinRange(
+      params?.olderThanHoursRaw,
+      this.getMediaCleanupGraceHours(),
+      1,
+      24 * 30,
+    );
+    const threshold = new Date(Date.now() - olderThanHours * 60 * 60 * 1000);
 
-    return this.prisma.media.findMany({
+    const items = await this.prisma.media.findMany({
+      where: orphanOnly ? this.buildOrphanWhere(threshold) : undefined,
       take: limit,
       orderBy: [{ createdAt: 'desc' }],
+      include: {
+        _count: {
+          select: {
+            services: true,
+            doctors: true,
+            blogPosts: true,
+            galleryItems: true,
+          },
+        },
+      },
+    });
+
+    return items.map((item: {
+      id: string;
+      originalName: string;
+      mimeType: string;
+      size: number;
+      provider: string;
+      storageKey: string;
+      cdnUrl: string;
+      createdAt: Date;
+      updatedAt: Date;
+      _count: {
+        services: number;
+        doctors: number;
+        blogPosts: number;
+        galleryItems: number;
+      };
+    }) => {
+      const usage = this.toMediaUsageSummary(item._count);
+      return {
+        id: item.id,
+        originalName: item.originalName,
+        mimeType: item.mimeType,
+        size: item.size,
+        provider: item.provider,
+        storageKey: item.storageKey,
+        cdnUrl: item.cdnUrl,
+        createdAt: item.createdAt,
+        updatedAt: item.updatedAt,
+        usage,
+        isOrphan: usage.total === 0,
+      };
     });
   }
 
   async removeMedia(id: string) {
     const media = await this.prisma.media.findUnique({
       where: { id },
+      include: {
+        _count: {
+          select: {
+            services: true,
+            doctors: true,
+            blogPosts: true,
+            galleryItems: true,
+          },
+        },
+      },
     });
 
     if (!media) {
       this.throwHttpError(HttpStatus.NOT_FOUND, 'MEDIA_NOT_FOUND', 'Media not found');
     }
 
-    const absolutePath = join(this.uploadRoot, media.storageKey);
-    if (existsSync(absolutePath)) {
-      await unlink(absolutePath);
+    const usage = this.toMediaUsageSummary(media._count);
+    if (usage.total > 0) {
+      this.throwHttpError(
+        HttpStatus.CONFLICT,
+        'MEDIA_IN_USE',
+        'Media is used by other records and cannot be deleted',
+        { mediaId: media.id, usage },
+      );
     }
 
-    await this.prisma.media.delete({
-      where: { id },
+    const deleteResult = await this.prisma.media.deleteMany({
+      where: {
+        id,
+        ...this.buildOrphanWhere(),
+      },
     });
 
+    if (deleteResult.count === 0) {
+      this.throwHttpError(
+        HttpStatus.CONFLICT,
+        'MEDIA_IN_USE',
+        'Media is used by other records and cannot be deleted',
+        { mediaId: id },
+      );
+    }
+
+    await this.tryDeleteStoredFile(media.storageKey);
+
     return { success: true };
+  }
+
+  async cleanupOrphanMedia(params?: {
+    limitRaw?: string;
+    olderThanHoursRaw?: string;
+    dryRunRaw?: string;
+  }) {
+    const dryRun =
+      params?.dryRunRaw === undefined
+        ? true
+        : this.parseBooleanFlag(params?.dryRunRaw);
+    const limit = this.parsePositiveIntWithinRange(
+      params?.limitRaw,
+      this.getMediaCleanupBatchLimit(),
+      1,
+      500,
+    );
+    const olderThanHours = this.parsePositiveIntWithinRange(
+      params?.olderThanHoursRaw,
+      this.getMediaCleanupGraceHours(),
+      1,
+      24 * 30,
+    );
+    const threshold = new Date(Date.now() - olderThanHours * 60 * 60 * 1000);
+
+    const candidates = await this.prisma.media.findMany({
+      where: this.buildOrphanWhere(threshold),
+      orderBy: [{ createdAt: 'asc' }],
+      take: limit,
+    });
+
+    if (dryRun) {
+      return {
+        dryRun: true,
+        olderThanHours,
+        threshold: threshold.toISOString(),
+        scannedCount: candidates.length,
+        deletedCount: 0,
+        skippedInUseCount: 0,
+        fileDeletedCount: 0,
+        fileMissingCount: 0,
+        fileDeleteErrorCount: 0,
+        items: candidates.map(
+          (candidate: {
+            id: string;
+            storageKey: string;
+            cdnUrl: string;
+          }): MediaCleanupItem => ({
+            id: candidate.id,
+            storageKey: candidate.storageKey,
+            cdnUrl: candidate.cdnUrl,
+            status: 'would_delete',
+          }),
+        ),
+      };
+    }
+
+    let deletedCount = 0;
+    let skippedInUseCount = 0;
+    let fileDeletedCount = 0;
+    let fileMissingCount = 0;
+    let fileDeleteErrorCount = 0;
+
+    const items: MediaCleanupItem[] = [];
+    for (const candidate of candidates) {
+      const deleteResult = await this.prisma.media.deleteMany({
+        where: {
+          id: candidate.id,
+          ...this.buildOrphanWhere(threshold),
+        },
+      });
+
+      if (deleteResult.count === 0) {
+        skippedInUseCount += 1;
+        items.push({
+          id: candidate.id,
+          storageKey: candidate.storageKey,
+          cdnUrl: candidate.cdnUrl,
+          status: 'skipped_in_use',
+          reason: 'Media received a reference before deletion',
+        });
+        continue;
+      }
+
+      deletedCount += 1;
+      const fileResult = await this.tryDeleteStoredFile(candidate.storageKey);
+      if (fileResult === 'deleted') {
+        fileDeletedCount += 1;
+        items.push({
+          id: candidate.id,
+          storageKey: candidate.storageKey,
+          cdnUrl: candidate.cdnUrl,
+          status: 'deleted',
+        });
+        continue;
+      }
+
+      if (fileResult === 'missing') {
+        fileMissingCount += 1;
+        items.push({
+          id: candidate.id,
+          storageKey: candidate.storageKey,
+          cdnUrl: candidate.cdnUrl,
+          status: 'deleted_file_missing',
+        });
+        continue;
+      }
+
+      fileDeleteErrorCount += 1;
+      items.push({
+        id: candidate.id,
+        storageKey: candidate.storageKey,
+        cdnUrl: candidate.cdnUrl,
+        status: 'deleted_file_error',
+      });
+    }
+
+    return {
+      dryRun: false,
+      olderThanHours,
+      threshold: threshold.toISOString(),
+      scannedCount: candidates.length,
+      deletedCount,
+      skippedInUseCount,
+      fileDeletedCount,
+      fileMissingCount,
+      fileDeleteErrorCount,
+      items,
+    };
   }
 
   private getCookieToken(request: Request): string | null {
@@ -424,6 +660,94 @@ export class AdminService {
       '',
     );
     return `${cdnBase}/${storageKey}`;
+  }
+
+  private buildOrphanWhere(threshold?: Date) {
+    return {
+      services: { none: {} },
+      doctors: { none: {} },
+      blogPosts: { none: {} },
+      galleryItems: { none: {} },
+      ...(threshold ? { createdAt: { lt: threshold } } : {}),
+    };
+  }
+
+  private toMediaUsageSummary(counts: {
+    services: number;
+    doctors: number;
+    blogPosts: number;
+    galleryItems: number;
+  }): MediaUsageSummary {
+    return {
+      services: counts.services,
+      doctors: counts.doctors,
+      blogPosts: counts.blogPosts,
+      galleryItems: counts.galleryItems,
+      total: counts.services + counts.doctors + counts.blogPosts + counts.galleryItems,
+    };
+  }
+
+  private parsePositiveIntWithinRange(
+    raw: string | undefined,
+    fallback: number,
+    min: number,
+    max: number,
+  ): number {
+    const parsed = Number.parseInt(raw ?? '', 10);
+    if (!Number.isFinite(parsed)) {
+      return fallback;
+    }
+    return Math.min(Math.max(parsed, min), max);
+  }
+
+  private parseBooleanFlag(raw: string | undefined): boolean {
+    if (!raw) {
+      return false;
+    }
+    return raw === '1' || raw.toLowerCase() === 'true';
+  }
+
+  private getMediaCleanupGraceHours(): number {
+    const parsed = Number.parseInt(
+      process.env.MEDIA_CLEANUP_GRACE_HOURS ??
+        String(DEFAULT_MEDIA_CLEANUP_GRACE_HOURS),
+      10,
+    );
+    if (!Number.isFinite(parsed) || parsed < 1 || parsed > 24 * 30) {
+      return DEFAULT_MEDIA_CLEANUP_GRACE_HOURS;
+    }
+    return parsed;
+  }
+
+  private getMediaCleanupBatchLimit(): number {
+    const parsed = Number.parseInt(
+      process.env.MEDIA_CLEANUP_BATCH_LIMIT ??
+        String(DEFAULT_MEDIA_CLEANUP_BATCH_LIMIT),
+      10,
+    );
+    if (!Number.isFinite(parsed) || parsed < 1 || parsed > 500) {
+      return DEFAULT_MEDIA_CLEANUP_BATCH_LIMIT;
+    }
+    return parsed;
+  }
+
+  private async tryDeleteStoredFile(
+    storageKey: string,
+  ): Promise<'deleted' | 'missing' | 'error'> {
+    const absolutePath = join(this.uploadRoot, storageKey);
+    if (!existsSync(absolutePath)) {
+      return 'missing';
+    }
+
+    try {
+      await unlink(absolutePath);
+      return 'deleted';
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : 'Unknown file delete error';
+      this.logger.error(`Failed to delete media file: ${absolutePath} (${message})`);
+      return 'error';
+    }
   }
 
   private parseSessionPayload(

@@ -196,6 +196,14 @@ export type AdminMediaRecord = {
   cdnUrl: string;
   createdAt: string;
   updatedAt: string;
+  usage?: {
+    services: number;
+    doctors: number;
+    blogPosts: number;
+    galleryItems: number;
+    total: number;
+  };
+  isOrphan?: boolean;
 };
 
 type AdminMediaUploadResponse = {
@@ -204,6 +212,30 @@ type AdminMediaUploadResponse = {
   storageKey: string;
   mimeType: string;
   size: number;
+};
+
+export type AdminMediaCleanupResult = {
+  dryRun: boolean;
+  olderThanHours: number;
+  threshold: string;
+  scannedCount: number;
+  deletedCount: number;
+  skippedInUseCount: number;
+  fileDeletedCount: number;
+  fileMissingCount: number;
+  fileDeleteErrorCount: number;
+  items: Array<{
+    id: string;
+    storageKey: string;
+    cdnUrl: string;
+    status:
+      | 'would_delete'
+      | 'deleted'
+      | 'skipped_in_use'
+      | 'deleted_file_missing'
+      | 'deleted_file_error';
+    reason?: string;
+  }>;
 };
 
 type AdminErrorPayload = {
@@ -581,13 +613,60 @@ export async function uploadAdminMedia(file: File): Promise<AdminMediaUploadResp
   return payload as AdminMediaUploadResponse;
 }
 
-export async function getAdminMedia(limit = 50): Promise<AdminMediaRecord[]> {
-  return request<AdminMediaRecord[]>(`/admin/media?limit=${limit}`);
+export async function getAdminMedia(
+  limit = 50,
+  options?: { orphansOnly?: boolean; olderThanHours?: number },
+): Promise<AdminMediaRecord[]> {
+  const params = new URLSearchParams();
+  params.set('limit', String(limit));
+  if (options?.orphansOnly) {
+    params.set('orphansOnly', 'true');
+  }
+  if (
+    typeof options?.olderThanHours === 'number' &&
+    Number.isFinite(options.olderThanHours) &&
+    options.olderThanHours > 0
+  ) {
+    params.set('olderThanHours', String(Math.floor(options.olderThanHours)));
+  }
+
+  return request<AdminMediaRecord[]>(`/admin/media?${params.toString()}`);
 }
 
 export async function deleteAdminMedia(id: string): Promise<{ success: boolean }> {
   return request<{ success: boolean }>(`/admin/media/${id}`, {
     method: 'DELETE',
+  });
+}
+
+export async function cleanupAdminOrphanMedia(options?: {
+  dryRun?: boolean;
+  limit?: number;
+  olderThanHours?: number;
+}): Promise<AdminMediaCleanupResult> {
+  const params = new URLSearchParams();
+
+  if (typeof options?.dryRun === 'boolean') {
+    params.set('dryRun', options.dryRun ? 'true' : 'false');
+  }
+  if (typeof options?.limit === 'number' && Number.isFinite(options.limit) && options.limit > 0) {
+    params.set('limit', String(Math.floor(options.limit)));
+  }
+  if (
+    typeof options?.olderThanHours === 'number' &&
+    Number.isFinite(options.olderThanHours) &&
+    options.olderThanHours > 0
+  ) {
+    params.set('olderThanHours', String(Math.floor(options.olderThanHours)));
+  }
+
+  const query = params.toString();
+  const path = query.length > 0
+    ? `/admin/media/cleanup-orphans?${query}`
+    : '/admin/media/cleanup-orphans';
+
+  return request<AdminMediaCleanupResult>(path, {
+    method: 'POST',
   });
 }
 

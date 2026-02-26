@@ -196,13 +196,36 @@ export class AdminController {
 
   @UseGuards(AdminAuthGuard)
   @Get('media')
-  listMedia(@Query('limit') limit?: string) {
-    return this.adminService.listMedia(limit);
+  listMedia(
+    @Query('limit') limit?: string,
+    @Query('orphansOnly') orphansOnly?: string,
+    @Query('olderThanHours') olderThanHours?: string,
+  ) {
+    return this.adminService.listMedia({
+      limitRaw: limit,
+      orphanOnlyRaw: orphansOnly,
+      olderThanHoursRaw: olderThanHours,
+    });
   }
 
   @UseGuards(AdminAuthGuard)
   @Delete('media/:id')
   removeMedia(@Param('id') id: string) {
     return this.adminService.removeMedia(id);
+  }
+
+  @UseGuards(AdminAuthGuard)
+  @HttpCode(HttpStatus.OK)
+  @Post('media/cleanup-orphans')
+  cleanupOrphanMedia(
+    @Query('limit') limit?: string,
+    @Query('olderThanHours') olderThanHours?: string,
+    @Query('dryRun') dryRun?: string,
+  ) {
+    return this.adminService.cleanupOrphanMedia({
+      limitRaw: limit,
+      olderThanHoursRaw: olderThanHours,
+      dryRunRaw: dryRun,
+    });
   }
 }
