@@ -363,12 +363,14 @@ export class AdminService {
 
   getAuthCookieOptions(expiresAt: Date): CookieOptions {
     const isProduction = process.env.NODE_ENV === 'production';
+    const domain = this.getAuthCookieDomain();
     return {
       httpOnly: true,
       sameSite: 'strict',
       secure: isProduction,
       path: '/',
       expires: expiresAt,
+      ...(domain ? { domain } : {}),
     };
   }
 
@@ -647,6 +649,58 @@ export class AdminService {
     const rawCookies = request.cookies as Record<string, unknown> | undefined;
     const token = rawCookies?.[ADMIN_AUTH_COOKIE];
     return typeof token === 'string' && token.length > 0 ? token : null;
+  }
+
+  private getAuthCookieDomain(): string | undefined {
+    const explicit = process.env.ADMIN_AUTH_COOKIE_DOMAIN;
+    const normalizedExplicit = this.normalizeCookieDomain(explicit);
+    if (normalizedExplicit) {
+      return normalizedExplicit;
+    }
+
+    const configuredFrontendOrigin = process.env.FRONTEND_ORIGIN
+      ?.split(',')[0]
+      ?.trim();
+    if (!configuredFrontendOrigin) {
+      return undefined;
+    }
+
+    try {
+      const host = new URL(configuredFrontendOrigin).hostname;
+      return this.normalizeCookieDomain(host);
+    } catch {
+      return undefined;
+    }
+  }
+
+  private normalizeCookieDomain(raw: string | undefined): string | undefined {
+    if (!raw || typeof raw !== 'string') {
+      return undefined;
+    }
+
+    let domain = raw.trim();
+    if (!domain) {
+      return undefined;
+    }
+
+    if (domain.startsWith('http://') || domain.startsWith('https://')) {
+      try {
+        domain = new URL(domain).hostname;
+      } catch {
+        return undefined;
+      }
+    }
+
+    domain = domain.replace(/:\d+$/, '').replace(/\.$/, '').trim();
+    if (!domain) {
+      return undefined;
+    }
+
+    if (domain === 'localhost' || /^[\d.]+$/.test(domain)) {
+      return undefined;
+    }
+
+    return domain.startsWith('.') ? domain : `.${domain}`;
   }
 
   private toStorageKey(filePath: string): string {
