@@ -26,7 +26,11 @@ WORKDIR /app
 
 COPY --from=builder /app/apps/web/.next ./apps/web/.next
 COPY --from=builder /app/apps/web/public ./apps/web/public
+COPY --from=builder /app/apps/web/messages ./apps/web/messages
+COPY --from=builder /app/apps/web/next.config.ts ./apps/web/next.config.ts
+COPY --from=builder /app/apps/web/next.config.mjs ./apps/web/next.config.mjs
 COPY --from=builder /app/apps/web/package.json ./apps/web/package.json
+COPY --from=builder /app/apps/web/node_modules ./apps/web/node_modules
 COPY --from=builder /app/node_modules ./node_modules
 
 ARG FRONTEND_PORT
