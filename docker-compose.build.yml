@@ -11,8 +11,6 @@ services:
       timeout: 3s
       retries: 20
       start_period: 10s
-    ports:
-      - "${DB_PORT}:3306"
     volumes:
       - mysql_data_prod:/var/lib/mysql
 
@@ -23,7 +21,7 @@ services:
       args:
         BACKEND_PORT: ${BACKEND_PORT}
     ports:
-      - "${BACKEND_PORT}:${BACKEND_PORT}"
+      - "127.0.0.1:${BACKEND_PORT}:${BACKEND_PORT}"
     environment:
       DATABASE_URL: "${DATABASE_URL}"
       BACKEND_PORT: "${BACKEND_PORT}"
@@ -36,10 +34,13 @@ services:
       ADMIN_SEED_EMAIL: "${ADMIN_SEED_EMAIL}"
       ADMIN_SEED_PASSWORD: "${ADMIN_SEED_PASSWORD}"
       NODE_ENV: "${NODE_ENV}"
+      TRUST_PROXY: "${TRUST_PROXY}"
     depends_on:
       db:
         condition: service_healthy
     restart: always
+    volumes:
+      - api_uploads:/app/uploads
 
   web:
     build:
@@ -48,13 +49,17 @@ services:
       args:
         FRONTEND_PORT: ${FRONTEND_PORT}
         BACKEND_PORT: ${BACKEND_PORT}
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
     ports:
-      - "${FRONTEND_PORT}:${FRONTEND_PORT}"
+      - "127.0.0.1:${FRONTEND_PORT}:${FRONTEND_PORT}"
     environment:
-      NEXT_PUBLIC_API_URL: "https://api.ultramed.az" # Change to actual domain
-      API_INTERNAL_URL: "http://api:${BACKEND_PORT}"
+      NEXT_PUBLIC_API_URL: "${NEXT_PUBLIC_API_URL}"
+      API_INTERNAL_URL: "${API_INTERNAL_URL}"
       FRONTEND_PORT: "${FRONTEND_PORT}"
+    depends_on:
+      - api
     restart: always
 
 volumes:
   mysql_data_prod:
+  api_uploads:

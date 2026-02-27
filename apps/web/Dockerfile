@@ -4,6 +4,9 @@ RUN npm install -g pnpm && apk add --no-cache openssl libc6-compat
 
 WORKDIR /app
 
+ARG NEXT_PUBLIC_API_URL
+ENV NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
+
 COPY pnpm-lock.yaml pnpm-workspace.yaml package.json ./
 COPY apps/web/package.json ./apps/web/
 COPY packages/database/package.json ./packages/database/
