@@ -30,12 +30,32 @@ function toPhoneHref(value: string): string | null {
     return `tel:${digits}`;
 }
 
+type ContactFormValues = {
+    firstName: string;
+    lastName: string;
+    email: string;
+    phone: string;
+    subject: string;
+    message: string;
+};
+
+type ContactFormErrors = Partial<Record<keyof ContactFormValues, string>>;
+
 export default function ContactPage() {
     const params = useParams<{ locale: string }>();
     const locale = params?.locale ?? 'az';
     const t = useTranslations('ContactPage');
 
     const [isSubmitted, setIsSubmitted] = useState(false);
+    const [formValues, setFormValues] = useState<ContactFormValues>({
+        firstName: '',
+        lastName: '',
+        email: '',
+        phone: '',
+        subject: '',
+        message: '',
+    });
+    const [formErrors, setFormErrors] = useState<ContactFormErrors>({});
     const [refreshKey, setRefreshKey] = useState(0);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -63,6 +83,18 @@ export default function ContactPage() {
         [t],
     );
     const [contactInfo, setContactInfo] = useState<ContactInfoResponse>(fallbackContact);
+
+    const fieldLabels = useMemo(
+        () => ({
+            firstName: t('firstNameLabel'),
+            lastName: t('lastNameLabel'),
+            email: t('emailFieldLabel'),
+            phone: t('phoneFieldLabel'),
+            subject: t('subjectLabel'),
+            message: t('messageLabel'),
+        }),
+        [t],
+    );
 
     useEffect(() => {
         let isCancelled = false;
@@ -101,10 +133,75 @@ export default function ContactPage() {
         };
     }, [fallbackContact, locale, refreshKey, t]);
 
+    const handleFieldChange = (field: keyof ContactFormValues, value: string) => {
+        const nextValue = field === 'phone' ? value.replace(/\D+/g, '') : value;
+
+        setFormValues((prev) => ({
+            ...prev,
+            [field]: nextValue,
+        }));
+        setFormErrors((prev) => {
+            if (!prev[field]) {
+                return prev;
+            }
+
+            const nextErrors = { ...prev };
+            delete nextErrors[field];
+            return nextErrors;
+        });
+        if (isSubmitted) {
+            setIsSubmitted(false);
+        }
+    };
+
+    const validateForm = () => {
+        const errors: ContactFormErrors = {};
+        const trimmedValues = {
+            firstName: formValues.firstName.trim(),
+            lastName: formValues.lastName.trim(),
+            email: formValues.email.trim(),
+            phone: formValues.phone.trim(),
+            subject: formValues.subject.trim(),
+            message: formValues.message.trim(),
+        };
+
+        (Object.keys(trimmedValues) as (keyof ContactFormValues)[]).forEach((field) => {
+            if (!trimmedValues[field]) {
+                errors[field] = t('validation.requiredField', { field: fieldLabels[field] });
+            }
+        });
+
+        if (trimmedValues.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedValues.email)) {
+            errors.email = t('validation.invalidEmail');
+        }
+
+        if (trimmedValues.phone && !/^\d+$/.test(trimmedValues.phone)) {
+            errors.phone = t('validation.phoneDigitsOnly');
+        }
+
+        return errors;
+    };
+
     const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+
+        const errors = validateForm();
+        if (Object.keys(errors).length > 0) {
+            setFormErrors(errors);
+            setIsSubmitted(false);
+            return;
+        }
+
+        setFormErrors({});
         setIsSubmitted(true);
-        e.currentTarget.reset();
+        setFormValues({
+            firstName: '',
+            lastName: '',
+            email: '',
+            phone: '',
+            subject: '',
+            message: '',
+        });
     };
 
     if (isUnavailable) {
@@ -300,43 +397,89 @@ export default function ContactPage() {
                                         </div>
                                     )}
 
-                                    <form onSubmit={handleFormSubmit} className="space-y-6">
+                                    <form onSubmit={handleFormSubmit} noValidate className="space-y-6">
                                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                                             <div className="space-y-2">
                                                 <Label htmlFor="firstName" className="text-slate-700">{t('firstNameLabel')}</Label>
-                                                <Input id="firstName" placeholder={t('firstNamePlaceholder')} required className="h-12 bg-slate-50 border-slate-200 focus-visible:ring-brand-blue" />
+                                                <Input
+                                                    id="firstName"
+                                                    value={formValues.firstName}
+                                                    onChange={(event) => handleFieldChange('firstName', event.target.value)}
+                                                    placeholder={t('firstNamePlaceholder')}
+                                                    aria-invalid={Boolean(formErrors.firstName)}
+                                                    className={`h-12 bg-slate-50 focus-visible:ring-brand-blue ${formErrors.firstName ? 'border-red-500 focus-visible:ring-red-500' : 'border-slate-200'}`}
+                                                />
+                                                {formErrors.firstName && <p className="text-sm text-red-600">{formErrors.firstName}</p>}
                                             </div>
                                             <div className="space-y-2">
                                                 <Label htmlFor="lastName" className="text-slate-700">{t('lastNameLabel')}</Label>
-                                                <Input id="lastName" placeholder={t('lastNamePlaceholder')} required className="h-12 bg-slate-50 border-slate-200 focus-visible:ring-brand-blue" />
+                                                <Input
+                                                    id="lastName"
+                                                    value={formValues.lastName}
+                                                    onChange={(event) => handleFieldChange('lastName', event.target.value)}
+                                                    placeholder={t('lastNamePlaceholder')}
+                                                    aria-invalid={Boolean(formErrors.lastName)}
+                                                    className={`h-12 bg-slate-50 focus-visible:ring-brand-blue ${formErrors.lastName ? 'border-red-500 focus-visible:ring-red-500' : 'border-slate-200'}`}
+                                                />
+                                                {formErrors.lastName && <p className="text-sm text-red-600">{formErrors.lastName}</p>}
                                             </div>
                                         </div>
 
                                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                                             <div className="space-y-2">
                                                 <Label htmlFor="email" className="text-slate-700">{t('emailFieldLabel')}</Label>
-                                                <Input id="email" type="email" placeholder={t('emailFieldPlaceholder')} required className="h-12 bg-slate-50 border-slate-200 focus-visible:ring-brand-blue" />
+                                                <Input
+                                                    id="email"
+                                                    type="email"
+                                                    value={formValues.email}
+                                                    onChange={(event) => handleFieldChange('email', event.target.value)}
+                                                    placeholder={t('emailFieldPlaceholder')}
+                                                    aria-invalid={Boolean(formErrors.email)}
+                                                    className={`h-12 bg-slate-50 focus-visible:ring-brand-blue ${formErrors.email ? 'border-red-500 focus-visible:ring-red-500' : 'border-slate-200'}`}
+                                                />
+                                                {formErrors.email && <p className="text-sm text-red-600">{formErrors.email}</p>}
                                             </div>
                                             <div className="space-y-2">
                                                 <Label htmlFor="phone" className="text-slate-700">{t('phoneFieldLabel')}</Label>
-                                                <Input id="phone" type="tel" placeholder={t('phoneFieldPlaceholder')} className="h-12 bg-slate-50 border-slate-200 focus-visible:ring-brand-blue" />
+                                                <Input
+                                                    id="phone"
+                                                    type="tel"
+                                                    inputMode="numeric"
+                                                    value={formValues.phone}
+                                                    onChange={(event) => handleFieldChange('phone', event.target.value)}
+                                                    placeholder={t('phoneFieldPlaceholder')}
+                                                    aria-invalid={Boolean(formErrors.phone)}
+                                                    className={`h-12 bg-slate-50 focus-visible:ring-brand-blue ${formErrors.phone ? 'border-red-500 focus-visible:ring-red-500' : 'border-slate-200'}`}
+                                                />
+                                                {formErrors.phone && <p className="text-sm text-red-600">{formErrors.phone}</p>}
                                             </div>
                                         </div>
 
                                         <div className="space-y-2">
                                             <Label htmlFor="subject" className="text-slate-700">{t('subjectLabel')}</Label>
-                                            <Input id="subject" placeholder={t('subjectPlaceholder')} required className="h-12 bg-slate-50 border-slate-200 focus-visible:ring-brand-blue" />
+                                            <Input
+                                                id="subject"
+                                                value={formValues.subject}
+                                                onChange={(event) => handleFieldChange('subject', event.target.value)}
+                                                placeholder={t('subjectPlaceholder')}
+                                                aria-invalid={Boolean(formErrors.subject)}
+                                                className={`h-12 bg-slate-50 focus-visible:ring-brand-blue ${formErrors.subject ? 'border-red-500 focus-visible:ring-red-500' : 'border-slate-200'}`}
+                                            />
+                                            {formErrors.subject && <p className="text-sm text-red-600">{formErrors.subject}</p>}
                                         </div>
 
                                         <div className="space-y-2">
                                             <Label htmlFor="message" className="text-slate-700">{t('messageLabel')}</Label>
                                             <Textarea
                                                 id="message"
+                                                value={formValues.message}
+                                                onChange={(event) => handleFieldChange('message', event.target.value)}
                                                 placeholder={t('messagePlaceholder')}
                                                 rows={5}
-                                                required
-                                                className="bg-slate-50 border-slate-200 focus-visible:ring-brand-blue resize-none"
+                                                aria-invalid={Boolean(formErrors.message)}
+                                                className={`bg-slate-50 focus-visible:ring-brand-blue resize-none ${formErrors.message ? 'border-red-500 focus-visible:ring-red-500' : 'border-slate-200'}`}
                                             />
+                                            {formErrors.message && <p className="text-sm text-red-600">{formErrors.message}</p>}
                                         </div>
 
                                         <Button type="submit" className="w-full h-14 bg-brand-orange hover:bg-brand-orange-dark text-white font-medium text-lg rounded-xl">

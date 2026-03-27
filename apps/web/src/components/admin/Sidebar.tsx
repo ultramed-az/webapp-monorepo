@@ -1,7 +1,7 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-import { Link, usePathname, useRouter } from '@/i18n/routing';
+import { Link, usePathname } from '@/i18n/routing';
 import Image from 'next/image';
 import {
     LayoutDashboard,
@@ -14,10 +14,8 @@ import {
     HelpCircle,
     Shield,
     ScrollText,
-    LogOut,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { logoutAdmin } from '@/lib/admin-api';
 
 type SidebarProps = {
     mobile?: boolean;
@@ -27,17 +25,6 @@ type SidebarProps = {
 export default function Sidebar({ mobile = false, onNavigate }: SidebarProps) {
     const t = useTranslations('Admin');
     const pathname = usePathname();
-    const router = useRouter();
-
-    const handleLogout = async () => {
-        try {
-            await logoutAdmin();
-        } finally {
-            onNavigate?.();
-            router.push('/admin/login');
-            router.refresh();
-        }
-    };
 
     const menuItems = [
         { icon: <LayoutDashboard className="w-5 h-5" />, label: t('dashboard', { default: 'Dashboard' }), href: '/admin/dashboard' },
@@ -62,7 +49,7 @@ export default function Sidebar({ mobile = false, onNavigate }: SidebarProps) {
             )}
         >
             <div className="h-16 flex items-center px-6 border-b border-white/15">
-                <Link href="/admin/dashboard" className="flex items-center gap-3" onClick={onNavigate}>
+                <Link href="/admin/dashboard" className="flex items-center" onClick={onNavigate}>
                     <Image
                         src="/logo.png"
                         alt="Ultramed"
@@ -70,9 +57,6 @@ export default function Sidebar({ mobile = false, onNavigate }: SidebarProps) {
                         height={38}
                         className="h-8 w-auto"
                     />
-                    <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-brand-orange text-white">
-                        Admin
-                    </span>
                 </Link>
             </div>
 
@@ -104,17 +88,6 @@ export default function Sidebar({ mobile = false, onNavigate }: SidebarProps) {
                         </Link>
                     ))}
                 </nav>
-            </div>
-
-            <div className="p-4 border-t border-white/15">
-                <button
-                    className="flex items-center gap-3 px-3 py-2.5 rounded-lg w-full text-white/70 hover:bg-brand-blue hover:text-brand-orange transition-colors group"
-                    onClick={handleLogout}
-                    type="button"
-                >
-                    <LogOut className="w-5 h-5" />
-                    <span className="font-medium text-sm">{t('logout', { default: 'Logout' })}</span>
-                </button>
             </div>
         </aside>
     );

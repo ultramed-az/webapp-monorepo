@@ -98,7 +98,12 @@ export default function Footer() {
                                 <Facebook className="h-5 w-5" />
                                 <span className="sr-only">{t('social.facebook')}</span>
                             </a>
-                            <a href="#" className="text-slate-200 hover:text-brand-orange transition-colors">
+                            <a
+                                href="https://www.instagram.com/ultramed_clinic"
+                                target="_blank"
+                                rel="noreferrer"
+                                className="text-slate-200 hover:text-brand-orange transition-colors"
+                            >
                                 <Instagram className="h-5 w-5" />
                                 <span className="sr-only">{t('social.instagram')}</span>
                             </a>

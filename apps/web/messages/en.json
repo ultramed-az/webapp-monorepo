@@ -86,7 +86,14 @@
     "logoutAll": "Logout all sessions",
     "search": "Search...",
     "openMenu": "Open menu",
-    "profile": "Profile"
+    "profile": "Profile",
+    "notifications": "Notifications",
+    "notificationsDescription": "Recent updates and helpful reminders appear here.",
+    "notificationsEmpty": "There are no new notifications right now.",
+    "notificationSecurityTitle": "Session security is active",
+    "notificationSecurityDescription": "You can end all active sessions from the profile menu at any time.",
+    "notificationMediaTitle": "Media management is enabled",
+    "notificationMediaDescription": "Uploaded images and files can be reviewed from the Media section."
   },
   "AboutPage": {
     "heroTitle": "Who Are We?",
@@ -243,7 +250,7 @@
     "emailFieldLabel": "Email Address",
     "emailFieldPlaceholder": "Enter your email",
     "phoneFieldLabel": "Phone Number",
-    "phoneFieldPlaceholder": "+994",
+    "phoneFieldPlaceholder": "0550702235856",
     "subjectLabel": "Subject",
     "subjectPlaceholder": "Subject of your request",
     "messageLabel": "Your Message",
@@ -257,7 +264,12 @@
       "workDayLabel": "Mon - Fri",
       "saturdayLabel": "Saturday"
     },
-    "mapTitle": "Clinic map"
+    "mapTitle": "Clinic map",
+    "validation": {
+      "requiredField": "{field} field is required.",
+      "invalidEmail": "Please enter a valid email address.",
+      "phoneDigitsOnly": "Phone number must contain digits only."
+    }
   },
   "GalleryPage": {
     "title": "Gallery",

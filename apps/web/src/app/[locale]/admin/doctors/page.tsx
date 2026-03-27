@@ -392,7 +392,7 @@ export default function DoctorsPage() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h2 className="text-2xl font-bold tracking-tight text-slate-900">Həkimlər</h2>
-          <p className="text-slate-500">Həkimlər backend CRUD ilə idarə olunur.</p>
+          <p className="text-slate-500">Həkim profillərinin idarə edilməsi.</p>
         </div>
         <Button
           className="bg-brand-orange hover:bg-brand-orange-dark text-white shadow-sm flex items-center gap-2"

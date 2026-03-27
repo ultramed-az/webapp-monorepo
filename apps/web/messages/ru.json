@@ -86,7 +86,14 @@
     "logoutAll": "Выйти из всех сессий",
     "search": "Поиск...",
     "openMenu": "Открыть меню",
-    "profile": "Профиль"
+    "profile": "Профиль",
+    "notifications": "Уведомления",
+    "notificationsDescription": "Здесь отображаются последние обновления и полезные напоминания.",
+    "notificationsEmpty": "Сейчас новых уведомлений нет.",
+    "notificationSecurityTitle": "Защита сессий активна",
+    "notificationSecurityDescription": "Вы можете завершить все активные сессии через меню профиля в любой момент.",
+    "notificationMediaTitle": "Управление медиа активно",
+    "notificationMediaDescription": "Загруженные изображения и файлы можно просматривать в разделе Media."
   },
   "AboutPage": {
     "heroTitle": "Кто мы?",
@@ -243,7 +250,7 @@
     "emailFieldLabel": "Адрес эл. почты",
     "emailFieldPlaceholder": "Введите эл. почту",
     "phoneFieldLabel": "Номер телефона",
-    "phoneFieldPlaceholder": "+994",
+    "phoneFieldPlaceholder": "0550702235856",
     "subjectLabel": "Тема",
     "subjectPlaceholder": "Тема обращения",
     "messageLabel": "Сообщение",
@@ -257,7 +264,12 @@
       "workDayLabel": "Пн - Пт",
       "saturdayLabel": "Суббота"
     },
-    "mapTitle": "Карта клиники"
+    "mapTitle": "Карта клиники",
+    "validation": {
+      "requiredField": "Поле «{field}» обязательно для заполнения.",
+      "invalidEmail": "Введите корректный адрес электронной почты.",
+      "phoneDigitsOnly": "Номер телефона должен содержать только цифры."
+    }
   },
   "GalleryPage": {
     "title": "Галерея",

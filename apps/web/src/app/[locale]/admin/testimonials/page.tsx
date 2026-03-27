@@ -181,7 +181,7 @@ export default function AdminTestimonialsPage() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h2 className="text-2xl font-bold tracking-tight text-slate-900">Rəylər İdarəetməsi</h2>
-          <p className="text-slate-500">Pasiyent rəyləri backend CRUD ilə idarə olunur.</p>
+          <p className="text-slate-500">Pasiyent rəylərinin idarə edilməsi.</p>
         </div>
         <Button
           className="bg-brand-orange hover:bg-brand-orange-dark text-white"

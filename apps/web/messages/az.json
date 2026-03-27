@@ -33,7 +33,7 @@
     "blog": "Bloq",
     "gallery": "Qalereya",
     "testimonials": "Rəylər",
-    "faq": "Mualicə",
+    "faq": "Sual-Cavab",
     "contact": "Əlaqə",
     "callUs": "Zəng edin:",
     "addressLine": "Bakı şəhəri, Heydər Əliyev pr. 125",
@@ -86,7 +86,14 @@
     "logoutAll": "Bütün sessiyalardan çıxış",
     "search": "Axtar...",
     "openMenu": "Menyunu aç",
-    "profile": "Profil"
+    "profile": "Profil",
+    "notifications": "Bildirişlər",
+    "notificationsDescription": "Son yeniləmələr və faydalı xatırlatmalar burada görünür.",
+    "notificationsEmpty": "Hazırda yeni bildiriş yoxdur.",
+    "notificationSecurityTitle": "Sessiya təhlükəsizliyi aktivdir",
+    "notificationSecurityDescription": "Profil menyusundan bütün aktiv sessiyaları istənilən vaxt sonlandıra bilərsiniz.",
+    "notificationMediaTitle": "Media idarəetməsi aktivdir",
+    "notificationMediaDescription": "Yüklənən şəkil və faylları Media bölməsindən izləyə bilərsiniz."
   },
   "AboutPage": {
     "heroTitle": "Biz Kimik?",
@@ -243,7 +250,7 @@
     "emailFieldLabel": "E-poçt Ünvanı",
     "emailFieldPlaceholder": "E-poçtunuzu daxil edin",
     "phoneFieldLabel": "Telefon Nömrəsi",
-    "phoneFieldPlaceholder": "+994",
+    "phoneFieldPlaceholder": "0550702235856",
     "subjectLabel": "Mövzu",
     "subjectPlaceholder": "Müraciətinizin mövzusu",
     "messageLabel": "Mesajınız",
@@ -257,7 +264,12 @@
       "workDayLabel": "Bazar ertəsi - Cümə",
       "saturdayLabel": "Şənbə"
     },
-    "mapTitle": "Klinikanın xəritəsi"
+    "mapTitle": "Klinikanın xəritəsi",
+    "validation": {
+      "requiredField": "{field} sahəsi mütləqdir.",
+      "invalidEmail": "Düzgün e-poçt ünvanı daxil edin.",
+      "phoneDigitsOnly": "Telefon nömrəsi yalnız rəqəmlərdən ibarət olmalıdır."
+    }
   },
   "GalleryPage": {
     "title": "Qalereya",

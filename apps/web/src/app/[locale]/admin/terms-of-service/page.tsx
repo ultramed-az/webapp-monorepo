@@ -140,7 +140,7 @@ export default function AdminTermsPage() {
     <div className="space-y-6">
       <div>
         <h2 className="text-2xl font-bold tracking-tight text-slate-900">İstifadə Şərtləri (Admin)</h2>
-        <p className="text-slate-500">ContentPage (`terms-of-service`) backend CRUD ilə redaktə edilir.</p>
+        <p className="text-slate-500">İstifadə şərtləri məzmununun idarə edilməsi.</p>
       </div>
 
       {errorMessage ? (

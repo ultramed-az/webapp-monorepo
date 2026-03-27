@@ -310,7 +310,7 @@ export default function BlogPage() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h2 className="text-2xl font-bold tracking-tight text-slate-900">Bloq İdarəetməsi</h2>
-          <p className="text-slate-500">Məqalələr backend CRUD ilə idarə olunur.</p>
+          <p className="text-slate-500">Bloq məqalələrinin idarə edilməsi.</p>
         </div>
         <Button
           className="bg-brand-orange hover:bg-brand-orange-dark text-white shadow-sm flex items-center gap-2"

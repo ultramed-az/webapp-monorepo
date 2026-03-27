@@ -141,7 +141,7 @@ export default function AdminPrivacyPolicyPage() {
     <div className="space-y-6">
       <div>
         <h2 className="text-2xl font-bold tracking-tight text-slate-900">Məxfilik Siyasəti (Admin)</h2>
-        <p className="text-slate-500">ContentPage (`privacy-policy`) real backend datası ilə redaktə olunur.</p>
+        <p className="text-slate-500">Məxfilik siyasəti məzmununun idarə edilməsi.</p>
       </div>
 
       {errorMessage ? (

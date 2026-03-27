@@ -235,7 +235,7 @@ export default function AdminGalleryPage() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h2 className="text-2xl font-bold tracking-tight text-slate-900">Qalereya İdarəetməsi</h2>
-          <p className="text-slate-500">Qalereya backend CRUD və media upload ilə idarə olunur.</p>
+          <p className="text-slate-500">Qalereya şəkillərinin və media fayllarının idarə edilməsi.</p>
         </div>
         <Button
           className="bg-brand-orange hover:bg-brand-orange-dark text-white"

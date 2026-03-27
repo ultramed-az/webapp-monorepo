@@ -140,6 +140,18 @@ export default function ServicesPage() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
+  useEffect(() => {
+    if (!successMessage) {
+      return;
+    }
+
+    const timeoutId = window.setTimeout(() => {
+      setSuccessMessage(null);
+    }, 4000);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [successMessage]);
+
   const filteredItems = useMemo(() => {
     const needle = searchTerm.trim().toLowerCase();
     if (!needle) {
@@ -325,7 +337,7 @@ export default function ServicesPage() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h2 className="text-2xl font-bold tracking-tight text-slate-900">Xidmətlər (Şöbələr)</h2>
-          <p className="text-slate-500">Xidmətləri backend CRUD ilə idarə edin.</p>
+          <p className="text-slate-500">Xidmətlərin idarə edilməsi və sıralanması.</p>
         </div>
         <Button
           className="bg-brand-orange hover:bg-brand-orange-dark text-white shadow-sm flex items-center gap-2"
@@ -378,7 +390,6 @@ export default function ServicesPage() {
               <Table>
                 <TableHeader className="bg-slate-50">
                   <TableRow>
-                    <TableHead>ID</TableHead>
                     <TableHead>Ad (AZ)</TableHead>
                     <TableHead>Ad (EN)</TableHead>
                     <TableHead>Status</TableHead>
@@ -389,7 +400,6 @@ export default function ServicesPage() {
                 <TableBody>
                   {filteredItems.map((item) => (
                     <TableRow key={item.id}>
-                      <TableCell className="font-mono text-xs text-slate-500">{item.id.slice(0, 8)}</TableCell>
                       <TableCell className="font-semibold text-slate-900">{item.titleAz}</TableCell>
                       <TableCell className="text-slate-600">{item.titleEn}</TableCell>
                       <TableCell>
