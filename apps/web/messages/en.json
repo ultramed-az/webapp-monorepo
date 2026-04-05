@@ -133,24 +133,19 @@
       "description": "Years of continuous growth and innovation have built strong clinical expertise.",
       "items": [
         {
-          "year": "2010",
-          "title": "Clinic Foundation",
-          "description": "Ultramed started as a small outpatient clinic in Baku."
+          "year": "2008",
+          "title": "Clinic operations begin",
+          "description": "Ultramed Clinic started operating at 47 Mahammad Hadi Street in Khatai district and delivered its first medical services to patients."
         },
         {
-          "year": "2015",
-          "title": "Inpatient Department Launch",
-          "description": "A 50-bed inpatient unit and surgical block were opened to meet growing demand."
+          "year": "2024 (October)",
+          "title": "Modern service at a new address",
+          "description": "Our clinic moved to its new building at 55 Nasiraddin Tusi Street, offering a larger space renovated in an aesthetic style and equipped with modern medical technology."
         },
         {
-          "year": "2018",
-          "title": "International Accreditation",
-          "description": "Our quality of care was recognized in line with JCI-level standards."
-        },
-        {
-          "year": "2023",
-          "title": "Innovative Diagnostics Center",
-          "description": "High-frequency MRI and a modern genetics lab were deployed in the region."
+          "year": "Today",
+          "title": "Professional team and continuous growth",
+          "description": "With our doctors who bring deep scientific knowledge and a long path of experience, along with our skilled medical staff, we continue to stand guard over your health every day."
         }
       ]
     },

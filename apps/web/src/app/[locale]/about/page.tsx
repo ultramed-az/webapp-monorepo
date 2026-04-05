@@ -43,11 +43,6 @@ export default function AboutPage() {
             title: t('timeline.items.2.title'),
             desc: t('timeline.items.2.description'),
         },
-        {
-            year: t('timeline.items.3.year'),
-            title: t('timeline.items.3.title'),
-            desc: t('timeline.items.3.description'),
-        },
     ];
 
     return (

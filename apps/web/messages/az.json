@@ -133,24 +133,19 @@
       "description": "İllərlə davam edən inkişaf və innovasiyalar güclü klinik təcrübəmizi formalaşdırıb.",
       "items": [
         {
-          "year": "2010",
-          "title": "Klinikanın Yaradılması",
-          "description": "Ultramed Bakıda kiçik bir ambulator klinika kimi fəaliyyətə başladı."
+          "year": "2008",
+          "title": "Klinikanın fəaliyyətə başlaması",
+          "description": "\"Ultramed\" klinikası Xətai rayonu, Məhəmməd Hadi 47 ünvanında fəaliyyətə başlayaraq pasiyentlərə ilk tibbi xidmətlərini təqdim etdi."
         },
         {
-          "year": "2015",
-          "title": "Stasionar Şöbənin Açılışı",
-          "description": "Artan tələbatı qarşılamaq üçün 50 çarpayılıq stasionar blok və cərrahi bölmə istifadəyə verildi."
+          "year": "2024 (Oktyabr)",
+          "title": "Yeni ünvanda müasir xidmət",
+          "description": "Klinikamız daha geniş, estetik üslubda təmir olunmuş və müasir texnoloji tibbi avadanlıqlarla təchiz edilmiş Nəsirəddin Tusi 55 ünvanındakı yeni binasına köçdü."
         },
         {
-          "year": "2018",
-          "title": "Beynəlxalq Akkreditasiya",
-          "description": "Göstərdiyimiz xidmətin keyfiyyəti JCI səviyyəli standartlara uyğun olaraq tanındı."
-        },
-        {
-          "year": "2023",
-          "title": "İnnovativ Diaqnostika Mərkəzi",
-          "description": "Regionda yüksək tezlikli MRT və müasir genetika laboratoriyası istifadəyə verildi."
+          "year": "Bu gün",
+          "title": "Peşəkar komanda və inkişaf",
+          "description": "Dərin elmi biliklərə və uzun təcrübə yoluna malik həkim komandamız və təcrübəli tibbi personalımızla hər zaman sağlamlığınızın keşiyindəyik."
         }
       ]
     },
