@@ -921,6 +921,7 @@ export default function DoctorsPage() {
       <ImageCropDialog
         open={cropperOpen}
         file={pendingImageFile}
+        aspect={1}
         onOpenChange={(open) => {
           setCropperOpen(open);
           if (!open) {

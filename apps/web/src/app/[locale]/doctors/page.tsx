@@ -237,8 +237,13 @@ export default function DoctorsPage() {
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                             {Array.from({ length: 6 }).map((_, index) => (
                                 <Card key={index} className="overflow-hidden border-slate-100 bg-white rounded-2xl">
-                                    <Skeleton className="aspect-[4/3] w-full rounded-none" />
-                                    <CardContent className="space-y-3 pt-6">
+                                    <CardContent className="space-y-3 pt-8">
+                                        <div className="flex justify-center">
+                                            <Skeleton className="h-32 w-32 rounded-full" />
+                                        </div>
+                                        <div className="flex justify-center">
+                                            <Skeleton className="h-6 w-32 rounded-full" />
+                                        </div>
                                         <Skeleton className="h-4 w-2/3" />
                                         <Skeleton className="h-4 w-1/2" />
                                         <Skeleton className="h-4 w-full" />
@@ -284,23 +289,25 @@ export default function DoctorsPage() {
                                 const imageSrc = doctor.image || '/logo.png';
                                 return (
                                 <Card key={doctor.id} className="overflow-hidden border-slate-100 hover:shadow-xl transition-all duration-300 group flex flex-col bg-white rounded-2xl">
-                                    <div className="aspect-[4/3] bg-slate-100 relative overflow-hidden">
-                                        <Image
-                                            src={imageSrc}
-                                            alt={doctor.name}
-                                            fill
-                                            unoptimized={shouldBypassImageOptimization(imageSrc)}
-                                            className="object-cover object-top group-hover:scale-105 transition-transform duration-500"
-                                        />
-                                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
-                                        <div className="absolute max-w-full bottom-0 left-0 p-6 w-full">
-                                            <div className="inline-block bg-brand-blue text-white text-xs font-semibold px-2 py-1 rounded mb-2">
+                                    <CardContent className="pt-8 pb-2 px-6 flex-grow">
+                                        <div className="flex flex-col items-center text-center">
+                                            <div className="relative flex h-32 w-32 items-center justify-center overflow-hidden rounded-full bg-slate-100 ring-4 ring-brand-blue-soft shadow-sm">
+                                                <Image
+                                                    src={imageSrc}
+                                                    alt={doctor.name}
+                                                    fill
+                                                    unoptimized={shouldBypassImageOptimization(imageSrc)}
+                                                    className="object-cover object-center group-hover:scale-105 transition-transform duration-500"
+                                                />
+                                            </div>
+                                            <div className="mt-5 inline-flex rounded-full bg-brand-blue-soft px-3 py-1 text-xs font-semibold text-brand-blue">
                                                 {doctor.specialty}
                                             </div>
-                                            <h3 className="text-xl font-bold text-white truncate max-w-full block" title={doctor.name}>{doctor.name}</h3>
+                                            <h3 className="mt-4 text-xl font-bold text-slate-900 truncate max-w-full block" title={doctor.name}>
+                                                {doctor.name}
+                                            </h3>
                                         </div>
-                                    </div>
-                                    <CardContent className="pt-6 pb-2 px-6 flex-grow">
+
                                         <ul className="space-y-3">
                                             <li className="flex items-start">
                                                 <UserRound className="w-5 h-5 text-brand-blue mr-3 mt-0.5 shrink-0" />
@@ -345,33 +352,10 @@ export default function DoctorsPage() {
 
             <Dialog open={isProfileModalOpen} onOpenChange={handleProfileModalChange}>
                 <DialogContent className="sm:max-w-3xl max-h-[88vh] overflow-y-auto p-0 gap-0">
-                    {(selectedDoctorDetail || selectedDoctor) && (
-                        <div className="relative h-64 w-full bg-slate-100">
-                            <Image
-                                src={selectedDoctorImageSrc}
-                                alt={selectedDoctorDetail?.name ?? selectedDoctor?.name ?? t('doctorAlt')}
-                                fill
-                                unoptimized={shouldBypassImageOptimization(selectedDoctorImageSrc)}
-                                className="object-cover object-top"
-                            />
-                            <div className="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-slate-900/25 to-transparent"></div>
-                            <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
-                                <p className="text-sm uppercase tracking-[0.2em] text-white/80 mb-2">
-                                    {selectedDoctorDetail?.specialty ?? selectedDoctor?.specialty}
-                                </p>
-                                <h2 className="text-3xl font-extrabold tracking-tight">
-                                    {selectedDoctorDetail?.name ?? selectedDoctor?.name}
-                                </h2>
-                            </div>
-                        </div>
-                    )}
-
                     <div className="p-6 space-y-6">
-                        <DialogHeader className="space-y-2">
-                            <DialogTitle className="text-2xl text-slate-900">{t('modalTitle')}</DialogTitle>
-                            <DialogDescription className="text-base text-slate-600 whitespace-pre-line leading-8">
-                                {formattedBio || t('modalFallback')}
-                            </DialogDescription>
+                        <DialogHeader className="sr-only">
+                            <DialogTitle>{selectedDoctorDetail?.name ?? selectedDoctor?.name ?? t('modalTitle')}</DialogTitle>
+                            <DialogDescription>{formattedBio || t('modalFallback')}</DialogDescription>
                         </DialogHeader>
 
                         {isProfileLoading ? (
@@ -393,6 +377,29 @@ export default function DoctorsPage() {
                             </div>
                         ) : selectedDoctorDetail ? (
                             <div className="space-y-6">
+                                <div className="rounded-3xl border border-slate-100 bg-slate-50 px-6 py-8">
+                                    <div className="flex flex-col items-center text-center">
+                                        <div className="relative h-36 w-36 overflow-hidden rounded-full bg-slate-100 ring-4 ring-brand-blue-soft shadow-md">
+                                            <Image
+                                                src={selectedDoctorImageSrc}
+                                                alt={selectedDoctorDetail?.name ?? selectedDoctor?.name ?? t('doctorAlt')}
+                                                fill
+                                                unoptimized={shouldBypassImageOptimization(selectedDoctorImageSrc)}
+                                                className="object-cover object-center"
+                                            />
+                                        </div>
+                                        <div className="mt-5 inline-flex rounded-full bg-brand-blue-soft px-3 py-1 text-xs font-semibold text-brand-blue">
+                                            {selectedDoctorDetail.specialty}
+                                        </div>
+                                        <h2 className="mt-4 text-3xl font-extrabold tracking-tight text-slate-900">
+                                            {selectedDoctorDetail.name}
+                                        </h2>
+                                        <p className="mt-4 max-w-2xl text-base text-slate-600 whitespace-pre-line leading-8">
+                                            {formattedBio || t('modalFallback')}
+                                        </p>
+                                    </div>
+                                </div>
+
                                 <p className="text-slate-700 leading-8 whitespace-pre-line">
                                     {formattedProfile}
                                 </p>
