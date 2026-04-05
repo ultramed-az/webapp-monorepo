@@ -83,6 +83,9 @@ export class DoctorsService {
       profile: this.pickLocalizedField(doctor, 'profile', locale) ?? '',
       experience: doctor.experience ?? '',
       education: this.pickLocalizedField(doctor, 'education', locale) ?? '',
+      educationDetails: this.buildEducationDetails(doctor, locale),
+      experienceDetails: this.buildExperienceDetails(doctor, locale),
+      certifications: this.buildCertificationDetails(doctor, locale),
       room: this.pickLocalizedField(doctor, 'room', locale) ?? '',
       schedule: this.pickLocalizedStringArray(doctor, 'schedule', locale),
       languages: this.pickLocalizedStringArray(doctor, 'languages', locale),
@@ -225,11 +228,28 @@ export class DoctorsService {
       educationAz: string | null;
       educationEn: string | null;
       educationRu: string | null;
+      educationDetailsAz: string | null;
+      educationDetailsEn: string | null;
+      educationDetailsRu: string | null;
+      experienceDetailsAz: string | null;
+      experienceDetailsEn: string | null;
+      experienceDetailsRu: string | null;
+      certificationsAz: string | null;
+      certificationsEn: string | null;
+      certificationsRu: string | null;
       roomAz: string | null;
       roomEn: string | null;
       roomRu: string | null;
     },
-    base: 'title' | 'bio' | 'education' | 'profile' | 'room',
+    base:
+      | 'title'
+      | 'bio'
+      | 'education'
+      | 'profile'
+      | 'room'
+      | 'educationDetails'
+      | 'experienceDetails'
+      | 'certifications',
     locale: 'az' | 'en' | 'ru',
   ): string | null {
     if (base === 'title') {
@@ -256,9 +276,149 @@ export class DoctorsService {
       return doctor.roomAz;
     }
 
+    if (base === 'educationDetails') {
+      if (locale === 'en') return doctor.educationDetailsEn;
+      if (locale === 'ru') return doctor.educationDetailsRu;
+      return doctor.educationDetailsAz;
+    }
+
+    if (base === 'experienceDetails') {
+      if (locale === 'en') return doctor.experienceDetailsEn;
+      if (locale === 'ru') return doctor.experienceDetailsRu;
+      return doctor.experienceDetailsAz;
+    }
+
+    if (base === 'certifications') {
+      if (locale === 'en') return doctor.certificationsEn;
+      if (locale === 'ru') return doctor.certificationsRu;
+      return doctor.certificationsAz;
+    }
+
     if (locale === 'en') return doctor.educationEn;
     if (locale === 'ru') return doctor.educationRu;
     return doctor.educationAz;
+  }
+
+  private buildEducationDetails(
+    doctor: {
+      educationAz: string | null;
+      educationEn: string | null;
+      educationRu: string | null;
+      educationDetailsAz: string | null;
+      educationDetailsEn: string | null;
+      educationDetailsRu: string | null;
+    },
+    locale: 'az' | 'en' | 'ru',
+  ): string[] {
+    const detailed = this.pickLocalizedOptionalString(
+      locale,
+      doctor.educationDetailsAz,
+      doctor.educationDetailsEn,
+      doctor.educationDetailsRu,
+    );
+    if (detailed) {
+      return this.splitTextToItems(detailed);
+    }
+
+    return this.splitTextToItems(
+      this.pickLocalizedOptionalString(
+        locale,
+        doctor.educationAz,
+        doctor.educationEn,
+        doctor.educationRu,
+      ) ?? '',
+    );
+  }
+
+  private buildExperienceDetails(
+    doctor: {
+      profileAz: string | null;
+      profileEn: string | null;
+      profileRu: string | null;
+      bioAz: string;
+      bioEn: string;
+      bioRu: string;
+      experienceDetailsAz: string | null;
+      experienceDetailsEn: string | null;
+      experienceDetailsRu: string | null;
+      experience: string | null;
+    },
+    locale: 'az' | 'en' | 'ru',
+  ): string[] {
+    const detailed = this.pickLocalizedOptionalString(
+      locale,
+      doctor.experienceDetailsAz,
+      doctor.experienceDetailsEn,
+      doctor.experienceDetailsRu,
+    );
+    if (detailed) {
+      return this.splitTextToItems(detailed);
+    }
+
+    return this.splitTextToItems(
+      this.pickLocalizedOptionalString(
+        locale,
+        doctor.profileAz,
+        doctor.profileEn,
+        doctor.profileRu,
+      ) ??
+        this.pickLocalizedOptionalString(
+          locale,
+          doctor.bioAz,
+          doctor.bioEn,
+          doctor.bioRu,
+        ) ??
+        doctor.experience ??
+        '',
+    );
+  }
+
+  private buildCertificationDetails(
+    doctor: {
+      certificationsAz: string | null;
+      certificationsEn: string | null;
+      certificationsRu: string | null;
+    },
+    locale: 'az' | 'en' | 'ru',
+  ): string[] {
+    return this.splitTextToItems(
+      this.pickLocalizedOptionalString(
+        locale,
+        doctor.certificationsAz,
+        doctor.certificationsEn,
+        doctor.certificationsRu,
+      ) ?? '',
+    );
+  }
+
+  private pickLocalizedOptionalString(
+    locale: 'az' | 'en' | 'ru',
+    az: string | null | undefined,
+    en: string | null | undefined,
+    ru: string | null | undefined,
+  ): string | null {
+    if (locale === 'en') {
+      return en ?? null;
+    }
+
+    if (locale === 'ru') {
+      return ru ?? null;
+    }
+
+    return az ?? null;
+  }
+
+  private splitTextToItems(value: string | null | undefined): string[] {
+    if (!value) {
+      return [];
+    }
+
+    return value
+      .replace(/\r/g, '')
+      .split('\n')
+      .flatMap((part) => part.split(/(?<=[.!?])\s+/))
+      .map((item) => item.replace(/^[-*•]\s*/, '').trim())
+      .filter((item) => item.length > 0);
   }
 
   private pickLocalizedStringArray(

@@ -19,6 +19,9 @@ export type DoctorDetailItem = {
     profile: string;
     experience: string;
     education: string;
+    educationDetails: string[];
+    experienceDetails: string[];
+    certifications: string[];
     room: string;
     schedule: string[];
     languages: string[];

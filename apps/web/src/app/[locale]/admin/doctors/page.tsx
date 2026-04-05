@@ -64,6 +64,15 @@ type FormState = {
   educationAz: string;
   educationEn: string;
   educationRu: string;
+  educationDetailsAz: string;
+  educationDetailsEn: string;
+  educationDetailsRu: string;
+  experienceDetailsAz: string;
+  experienceDetailsEn: string;
+  experienceDetailsRu: string;
+  certificationsAz: string;
+  certificationsEn: string;
+  certificationsRu: string;
   roomAz: string;
   roomEn: string;
   roomRu: string;
@@ -103,6 +112,15 @@ const EMPTY_FORM: FormState = {
   educationAz: '',
   educationEn: '',
   educationRu: '',
+  educationDetailsAz: '',
+  educationDetailsEn: '',
+  educationDetailsRu: '',
+  experienceDetailsAz: '',
+  experienceDetailsEn: '',
+  experienceDetailsRu: '',
+  certificationsAz: '',
+  certificationsEn: '',
+  certificationsRu: '',
   roomAz: '',
   roomEn: '',
   roomRu: '',
@@ -157,6 +175,15 @@ function toFormState(record: AdminDoctorRecord): FormState {
     educationAz: record.educationAz ?? '',
     educationEn: record.educationEn ?? '',
     educationRu: record.educationRu ?? '',
+    educationDetailsAz: record.educationDetailsAz ?? '',
+    educationDetailsEn: record.educationDetailsEn ?? '',
+    educationDetailsRu: record.educationDetailsRu ?? '',
+    experienceDetailsAz: record.experienceDetailsAz ?? '',
+    experienceDetailsEn: record.experienceDetailsEn ?? '',
+    experienceDetailsRu: record.experienceDetailsRu ?? '',
+    certificationsAz: record.certificationsAz ?? '',
+    certificationsEn: record.certificationsEn ?? '',
+    certificationsRu: record.certificationsRu ?? '',
     roomAz: record.roomAz ?? '',
     roomEn: record.roomEn ?? '',
     roomRu: record.roomRu ?? '',
@@ -346,6 +373,15 @@ export default function DoctorsPage() {
       educationAz: form.educationAz.trim() || null,
       educationEn: form.educationEn.trim() || null,
       educationRu: form.educationRu.trim() || null,
+      educationDetailsAz: form.educationDetailsAz.trim() || null,
+      educationDetailsEn: form.educationDetailsEn.trim() || null,
+      educationDetailsRu: form.educationDetailsRu.trim() || null,
+      experienceDetailsAz: form.experienceDetailsAz.trim() || null,
+      experienceDetailsEn: form.experienceDetailsEn.trim() || null,
+      experienceDetailsRu: form.experienceDetailsRu.trim() || null,
+      certificationsAz: form.certificationsAz.trim() || null,
+      certificationsEn: form.certificationsEn.trim() || null,
+      certificationsRu: form.certificationsRu.trim() || null,
       roomAz: form.roomAz.trim() || null,
       roomEn: form.roomEn.trim() || null,
       roomRu: form.roomRu.trim() || null,
@@ -614,6 +650,69 @@ export default function DoctorsPage() {
                   placeholder="Education RU"
                   value={form.educationRu}
                   onChange={(event) => setForm((prev) => ({ ...prev, educationRu: event.target.value }))}
+                />
+              </div>
+
+              <div className="grid gap-3 md:grid-cols-3">
+                <Textarea
+                  className="min-h-28"
+                  placeholder="Ətraflı təhsil məlumatı AZ (hər qeyd yeni sətirdən)"
+                  value={form.educationDetailsAz}
+                  onChange={(event) => setForm((prev) => ({ ...prev, educationDetailsAz: event.target.value }))}
+                />
+                <Textarea
+                  className="min-h-28"
+                  placeholder="Detailed education EN"
+                  value={form.educationDetailsEn}
+                  onChange={(event) => setForm((prev) => ({ ...prev, educationDetailsEn: event.target.value }))}
+                />
+                <Textarea
+                  className="min-h-28"
+                  placeholder="Подробное образование RU"
+                  value={form.educationDetailsRu}
+                  onChange={(event) => setForm((prev) => ({ ...prev, educationDetailsRu: event.target.value }))}
+                />
+              </div>
+
+              <div className="grid gap-3 md:grid-cols-3">
+                <Textarea
+                  className="min-h-28"
+                  placeholder="Ətraflı təcrübə AZ (hər qeyd yeni sətirdən)"
+                  value={form.experienceDetailsAz}
+                  onChange={(event) => setForm((prev) => ({ ...prev, experienceDetailsAz: event.target.value }))}
+                />
+                <Textarea
+                  className="min-h-28"
+                  placeholder="Detailed experience EN"
+                  value={form.experienceDetailsEn}
+                  onChange={(event) => setForm((prev) => ({ ...prev, experienceDetailsEn: event.target.value }))}
+                />
+                <Textarea
+                  className="min-h-28"
+                  placeholder="Подробный опыт RU"
+                  value={form.experienceDetailsRu}
+                  onChange={(event) => setForm((prev) => ({ ...prev, experienceDetailsRu: event.target.value }))}
+                />
+              </div>
+
+              <div className="grid gap-3 md:grid-cols-3">
+                <Textarea
+                  className="min-h-28"
+                  placeholder="Kurslar və sertifikatlar AZ (hər qeyd yeni sətirdən)"
+                  value={form.certificationsAz}
+                  onChange={(event) => setForm((prev) => ({ ...prev, certificationsAz: event.target.value }))}
+                />
+                <Textarea
+                  className="min-h-28"
+                  placeholder="Courses and certifications EN"
+                  value={form.certificationsEn}
+                  onChange={(event) => setForm((prev) => ({ ...prev, certificationsEn: event.target.value }))}
+                />
+                <Textarea
+                  className="min-h-28"
+                  placeholder="Курсы и сертификаты RU"
+                  value={form.certificationsRu}
+                  onChange={(event) => setForm((prev) => ({ ...prev, certificationsRu: event.target.value }))}
                 />
               </div>
 

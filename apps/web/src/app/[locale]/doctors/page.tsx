@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Calendar, HeartPulse, Languages, Mail, MapPin, Phone, Search, Stethoscope, UserRound } from 'lucide-react';
+import { Calendar, HeartPulse, Search, Stethoscope, UserRound } from 'lucide-react';
 import Image from 'next/image';
 import TemporaryUnavailable from '@/components/feedback/TemporaryUnavailable';
 import { getDoctorById, getDoctors, isBackendUnavailableError, type DoctorDetailItem, type DoctorListItem } from '@/lib/api';
@@ -20,6 +20,20 @@ function normalizeLocale(localeRaw: string | undefined): 'az' | 'en' | 'ru' {
         return localeRaw;
     }
     return 'az';
+}
+
+function formatReadableText(value: string | null | undefined): string {
+    if (!value) {
+        return '';
+    }
+
+    return value
+        .replace(/\r/g, '')
+        .split('\n')
+        .flatMap((part) => part.split(/(?<=[.!?])\s+/))
+        .map((part) => part.trim())
+        .filter((part) => part.length > 0)
+        .join('\n');
 }
 
 export default function DoctorsPage() {
@@ -39,6 +53,7 @@ export default function DoctorsPage() {
     const [doctorDetailsById, setDoctorDetailsById] = useState<Record<string, DoctorDetailItem>>({});
     const [isProfileLoading, setIsProfileLoading] = useState(false);
     const [profileError, setProfileError] = useState<string | null>(null);
+    const [isExtendedDetailsOpen, setIsExtendedDetailsOpen] = useState(false);
 
     useEffect(() => {
         let isCancelled = false;
@@ -73,6 +88,7 @@ export default function DoctorsPage() {
         setSelectedDoctorId(null);
         setProfileError(null);
         setIsProfileLoading(false);
+        setIsExtendedDetailsOpen(false);
         setIsProfileModalOpen(false);
         void loadDoctors();
 
@@ -108,18 +124,36 @@ export default function DoctorsPage() {
         [doctorDetailsById, selectedDoctorId],
     );
     const selectedDoctorImageSrc = selectedDoctorDetail?.image ?? selectedDoctor?.image ?? '/logo.png';
-
-    const phoneHref = useMemo(() => {
-        if (!selectedDoctorDetail?.phone) {
-            return null;
-        }
-        return `tel:${selectedDoctorDetail.phone.replace(/\s+/g, '')}`;
-    }, [selectedDoctorDetail?.phone]);
+    const formattedBio = useMemo(
+        () => formatReadableText(selectedDoctorDetail?.bio ?? selectedDoctor?.bio ?? ''),
+        [selectedDoctor?.bio, selectedDoctorDetail?.bio],
+    );
+    const formattedProfile = useMemo(
+        () =>
+            formatReadableText(
+                selectedDoctorDetail?.profile || selectedDoctorDetail?.bio || selectedDoctor?.bio || '',
+            ),
+        [selectedDoctor?.bio, selectedDoctorDetail?.bio, selectedDoctorDetail?.profile],
+    );
+    const hasEducationExtraDetails = useMemo(
+        () =>
+            Boolean(
+                selectedDoctorDetail &&
+                    (selectedDoctorDetail.educationDetails.length > 0 ||
+                        selectedDoctorDetail.certifications.length > 0),
+            ),
+        [selectedDoctorDetail],
+    );
+    const hasExperienceExtraDetails = useMemo(
+        () => Boolean(selectedDoctorDetail && selectedDoctorDetail.experienceDetails.length > 0),
+        [selectedDoctorDetail],
+    );
 
     const openProfileModal = async (doctorId: string) => {
         setSelectedDoctorId(doctorId);
         setIsProfileModalOpen(true);
         setProfileError(null);
+        setIsExtendedDetailsOpen(false);
 
         if (doctorDetailsById[doctorId]) {
             setIsProfileLoading(false);
@@ -152,6 +186,13 @@ export default function DoctorsPage() {
         }
 
         await openProfileModal(selectedDoctorId);
+    };
+
+    const handleProfileModalChange = (open: boolean) => {
+        setIsProfileModalOpen(open);
+        if (!open) {
+            setIsExtendedDetailsOpen(false);
+        }
     };
 
     if (isUnavailable && doctors.length === 0) {
@@ -262,7 +303,7 @@ export default function DoctorsPage() {
                                     <CardContent className="pt-6 pb-2 px-6 flex-grow">
                                         <ul className="space-y-3">
                                             <li className="flex items-start">
-                                                <MapPin className="w-5 h-5 text-brand-blue mr-3 mt-0.5 shrink-0" />
+                                                <UserRound className="w-5 h-5 text-brand-blue mr-3 mt-0.5 shrink-0" />
                                                 <span className="text-sm text-slate-700 leading-relaxed font-medium">{doctor.education}</span>
                                             </li>
                                             <li className="flex items-start">
@@ -302,7 +343,7 @@ export default function DoctorsPage() {
                 </div>
             </section>
 
-            <Dialog open={isProfileModalOpen} onOpenChange={setIsProfileModalOpen}>
+            <Dialog open={isProfileModalOpen} onOpenChange={handleProfileModalChange}>
                 <DialogContent className="sm:max-w-3xl max-h-[88vh] overflow-y-auto p-0 gap-0">
                     {(selectedDoctorDetail || selectedDoctor) && (
                         <div className="relative h-64 w-full bg-slate-100">
@@ -328,8 +369,8 @@ export default function DoctorsPage() {
                     <div className="p-6 space-y-6">
                         <DialogHeader className="space-y-2">
                             <DialogTitle className="text-2xl text-slate-900">{t('modalTitle')}</DialogTitle>
-                            <DialogDescription className="text-base text-slate-600">
-                                {selectedDoctorDetail?.bio ?? selectedDoctor?.bio ?? t('modalFallback')}
+                            <DialogDescription className="text-base text-slate-600 whitespace-pre-line leading-8">
+                                {formattedBio || t('modalFallback')}
                             </DialogDescription>
                         </DialogHeader>
 
@@ -352,7 +393,9 @@ export default function DoctorsPage() {
                             </div>
                         ) : selectedDoctorDetail ? (
                             <div className="space-y-6">
-                                <p className="text-slate-700 leading-relaxed">{selectedDoctorDetail.profile || selectedDoctorDetail.bio}</p>
+                                <p className="text-slate-700 leading-8 whitespace-pre-line">
+                                    {formattedProfile}
+                                </p>
 
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div className="rounded-xl border border-slate-200 bg-white p-4">
@@ -361,14 +404,16 @@ export default function DoctorsPage() {
                                             <span>{t('experienceLabel')}</span>
                                         </div>
                                         <p className="font-semibold text-slate-900">{selectedDoctorDetail.experience || t('notSpecified')}</p>
-                                    </div>
-
-                                    <div className="rounded-xl border border-slate-200 bg-white p-4">
-                                        <div className="flex items-center gap-2 text-slate-500 text-xs uppercase tracking-wide mb-1">
-                                            <MapPin className="h-4 w-4" />
-                                            <span>{t('roomLabel')}</span>
-                                        </div>
-                                        <p className="font-semibold text-slate-900">{selectedDoctorDetail.room || t('notSpecified')}</p>
+                                        {hasExperienceExtraDetails ? (
+                                            <Button
+                                                type="button"
+                                                variant="ghost"
+                                                className="mt-3 h-auto px-0 text-brand-blue hover:text-brand-blue-dark hover:bg-transparent"
+                                                onClick={() => setIsExtendedDetailsOpen((prev) => !prev)}
+                                            >
+                                                {isExtendedDetailsOpen ? t('detailsHideButton') : t('detailsButton')}
+                                            </Button>
+                                        ) : null}
                                     </div>
 
                                     <div className="rounded-xl border border-slate-200 bg-white p-4">
@@ -377,19 +422,68 @@ export default function DoctorsPage() {
                                             <span>{t('educationLabel')}</span>
                                         </div>
                                         <p className="font-semibold text-slate-900">{selectedDoctorDetail.education || t('notSpecified')}</p>
-                                    </div>
-
-                                    <div className="rounded-xl border border-slate-200 bg-white p-4">
-                                        <div className="flex items-center gap-2 text-slate-500 text-xs uppercase tracking-wide mb-1">
-                                            <Phone className="h-4 w-4" />
-                                            <span>{t('contactLabel')}</span>
-                                        </div>
-                                        <div className="space-y-1">
-                                            <p className="font-medium text-slate-900">{selectedDoctorDetail.phone || t('notSpecified')}</p>
-                                            <p className="text-sm text-slate-600">{selectedDoctorDetail.email || t('notSpecified')}</p>
-                                        </div>
+                                        {hasEducationExtraDetails ? (
+                                            <Button
+                                                type="button"
+                                                variant="ghost"
+                                                className="mt-3 h-auto px-0 text-brand-blue hover:text-brand-blue-dark hover:bg-transparent"
+                                                onClick={() => setIsExtendedDetailsOpen((prev) => !prev)}
+                                            >
+                                                {isExtendedDetailsOpen ? t('detailsHideButton') : t('detailsButton')}
+                                            </Button>
+                                        ) : null}
                                     </div>
                                 </div>
+
+                                {isExtendedDetailsOpen && (hasEducationExtraDetails || hasExperienceExtraDetails) ? (
+                                    <div className="rounded-2xl border border-slate-200 bg-white p-5 space-y-5">
+                                        <div>
+                                            <h4 className="text-lg font-semibold text-slate-900">{t('extendedInfoTitle')}</h4>
+                                            <p className="text-sm text-slate-500 mt-1">{t('extendedInfoDescription')}</p>
+                                        </div>
+
+                                        <div className="grid gap-5 lg:grid-cols-2">
+                                            <div className="rounded-xl border border-slate-100 bg-slate-50 p-4">
+                                                <h5 className="font-semibold text-slate-900 mb-3">{t('educationDetailsLabel')}</h5>
+                                                {selectedDoctorDetail.educationDetails.length > 0 ? (
+                                                    <ul className="space-y-2 list-disc pl-5 text-sm text-slate-700">
+                                                        {selectedDoctorDetail.educationDetails.map((item, index) => (
+                                                            <li key={`education-detail-${index}`}>{item}</li>
+                                                        ))}
+                                                    </ul>
+                                                ) : (
+                                                    <p className="text-sm text-slate-500">{t('notSpecified')}</p>
+                                                )}
+                                            </div>
+
+                                            <div className="rounded-xl border border-slate-100 bg-slate-50 p-4">
+                                                <h5 className="font-semibold text-slate-900 mb-3">{t('experienceDetailsLabel')}</h5>
+                                                {selectedDoctorDetail.experienceDetails.length > 0 ? (
+                                                    <ul className="space-y-2 list-disc pl-5 text-sm text-slate-700">
+                                                        {selectedDoctorDetail.experienceDetails.map((item, index) => (
+                                                            <li key={`experience-detail-${index}`}>{item}</li>
+                                                        ))}
+                                                    </ul>
+                                                ) : (
+                                                    <p className="text-sm text-slate-500">{t('notSpecified')}</p>
+                                                )}
+                                            </div>
+                                        </div>
+
+                                        <div className="rounded-xl border border-slate-100 bg-slate-50 p-4">
+                                            <h5 className="font-semibold text-slate-900 mb-3">{t('certificationsLabel')}</h5>
+                                            {selectedDoctorDetail.certifications.length > 0 ? (
+                                                <ul className="space-y-2 list-disc pl-5 text-sm text-slate-700">
+                                                    {selectedDoctorDetail.certifications.map((item, index) => (
+                                                        <li key={`certification-${index}`}>{item}</li>
+                                                    ))}
+                                                </ul>
+                                            ) : (
+                                                <p className="text-sm text-slate-500">{t('notSpecified')}</p>
+                                            )}
+                                        </div>
+                                    </div>
+                                ) : null}
 
                                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                                     <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
@@ -430,26 +524,6 @@ export default function DoctorsPage() {
                                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                                     <div className="rounded-xl border border-slate-200 bg-white p-4">
                                         <h4 className="font-semibold text-slate-900 mb-3 flex items-center gap-2">
-                                            <Languages className="h-4 w-4 text-brand-blue" />
-                                            {t('languagesLabel')}
-                                        </h4>
-                                        <div className="flex flex-wrap gap-2">
-                                            {(selectedDoctorDetail.languages.length > 0
-                                                ? selectedDoctorDetail.languages
-                                                : [t('notSpecified')]
-                                            ).map((language) => (
-                                                <span
-                                                    key={language}
-                                                    className="rounded-full border border-brand-blue/20 bg-brand-blue-soft px-3 py-1 text-xs font-semibold text-brand-blue"
-                                                >
-                                                    {language}
-                                                </span>
-                                            ))}
-                                        </div>
-                                    </div>
-
-                                    <div className="rounded-xl border border-slate-200 bg-white p-4">
-                                        <h4 className="font-semibold text-slate-900 mb-3 flex items-center gap-2">
                                             <HeartPulse className="h-4 w-4 text-brand-orange" />
                                             {t('expertiseLabel')}
                                         </h4>
@@ -472,22 +546,6 @@ export default function DoctorsPage() {
                                     <Button asChild className="bg-brand-orange hover:bg-brand-orange-dark text-white">
                                         <Link href={`/${locale}/contact`}>{t('appointmentButton')}</Link>
                                     </Button>
-                                    {phoneHref && (
-                                        <Button asChild variant="outline" className="border-brand-blue text-brand-blue hover:bg-brand-blue-soft">
-                                            <a href={phoneHref}>
-                                                <Phone className="h-4 w-4 mr-2" />
-                                                {t('callButton')}
-                                            </a>
-                                        </Button>
-                                    )}
-                                    {selectedDoctorDetail.email && (
-                                        <Button asChild variant="outline" className="border-slate-200 text-slate-700">
-                                            <a href={`mailto:${selectedDoctorDetail.email}`}>
-                                                <Mail className="h-4 w-4 mr-2" />
-                                                {t('emailButton')}
-                                            </a>
-                                        </Button>
-                                    )}
                                 </div>
                             </div>
                         ) : (

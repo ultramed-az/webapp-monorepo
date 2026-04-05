@@ -94,6 +94,15 @@ model Doctor {
   educationAz String?
   educationEn String?
   educationRu String?
+  educationDetailsAz String? @db.Text
+  educationDetailsEn String? @db.Text
+  educationDetailsRu String? @db.Text
+  experienceDetailsAz String? @db.Text
+  experienceDetailsEn String? @db.Text
+  experienceDetailsRu String? @db.Text
+  certificationsAz String? @db.Text
+  certificationsEn String? @db.Text
+  certificationsRu String? @db.Text
   roomAz     String?
   roomEn     String?
   roomRu     String?

@@ -75,6 +75,15 @@ export type AdminDoctorRecord = {
   educationAz: string | null;
   educationEn: string | null;
   educationRu: string | null;
+  educationDetailsAz: string | null;
+  educationDetailsEn: string | null;
+  educationDetailsRu: string | null;
+  experienceDetailsAz: string | null;
+  experienceDetailsEn: string | null;
+  experienceDetailsRu: string | null;
+  certificationsAz: string | null;
+  certificationsEn: string | null;
+  certificationsRu: string | null;
   roomAz: string | null;
   roomEn: string | null;
   roomRu: string | null;

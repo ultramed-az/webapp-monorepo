@@ -32,6 +32,15 @@ const DOCTOR_KEYS = [
   'educationAz',
   'educationEn',
   'educationRu',
+  'educationDetailsAz',
+  'educationDetailsEn',
+  'educationDetailsRu',
+  'experienceDetailsAz',
+  'experienceDetailsEn',
+  'experienceDetailsRu',
+  'certificationsAz',
+  'certificationsEn',
+  'certificationsRu',
   'roomAz',
   'roomEn',
   'roomRu',
@@ -74,6 +83,15 @@ export type CreateDoctorDto = {
   educationAz: OptionalNullableString;
   educationEn: OptionalNullableString;
   educationRu: OptionalNullableString;
+  educationDetailsAz: OptionalNullableString;
+  educationDetailsEn: OptionalNullableString;
+  educationDetailsRu: OptionalNullableString;
+  experienceDetailsAz: OptionalNullableString;
+  experienceDetailsEn: OptionalNullableString;
+  experienceDetailsRu: OptionalNullableString;
+  certificationsAz: OptionalNullableString;
+  certificationsEn: OptionalNullableString;
+  certificationsRu: OptionalNullableString;
   roomAz: OptionalNullableString;
   roomEn: OptionalNullableString;
   roomRu: OptionalNullableString;
@@ -176,6 +194,69 @@ export function parseCreateDoctorDto(body: unknown): CreateDoctorDto {
       toNullableString(
         readString(record, 'educationRu', { nullable: true, maxLength: 2000 }),
       ) ?? null,
+    educationDetailsAz:
+      toNullableString(
+        readString(record, 'educationDetailsAz', {
+          nullable: true,
+          maxLength: 20000,
+        }),
+      ) ?? null,
+    educationDetailsEn:
+      toNullableString(
+        readString(record, 'educationDetailsEn', {
+          nullable: true,
+          maxLength: 20000,
+        }),
+      ) ?? null,
+    educationDetailsRu:
+      toNullableString(
+        readString(record, 'educationDetailsRu', {
+          nullable: true,
+          maxLength: 20000,
+        }),
+      ) ?? null,
+    experienceDetailsAz:
+      toNullableString(
+        readString(record, 'experienceDetailsAz', {
+          nullable: true,
+          maxLength: 20000,
+        }),
+      ) ?? null,
+    experienceDetailsEn:
+      toNullableString(
+        readString(record, 'experienceDetailsEn', {
+          nullable: true,
+          maxLength: 20000,
+        }),
+      ) ?? null,
+    experienceDetailsRu:
+      toNullableString(
+        readString(record, 'experienceDetailsRu', {
+          nullable: true,
+          maxLength: 20000,
+        }),
+      ) ?? null,
+    certificationsAz:
+      toNullableString(
+        readString(record, 'certificationsAz', {
+          nullable: true,
+          maxLength: 20000,
+        }),
+      ) ?? null,
+    certificationsEn:
+      toNullableString(
+        readString(record, 'certificationsEn', {
+          nullable: true,
+          maxLength: 20000,
+        }),
+      ) ?? null,
+    certificationsRu:
+      toNullableString(
+        readString(record, 'certificationsRu', {
+          nullable: true,
+          maxLength: 20000,
+        }),
+      ) ?? null,
     roomAz:
       toNullableString(
         readString(record, 'roomAz', { nullable: true, maxLength: 255 }),
@@ -269,6 +350,60 @@ export function parseUpdateDoctorDto(body: unknown): UpdateDoctorDto {
     ),
     educationRu: toNullableString(
       readString(record, 'educationRu', { nullable: true, maxLength: 2000 }),
+    ),
+    educationDetailsAz: toNullableString(
+      readString(record, 'educationDetailsAz', {
+        nullable: true,
+        maxLength: 20000,
+      }),
+    ),
+    educationDetailsEn: toNullableString(
+      readString(record, 'educationDetailsEn', {
+        nullable: true,
+        maxLength: 20000,
+      }),
+    ),
+    educationDetailsRu: toNullableString(
+      readString(record, 'educationDetailsRu', {
+        nullable: true,
+        maxLength: 20000,
+      }),
+    ),
+    experienceDetailsAz: toNullableString(
+      readString(record, 'experienceDetailsAz', {
+        nullable: true,
+        maxLength: 20000,
+      }),
+    ),
+    experienceDetailsEn: toNullableString(
+      readString(record, 'experienceDetailsEn', {
+        nullable: true,
+        maxLength: 20000,
+      }),
+    ),
+    experienceDetailsRu: toNullableString(
+      readString(record, 'experienceDetailsRu', {
+        nullable: true,
+        maxLength: 20000,
+      }),
+    ),
+    certificationsAz: toNullableString(
+      readString(record, 'certificationsAz', {
+        nullable: true,
+        maxLength: 20000,
+      }),
+    ),
+    certificationsEn: toNullableString(
+      readString(record, 'certificationsEn', {
+        nullable: true,
+        maxLength: 20000,
+      }),
+    ),
+    certificationsRu: toNullableString(
+      readString(record, 'certificationsRu', {
+        nullable: true,
+        maxLength: 20000,
+      }),
     ),
     roomAz: toNullableString(
       readString(record, 'roomAz', { nullable: true, maxLength: 255 }),
