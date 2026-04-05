@@ -28,6 +28,7 @@ import {
 } from '@/components/ui/dialog';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
+import ImageCropDialog from '@/components/admin/ImageCropDialog';
 import {
   Plus,
   Search,
@@ -222,6 +223,8 @@ export default function DoctorsPage() {
   const [uploading, setUploading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [cropperOpen, setCropperOpen] = useState(false);
+  const [pendingImageFile, setPendingImageFile] = useState<File | null>(null);
 
   const filteredItems = useMemo(() => {
     const needle = searchTerm.trim().toLowerCase();
@@ -299,12 +302,7 @@ export default function DoctorsPage() {
     }
   };
 
-  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) {
-      return;
-    }
-
+  const uploadDoctorImage = async (file: File) => {
     setUploading(true);
     setErrorMessage(null);
     setSuccessMessage(null);
@@ -318,8 +316,19 @@ export default function DoctorsPage() {
       setErrorMessage(error instanceof Error ? error.message : 'Şəkil yüklənmədi.');
     } finally {
       setUploading(false);
-      event.target.value = '';
     }
+  };
+
+  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    event.target.value = '';
+
+    if (!file) {
+      return;
+    }
+
+    setPendingImageFile(file);
+    setCropperOpen(true);
   };
 
   const handleMediaSelect = (value: string) => {
@@ -908,6 +917,23 @@ export default function DoctorsPage() {
           </form>
         </DialogContent>
       </Dialog>
+
+      <ImageCropDialog
+        open={cropperOpen}
+        file={pendingImageFile}
+        onOpenChange={(open) => {
+          setCropperOpen(open);
+          if (!open) {
+            setPendingImageFile(null);
+          }
+        }}
+        title="Həkim şəklini kəs"
+        description="Profil kartında və həkim profilində şəkil səliqəli görünsün deyə əvvəlcə uyğun kadrı seçin."
+        onConfirm={async (croppedFile) => {
+          await uploadDoctorImage(croppedFile);
+          setPendingImageFile(null);
+        }}
+      />
     </div>
   );
 }
