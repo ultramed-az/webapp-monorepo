@@ -29,11 +29,21 @@ function formatReadableText(value: string | null | undefined): string {
 
     return value
         .replace(/\r/g, '')
+        .replace(/\bDr\.\s+/g, 'Dr__SPACE__')
+        .replace(/\bProf\.\s+/g, 'Prof__SPACE__')
         .split('\n')
         .flatMap((part) => part.split(/(?<=[.!?])\s+/))
         .map((part) => part.trim())
         .filter((part) => part.length > 0)
+        .map((part) => part.replace(/Dr__SPACE__/g, 'Dr. ').replace(/Prof__SPACE__/g, 'Prof. '))
         .join('\n');
+}
+
+function normalizeComparableText(value: string | null | undefined): string {
+    return formatReadableText(value)
+        .replace(/\s+/g, ' ')
+        .trim()
+        .toLowerCase();
 }
 
 export default function DoctorsPage() {
@@ -147,6 +157,15 @@ export default function DoctorsPage() {
     const hasExperienceExtraDetails = useMemo(
         () => Boolean(selectedDoctorDetail && selectedDoctorDetail.experienceDetails.length > 0),
         [selectedDoctorDetail],
+    );
+    const hasExtendedDetails = hasEducationExtraDetails || hasExperienceExtraDetails;
+    const shouldShowProfileSummary = useMemo(
+        () =>
+            Boolean(
+                formattedProfile &&
+                    normalizeComparableText(formattedProfile) !== normalizeComparableText(formattedBio),
+            ),
+        [formattedBio, formattedProfile],
     );
 
     const openProfileModal = async (doctorId: string) => {
@@ -377,7 +396,7 @@ export default function DoctorsPage() {
                             </div>
                         ) : selectedDoctorDetail ? (
                             <div className="space-y-6">
-                                <div className="rounded-3xl border border-slate-100 bg-slate-50 px-6 py-8">
+                                <div className="rounded-3xl border border-slate-100 bg-slate-50 px-6 py-7">
                                     <div className="flex flex-col items-center text-center">
                                         <div className="relative h-36 w-36 overflow-hidden rounded-full bg-slate-100 ring-4 ring-brand-blue-soft shadow-md">
                                             <Image
@@ -394,42 +413,25 @@ export default function DoctorsPage() {
                                         <h2 className="mt-4 text-3xl font-extrabold tracking-tight text-slate-900">
                                             {selectedDoctorDetail.name}
                                         </h2>
-                                        <p className="mt-4 max-w-2xl text-base text-slate-600 whitespace-pre-line leading-8">
+                                        <p className="mt-4 max-w-3xl text-base text-slate-600 whitespace-pre-line leading-7">
                                             {formattedBio || t('modalFallback')}
                                         </p>
+                                        {shouldShowProfileSummary ? (
+                                            <p className="mt-4 max-w-3xl text-left text-base text-slate-700 whitespace-pre-line leading-7">
+                                                {formattedProfile}
+                                            </p>
+                                        ) : null}
                                     </div>
                                 </div>
 
-                                <p className="text-slate-700 leading-8 whitespace-pre-line">
-                                    {formattedProfile}
-                                </p>
-
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div className="grid grid-cols-1 gap-4">
                                     <div className="rounded-xl border border-slate-200 bg-white p-4">
                                         <div className="flex items-center gap-2 text-slate-500 text-xs uppercase tracking-wide mb-1">
                                             <Calendar className="h-4 w-4" />
                                             <span>{t('experienceLabel')}</span>
                                         </div>
                                         <p className="font-semibold text-slate-900">{selectedDoctorDetail.experience || t('notSpecified')}</p>
-                                        {hasExperienceExtraDetails ? (
-                                            <Button
-                                                type="button"
-                                                variant="ghost"
-                                                className="mt-3 h-auto px-0 text-brand-blue hover:text-brand-blue-dark hover:bg-transparent"
-                                                onClick={() => setIsExtendedDetailsOpen((prev) => !prev)}
-                                            >
-                                                {isExtendedDetailsOpen ? t('detailsHideButton') : t('detailsButton')}
-                                            </Button>
-                                        ) : null}
-                                    </div>
-
-                                    <div className="rounded-xl border border-slate-200 bg-white p-4">
-                                        <div className="flex items-center gap-2 text-slate-500 text-xs uppercase tracking-wide mb-1">
-                                            <UserRound className="h-4 w-4" />
-                                            <span>{t('educationLabel')}</span>
-                                        </div>
-                                        <p className="font-semibold text-slate-900">{selectedDoctorDetail.education || t('notSpecified')}</p>
-                                        {hasEducationExtraDetails ? (
+                                        {hasExtendedDetails ? (
                                             <Button
                                                 type="button"
                                                 variant="ghost"
@@ -442,7 +444,7 @@ export default function DoctorsPage() {
                                     </div>
                                 </div>
 
-                                {isExtendedDetailsOpen && (hasEducationExtraDetails || hasExperienceExtraDetails) ? (
+                                {isExtendedDetailsOpen && hasExtendedDetails ? (
                                     <div className="rounded-2xl border border-slate-200 bg-white p-5 space-y-5">
                                         <div>
                                             <h4 className="text-lg font-semibold text-slate-900">{t('extendedInfoTitle')}</h4>
