@@ -192,18 +192,18 @@ export default function DoctorsPage() {
                                             <div className="absolute inset-0 bg-gradient-to-t from-brand-blue via-brand-blue/85 via-25% to-transparent" />
                                             <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.3),transparent_28%)]" />
 
-                                            <div className="absolute inset-x-0 bottom-0 p-6 text-white md:p-7">
-                                                <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-white/80 md:text-xs">
+                                            <div className="absolute inset-x-0 bottom-0 p-5 text-white md:p-6">
+                                                <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-white/80 md:text-[11px]">
                                                     {t('cardInstitutionLabel')}
                                                 </p>
-                                                <h2 className="mt-3 max-w-[92%] text-[2.35rem] font-black leading-[0.92] tracking-tight md:text-[3.35rem]">
+                                                <h2 className="mt-2 max-w-[88%] break-words text-[1.95rem] font-black leading-[0.92] tracking-tight md:text-[2.45rem]">
                                                     {doctor.name}
                                                 </h2>
-                                                <p className="mt-3 max-w-[90%] text-lg font-medium leading-snug text-white/95 md:text-[1.45rem]">
+                                                <p className="mt-2 max-w-[88%] text-base font-medium leading-snug text-white/95 md:text-[1.18rem]">
                                                     {doctor.specialty}
                                                 </p>
 
-                                                <span className="mt-6 inline-flex items-center gap-2 rounded-full bg-brand-orange px-6 py-3 text-base font-bold text-white shadow-lg shadow-brand-orange/30 transition-transform duration-300 group-hover:translate-y-[-2px] md:px-7 md:py-3.5 md:text-lg">
+                                                <span className="mt-5 inline-flex items-center gap-2 rounded-full bg-brand-orange px-5 py-2.5 text-sm font-bold text-white shadow-lg shadow-brand-orange/30 transition-transform duration-300 group-hover:translate-y-[-2px] md:px-6 md:py-3 md:text-base">
                                                     {t('profileButton')}
                                                     <ArrowRight className="h-4 w-4" />
                                                 </span>
