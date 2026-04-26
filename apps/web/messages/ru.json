@@ -187,8 +187,9 @@
     "noResultsTitle": "По вашему запросу ничего не найдено",
     "noResultsDescription": "Используйте другой запрос или очистите поиск.",
     "clearSearch": "Очистить поиск",
+    "cardInstitutionLabel": "Ultramed Clinic",
     "experienceLabel": "Стаж",
-    "profileButton": "Профиль",
+    "profileButton": "Подробнее",
     "appointmentButton": "Записаться",
     "modalTitle": "Профиль врача",
     "modalFallback": "Подробная информация о выбранном враче.",
@@ -209,6 +210,19 @@
     "detailRetry": "Обновить данные",
     "detailUnavailable": "Информация по этому врачу сейчас недоступна.",
     "doctorAlt": "Врач"
+  },
+  "DoctorDetailPage": {
+    "backToDoctors": "Назад ко всем врачам",
+    "sidebarTitle": "Информация",
+    "specialtyLabel": "Специализация",
+    "otherDoctorsTitle": "Другие врачи",
+    "viewAllDoctors": "Все врачи",
+    "biographyTitle": "Биография",
+    "notFoundTitle": "Профиль врача не найден",
+    "notFoundDescription": "Отдельная страница этого врача сейчас недоступна.",
+    "bookAppointment": "Записаться на прием",
+    "ctaTitle": "Запись и контакт",
+    "ctaDescription": "Запишитесь заранее, и наша команда поможет подобрать наиболее удобное время для визита."
   },
   "BlogPage": {
     "badge": "Медицинский блог",

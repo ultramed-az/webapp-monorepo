@@ -4,6 +4,7 @@ import { routing } from './i18n/routing';
 import { ADMIN_AUTH_COOKIE } from './lib/admin-api';
 
 const intlMiddleware = createMiddleware(routing);
+const LOCALE_COOKIE_NAME = 'NEXT_LOCALE';
 const API_BASE_URL = (
     process.env.API_INTERNAL_URL ??
     process.env.NEXT_PUBLIC_API_URL ??
@@ -60,6 +61,18 @@ function buildAdminLoginRedirect(request: NextRequest): NextResponse {
 
 export default async function middleware(request: NextRequest) {
     const pathname = request.nextUrl.pathname;
+
+    if (pathname === '/') {
+        const localeFromCookie = request.cookies.get(LOCALE_COOKIE_NAME)?.value;
+        const locale =
+            localeFromCookie && routing.locales.includes(localeFromCookie as 'az' | 'en' | 'ru')
+                ? localeFromCookie
+                : routing.defaultLocale;
+
+        const redirectUrl = new URL(`/${locale}${request.nextUrl.search}`, request.url);
+        return NextResponse.redirect(redirectUrl);
+    }
+
     const normalizedPath = stripLocalePrefix(pathname);
     const isAdminRoute = normalizedPath === '/admin' || normalizedPath.startsWith('/admin/');
     const isAdminLoginRoute =

@@ -187,8 +187,9 @@
     "noResultsTitle": "Uyğun həkim tapılmadı",
     "noResultsDescription": "Başqa bir açar söz sınayın və ya axtarışı təmizləyin.",
     "clearSearch": "Axtarışı təmizlə",
+    "cardInstitutionLabel": "Ultramed Clinic",
     "experienceLabel": "Təcrübə",
-    "profileButton": "Profil",
+    "profileButton": "Ətraflı",
     "appointmentButton": "Qəbul",
     "modalTitle": "Həkim Profili",
     "modalFallback": "Seçilmiş həkim haqqında ətraflı məlumat.",
@@ -209,6 +210,19 @@
     "detailRetry": "Yenidən cəhd et",
     "detailUnavailable": "Həkim məlumatları hazırda mövcud deyil.",
     "doctorAlt": "Həkim"
+  },
+  "DoctorDetailPage": {
+    "backToDoctors": "Bütün həkimlərə qayıt",
+    "sidebarTitle": "Məlumat",
+    "specialtyLabel": "İxtisas",
+    "otherDoctorsTitle": "Digər həkimlər",
+    "viewAllDoctors": "Bütün həkimlər",
+    "biographyTitle": "Bioqrafiya",
+    "notFoundTitle": "Həkim profili tapılmadı",
+    "notFoundDescription": "Bu həkim üçün ayrıca səhifə hazırda mövcud deyil.",
+    "bookAppointment": "Qəbula yazılmaq",
+    "ctaTitle": "Qəbul və əlaqə",
+    "ctaDescription": "Həkimlə görüş üçün əvvəlcədən qəbula yazılın və komandamız sizin üçün uyğun vaxt təşkil etsin."
   },
   "BlogPage": {
     "badge": "Tibbi Bloq",

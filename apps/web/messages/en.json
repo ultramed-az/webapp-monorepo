@@ -187,8 +187,9 @@
     "noResultsTitle": "No matching doctors found",
     "noResultsDescription": "Try another keyword or clear your search.",
     "clearSearch": "Clear Search",
+    "cardInstitutionLabel": "Ultramed Clinic",
     "experienceLabel": "Experience",
-    "profileButton": "Profile",
+    "profileButton": "Details",
     "appointmentButton": "Appointment",
     "modalTitle": "Doctor Profile",
     "modalFallback": "Detailed information about the selected doctor.",
@@ -209,6 +210,19 @@
     "detailRetry": "Retry details",
     "detailUnavailable": "Doctor details are currently unavailable.",
     "doctorAlt": "Doctor"
+  },
+  "DoctorDetailPage": {
+    "backToDoctors": "Back to all doctors",
+    "sidebarTitle": "Information",
+    "specialtyLabel": "Specialty",
+    "otherDoctorsTitle": "Other doctors",
+    "viewAllDoctors": "View all doctors",
+    "biographyTitle": "Biography",
+    "notFoundTitle": "Doctor profile was not found",
+    "notFoundDescription": "A dedicated page for this doctor is not available at the moment.",
+    "bookAppointment": "Book appointment",
+    "ctaTitle": "Appointments and contact",
+    "ctaDescription": "Schedule your visit in advance and our team will help arrange the most suitable time."
   },
   "BlogPage": {
     "badge": "Medical Blog",
