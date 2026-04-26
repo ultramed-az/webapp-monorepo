@@ -66,7 +66,7 @@ export default function AboutPage() {
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
                         <div className="relative h-[400px] lg:h-[500px] rounded-3xl overflow-hidden shadow-xl order-2 lg:order-1">
                             <Image
-                                src="https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?q=80&w=2000&auto=format&fit=crop"
+                                src="/about_banner.JPG"
                                 alt={t('mission.imageAlt')}
                                 fill
                                 className="object-cover"
