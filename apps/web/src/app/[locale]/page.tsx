@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslations } from 'next-intl';
+import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -133,12 +134,16 @@ export default function HomePage() {
                                 </Button>
                             </div>
                         </div>
-                        <div className="relative h-[400px] lg:h-[600px] rounded-3xl overflow-hidden shadow-2xl">
-                            {/* Placeholder for actual hero image. Since we don't have images yet, using a colored div placeholder */}
-                            <div className="absolute inset-0 bg-gradient-to-tr from-brand-blue-dark to-brand-blue flex items-center justify-center">
-                                <HeartPulse className="h-32 w-32 text-white/20" />
-                                <div className="absolute inset-0 bg-black/10"></div>
-                            </div>
+                        <div className="relative h-[320px] overflow-hidden rounded-3xl shadow-2xl sm:h-[420px] lg:h-[600px]">
+                            <Image
+                                src="/about_banner.JPG"
+                                alt={t('heroImageAlt')}
+                                fill
+                                priority
+                                sizes="(max-width: 1024px) 100vw, 50vw"
+                                className="object-cover object-center"
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-t from-brand-blue-dark/20 via-transparent to-white/5" />
                         </div>
                     </div>
                 </div>

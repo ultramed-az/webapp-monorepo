@@ -1,5 +1,4 @@
 import { useTranslations } from 'next-intl';
-import Image from 'next/image';
 import { Card, CardContent } from '@/components/ui/card';
 import { ShieldCheck, Target, Heart, Award, CheckCircle2 } from 'lucide-react';
 
@@ -63,40 +62,30 @@ export default function AboutPage() {
             {/* Mission & Vision */}
             <section className="py-20 bg-white">
                 <div className="container mx-auto px-6">
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-                        <div className="relative h-[400px] lg:h-[500px] rounded-3xl overflow-hidden shadow-xl order-2 lg:order-1">
-                            <Image
-                                src="/about_banner.JPG"
-                                alt={t('mission.imageAlt')}
-                                fill
-                                className="object-cover"
-                            />
-                        </div>
-                        <div className="space-y-8 order-1 lg:order-2">
-                            <div>
-                                <div className="inline-flex items-center space-x-2 bg-brand-blue-soft text-brand-blue font-medium px-4 py-2 rounded-full text-sm mb-4">
-                                    <Target className="h-4 w-4" />
-                                    <span>{t('mission.badge')}</span>
-                                </div>
-                                <h2 className="text-3xl font-bold text-slate-900 mb-4">{t('mission.title')}</h2>
-                                <p className="text-slate-600 text-lg leading-relaxed">
-                                    {t('mission.description')}
-                                </p>
+                    <div className="mx-auto max-w-5xl text-center">
+                        <div className="mx-auto max-w-3xl">
+                            <div className="inline-flex items-center space-x-2 bg-brand-blue-soft text-brand-blue font-medium px-4 py-2 rounded-full text-sm mb-4">
+                                <Target className="h-4 w-4" />
+                                <span>{t('mission.badge')}</span>
                             </div>
-                            <ul className="space-y-4">
-                                {[
-                                    t('mission.points.0'),
-                                    t('mission.points.1'),
-                                    t('mission.points.2'),
-                                    t('mission.points.3')
-                                ].map((item, i) => (
-                                    <li key={i} className="flex items-start">
-                                        <CheckCircle2 className="h-6 w-6 text-brand-orange mr-3 shrink-0" />
-                                        <span className="text-slate-700">{item}</span>
-                                    </li>
-                                ))}
-                            </ul>
+                            <h2 className="text-3xl font-bold text-slate-900 mb-4 md:text-4xl">{t('mission.title')}</h2>
+                            <p className="text-slate-600 text-lg leading-relaxed md:text-xl">
+                                {t('mission.description')}
+                            </p>
                         </div>
+                        <ul className="mx-auto mt-10 grid max-w-4xl grid-cols-1 gap-4 text-left md:grid-cols-2">
+                            {[
+                                t('mission.points.0'),
+                                t('mission.points.1'),
+                                t('mission.points.2'),
+                                t('mission.points.3')
+                            ].map((item, i) => (
+                                <li key={i} className="flex items-start rounded-2xl border border-slate-100 bg-slate-50 px-5 py-4">
+                                    <CheckCircle2 className="h-6 w-6 text-brand-orange mr-3 shrink-0" />
+                                    <span className="text-slate-700">{item}</span>
+                                </li>
+                            ))}
+                        </ul>
                     </div>
                 </div>
             </section>
