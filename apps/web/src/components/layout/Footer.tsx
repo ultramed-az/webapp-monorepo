@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/routing';
-import { Facebook, Instagram, Linkedin, Mail, MapPin, MessageCircle, Phone } from 'lucide-react';
+import { Mail, MapPin, MessageCircle, Phone } from 'lucide-react';
 import Image from 'next/image';
 import { useParams } from 'next/navigation';
 import { getContactInfo, type ContactInfoResponse } from '@/lib/api';
@@ -93,25 +93,6 @@ export default function Footer() {
                         <p className="text-slate-300 text-sm leading-relaxed">
                             {t('description', { default: 'Sizin sağlamlığınız bizim prioritetimizdir. Müasir avadanlıqlar və peşəkar həkim kollektivi.' })}
                         </p>
-                        <div className="flex space-x-4 pt-2">
-                            <a href="#" className="text-slate-200 hover:text-brand-orange transition-colors">
-                                <Facebook className="h-5 w-5" />
-                                <span className="sr-only">{t('social.facebook')}</span>
-                            </a>
-                            <a
-                                href="https://www.instagram.com/ultramed_clinic"
-                                target="_blank"
-                                rel="noreferrer"
-                                className="text-slate-200 hover:text-brand-orange transition-colors"
-                            >
-                                <Instagram className="h-5 w-5" />
-                                <span className="sr-only">{t('social.instagram')}</span>
-                            </a>
-                            <a href="#" className="text-slate-200 hover:text-brand-orange transition-colors">
-                                <Linkedin className="h-5 w-5" />
-                                <span className="sr-only">{t('social.linkedin')}</span>
-                            </a>
-                        </div>
                     </div>
 
                     {/* Quick Links */}
