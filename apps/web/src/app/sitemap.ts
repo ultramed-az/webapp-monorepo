@@ -9,7 +9,6 @@ const publicRoutes = [
     '/services',
     '/doctors',
     '/blog',
-    '/gallery',
     '/testimonials',
     '/faq',
     '/contact',

@@ -118,7 +118,6 @@ export default function Navbar() {
         { href: '/services', label: t('services', { default: 'Services' }) },
         { href: '/doctors', label: t('doctors', { default: 'Doctors' }) },
         { href: '/blog', label: t('blog', { default: 'Blog' }) },
-        { href: '/gallery', label: t('gallery', { default: 'Gallery' }) },
         { href: '/testimonials', label: t('testimonials', { default: 'Testimonials' }) },
         { href: '/faq', label: t('faq', { default: 'FAQ' }) },
         { href: '/contact', label: t('contact', { default: 'Contact' }) },

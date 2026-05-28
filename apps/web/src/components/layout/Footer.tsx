@@ -123,7 +123,6 @@ export default function Footer() {
                             <li><Link href="/services" className="text-slate-300 hover:text-brand-orange transition-colors">{t('services', { default: 'Xidmətlərimiz' })}</Link></li>
                             <li><Link href="/doctors" className="text-slate-300 hover:text-brand-orange transition-colors">{t('doctors', { default: 'Həkimlərimiz' })}</Link></li>
                             <li><Link href="/blog" className="text-slate-300 hover:text-brand-orange transition-colors">{t('blog', { default: 'Bloq' })}</Link></li>
-                            <li><Link href="/gallery" className="text-slate-300 hover:text-brand-orange transition-colors">{t('gallery', { default: 'Qalereya' })}</Link></li>
                             <li><Link href="/testimonials" className="text-slate-300 hover:text-brand-orange transition-colors">{t('testimonials', { default: 'Rəylər' })}</Link></li>
                             <li><Link href="/faq" className="text-slate-300 hover:text-brand-orange transition-colors">{t('faq', { default: 'Tez-tez soruşulan suallar' })}</Link></li>
                         </ul>
