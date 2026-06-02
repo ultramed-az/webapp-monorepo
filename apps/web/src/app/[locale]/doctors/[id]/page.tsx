@@ -45,13 +45,6 @@ function formatReadableText(value: string | null | undefined): string {
         .join('\n');
 }
 
-function normalizeComparableText(value: string | null | undefined): string {
-    return formatReadableText(value)
-        .replace(/\s+/g, ' ')
-        .trim()
-        .toLowerCase();
-}
-
 function DoctorDetailSkeleton() {
     return (
         <div className="space-y-10">
@@ -153,15 +146,6 @@ export default function DoctorDetailPage() {
         [doctor?.bio, doctor?.profile],
     );
 
-    const shouldShowProfileSummary = useMemo(
-        () =>
-            Boolean(
-                formattedProfile &&
-                    normalizeComparableText(formattedProfile) !== normalizeComparableText(formattedBio),
-            ),
-        [formattedBio, formattedProfile],
-    );
-
     const imageSrc = doctor?.image || '/logo.png';
 
     if (isUnavailable && !doctor) {
@@ -231,7 +215,7 @@ export default function DoctorDetailPage() {
                                         {doctor.name}
                                     </h1>
                                     <p className="mt-5 max-w-3xl whitespace-pre-line text-lg leading-8 text-slate-600">
-                                        {formattedBio || tList('modalFallback')}
+                                        {formattedProfile || tList('modalFallback')}
                                     </p>
                                     <div className="mt-8 flex flex-wrap gap-3">
                                         <Button asChild className="rounded-full bg-brand-orange px-6 text-white hover:bg-brand-orange-dark">
@@ -341,9 +325,6 @@ export default function DoctorDetailPage() {
                                     <h2 className="text-3xl font-bold text-slate-950">{t('biographyTitle')}</h2>
                                     <div className="mt-5 space-y-5 text-lg leading-9 text-slate-600">
                                         <p className="whitespace-pre-line">{formattedBio || tList('modalFallback')}</p>
-                                        {shouldShowProfileSummary ? (
-                                            <p className="whitespace-pre-line">{formattedProfile}</p>
-                                        ) : null}
                                     </div>
                                 </div>
 
