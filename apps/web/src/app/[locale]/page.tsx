@@ -1,236 +1,591 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { useTranslations } from 'next-intl';
 import Image from 'next/image';
+import { useParams } from 'next/navigation';
+import {
+    ArrowLeft,
+    ArrowRight,
+    Baby,
+    Brain,
+    ClipboardList,
+    Clock,
+    HeartPulse,
+    MapPin,
+    Microscope,
+    Phone,
+    ShieldCheck,
+    Stethoscope,
+    Syringe,
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Skeleton } from '@/components/ui/skeleton';
 import TemporaryUnavailable from '@/components/feedback/TemporaryUnavailable';
 import { Link } from '@/i18n/routing';
-import { HeartPulse, Stethoscope, Clock, ShieldCheck, ArrowRight, Activity, Users } from 'lucide-react';
-import { getHomeStats, isBackendUnavailableError } from '@/lib/api';
+import {
+    getBlogPosts,
+    getCheckupPackages,
+    getContactInfo,
+    getDoctors,
+    getHomeStats,
+    getServices,
+    isBackendUnavailableError,
+    type BlogListItem,
+    type CheckupPackageItem,
+    type ContactInfoResponse,
+    type DoctorListItem,
+    type HomeStatItem,
+    type ServiceListItem,
+} from '@/lib/api';
+import { shouldBypassImageOptimization } from '@/lib/image';
+
+type Locale = 'az' | 'en' | 'ru';
+
+function normalizeLocale(localeRaw: string | undefined): Locale {
+    if (localeRaw === 'en' || localeRaw === 'ru') return localeRaw;
+    return 'az';
+}
+
+const fallbackServices: ServiceListItem[] = [
+    { id: 'fallback-surgery', title: 'Ümumi cərrahiyyə', summary: 'Planlı və təcili cərrahi xidmətlər.', iconKey: 'activity', image: null },
+    { id: 'fallback-dentistry', title: 'Stomatologiya', summary: 'Terapevtik və estetik stomatoloji xidmətlər.', iconKey: 'shieldCheck', image: null },
+    { id: 'fallback-urology', title: 'Urologiya-andrologiya', summary: 'Diaqnostika və fərdi müalicə planı.', iconKey: 'stethoscope', image: null },
+    { id: 'fallback-trauma', title: 'Travmatologiya', summary: 'Sümük və oynaq problemlərinin müalicəsi.', iconKey: 'activity', image: null },
+    { id: 'fallback-lor', title: 'Lor', summary: 'Qulaq, burun və boğaz müayinələri.', iconKey: 'microscope', image: null },
+    { id: 'fallback-derma', title: 'Dermatologiya', summary: 'Dəri sağlamlığı üzrə konsultasiya.', iconKey: 'userRound', image: null },
+    { id: 'fallback-physio', title: 'Fizioterapiya', summary: 'Bərpa və reabilitasiya proqramları.', iconKey: 'heartPulse', image: null },
+    { id: 'fallback-pediatrics', title: 'Pediatriya', summary: 'Uşaqlar üçün profilaktik və müalicəvi xidmətlər.', iconKey: 'baby', image: null },
+];
+
+const fallbackDoctors: DoctorListItem[] = [
+    {
+        id: 'fallback-doctor-1',
+        name: 'Dr. Esmira Gülmalıyeva',
+        specialty: 'Terapevt',
+        bio: 'Profilaktika və daxili xəstəliklər üzrə təcrübəli həkim.',
+        experience: '15 il',
+        education: '',
+        tags: [],
+        image: null,
+    },
+    {
+        id: 'fallback-doctor-2',
+        name: 'Dr. Elşən Səfərov',
+        specialty: 'Uroloq-androloq',
+        bio: 'Uroloji müayinələr və fərdi müalicə planları.',
+        experience: '12 il',
+        education: '',
+        tags: [],
+        image: null,
+    },
+    {
+        id: 'fallback-doctor-3',
+        name: 'Dr. Qalina Cəfərova',
+        specialty: 'Pediatr',
+        bio: 'Uşaq sağlamlığı və profilaktik baxım.',
+        experience: '10 il',
+        education: '',
+        tags: [],
+        image: null,
+    },
+];
+
+const fallbackCheckups: CheckupPackageItem[] = [
+    { id: 'fallback-checkup-1', title: 'Ginekoloji check up', subtitle: '4 May 2026', price: '64', currency: '₼' },
+    { id: 'fallback-checkup-2', title: 'Yeni evlənənlər üçün check up', subtitle: '12 Aprel 2026', price: '99', currency: '₼' },
+    { id: 'fallback-checkup-3', title: 'Terapevtik check up', subtitle: '12 Aprel 2026', price: '109', currency: '₼' },
+];
+
+const fallbackBlogs: BlogListItem[] = [
+    {
+        id: 'fallback-blog-1',
+        title: 'Ginekoloji check up',
+        excerpt: 'Qadın sağlamlığı üçün əsas laborator və instrumental yoxlanışlar.',
+        content: '',
+        author: 'Ultramed',
+        category: 'Check-up',
+        image: 'https://images.unsplash.com/photo-1581431886211-6b932f8367f2?q=80&w=1600&auto=format&fit=crop',
+        featured: true,
+        views: 0,
+        date: '04 May 2026',
+    },
+    {
+        id: 'fallback-blog-2',
+        title: 'Yeni evlənənlər üçün check up',
+        excerpt: 'Ailə planlaması öncəsi profilaktik müayinə paketi.',
+        content: '',
+        author: 'Ultramed',
+        category: 'Aksiya',
+        image: 'https://images.unsplash.com/photo-1550831107-1553da8c8464?q=80&w=1600&auto=format&fit=crop',
+        featured: false,
+        views: 0,
+        date: '12 Aprel 2026',
+    },
+    {
+        id: 'fallback-blog-3',
+        title: 'Terapevtik check up',
+        excerpt: 'Ümumi sağlamlıq vəziyyətini vaxtında qiymətləndirmək üçün yoxlanış.',
+        content: '',
+        author: 'Ultramed',
+        category: 'Təklif',
+        image: 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?q=80&w=1600&auto=format&fit=crop',
+        featured: false,
+        views: 0,
+        date: '12 Aprel 2026',
+    },
+];
+
+const fallbackContact: ContactInfoResponse = {
+    address: 'Xətai rayonu Nəsrəddin Tusi 55, Ultramed Clinic',
+    map: {
+        latitude: 40.3763297,
+        longitude: 49.9628667,
+        embedUrl: 'https://maps.google.com/maps?q=N%C9%99sr%C9%99ddin%20Tusi%2055%20Baku&z=15&output=embed',
+    },
+    phones: [
+        { label: 'Telefon', value: '055/070-223-58-56' },
+        { label: 'WhatsApp', value: 'https://wa.me/994552235856' },
+    ],
+    emails: [{ label: 'Email', value: 'ultramedclinics@gmail.com' }],
+    workingHours: [
+        { label: 'Bazar ertəsi - Cümə', value: '09:00 - 19:00' },
+        { label: 'Şənbə', value: '10:00 - 16:00' },
+    ],
+};
+
+const partnerNames = ['Azsığorta', 'Bakı Sığorta', 'Mega Sığorta', 'A-Qroup', 'Aztibb', 'Paşa Sığorta'];
+
+function serviceIcon(iconKey: string | null) {
+    const className = 'h-8 w-8';
+    const normalized = iconKey?.toLowerCase() ?? '';
+
+    if (normalized.includes('brain')) return <Brain className={className} />;
+    if (normalized.includes('heart')) return <HeartPulse className={className} />;
+    if (normalized.includes('shield')) return <ShieldCheck className={className} />;
+    if (normalized.includes('baby') || normalized.includes('pedia')) return <Baby className={className} />;
+    if (normalized.includes('micro') || normalized.includes('lab')) return <Microscope className={className} />;
+    if (normalized.includes('syringe')) return <Syringe className={className} />;
+    return <Stethoscope className={className} />;
+}
+
+function displayed<T>(items: T[], fallback: T[], limit: number): T[] {
+    const source = items.length > 0 ? items : fallback;
+    return source.slice(0, limit);
+}
 
 export default function HomePage() {
-    const t = useTranslations('HomePage');
+    const params = useParams<{ locale: string }>();
+    const locale = normalizeLocale(params?.locale);
 
-    const features = [
-        {
-            icon: <Stethoscope className="h-8 w-8 text-brand-blue" />,
-            title: t('featureExpert', { default: 'Peşəkar Həkimlər' }),
-            description: t('featureExpertDesc', { default: 'Öz sahəsində uzman və beynəlxalq təcrübəli mütəxəssislər.' })
-        },
-        {
-            icon: <Activity className="h-8 w-8 text-brand-orange" />,
-            title: t('featureModern', { default: 'Müasir Avadanlıq' }),
-            description: t('featureModernDesc', { default: 'Ən son texnologiya ilə təchiz olunmuş laboratoriya və diaqnostika.' })
-        },
-        {
-            icon: <Clock className="h-8 w-8 text-brand-blue" />,
-            title: t('feature247', { default: '7/24 Xidmət' }),
-            description: t('feature247Desc', { default: 'Təcili hallarda günün hər saatı xidmətinizdəyik.' })
-        },
-        {
-            icon: <ShieldCheck className="h-8 w-8 text-brand-orange" />,
-            title: t('featureReliable', { default: 'Etibarlı Diaqnoz' }),
-            description: t('featureReliableDesc', { default: 'Dəqiq nəticələr və doğru müalicə metodları.' })
-        }
-    ];
-
-    const statsTemplate = [
-        { id: 'patients', icon: <Users className="h-6 w-6" />, defaultValue: '15,000+', label: t('statPatients', { default: 'Məmnun Pasiyent' }) },
-        { id: 'doctors', icon: <Stethoscope className="h-6 w-6" />, defaultValue: '50+', label: t('statDoctors', { default: 'Uzman Həkim' }) },
-        { id: 'departments', icon: <Activity className="h-6 w-6" />, defaultValue: '20+', label: t('statDepartments', { default: 'Tibbi Şöbə' }) },
-        { id: 'years', icon: <HeartPulse className="h-6 w-6" />, defaultValue: '15+', label: t('statYears', { default: 'İllik Təcrübə' }) },
-    ];
-
-    const [statValues, setStatValues] = useState<Record<string, string>>({
-        patients: '15,000+',
-        doctors: '50+',
-        departments: '20+',
-        years: '15+',
-    });
+    const [services, setServices] = useState<ServiceListItem[]>([]);
+    const [doctors, setDoctors] = useState<DoctorListItem[]>([]);
+    const [blogs, setBlogs] = useState<BlogListItem[]>([]);
+    const [checkups, setCheckups] = useState<CheckupPackageItem[]>([]);
+    const [contactInfo, setContactInfo] = useState<ContactInfoResponse>(fallbackContact);
+    const [stats, setStats] = useState<HomeStatItem[]>([]);
+    const [isUnavailable, setIsUnavailable] = useState(false);
     const [refreshKey, setRefreshKey] = useState(0);
-    const [isStatsLoading, setIsStatsLoading] = useState(true);
-    const [isStatsUnavailable, setIsStatsUnavailable] = useState(false);
 
     useEffect(() => {
         let isCancelled = false;
 
-        async function loadStats() {
-            setIsStatsLoading(true);
-            setIsStatsUnavailable(false);
+        async function loadHomeData() {
+            setIsUnavailable(false);
+            const results = await Promise.allSettled([
+                getServices(locale),
+                getDoctors(locale),
+                getBlogPosts(locale),
+                getCheckupPackages(locale),
+                getContactInfo(locale),
+                getHomeStats(),
+            ]);
 
-            try {
-                const response = await getHomeStats();
-                if (isCancelled) return;
+            if (isCancelled) return;
 
-                const nextValues = response.reduce<Record<string, string>>((acc, stat) => {
-                    acc[stat.id] = stat.value;
-                    return acc;
-                }, {});
+            const [serviceResult, doctorResult, blogResult, checkupResult, contactResult, statResult] = results;
 
-                setStatValues((currentValues) => ({
-                    ...currentValues,
-                    ...nextValues,
-                }));
-            } catch (fetchError) {
-                if (isCancelled) return;
-                if (isBackendUnavailableError(fetchError)) {
-                    setIsStatsUnavailable(true);
-                }
-                // Keep static defaults when API is not reachable.
-            } finally {
-                if (!isCancelled) {
-                    setIsStatsLoading(false);
-                }
+            if (serviceResult.status === 'fulfilled') setServices(serviceResult.value);
+            if (doctorResult.status === 'fulfilled') setDoctors(doctorResult.value);
+            if (blogResult.status === 'fulfilled') setBlogs(blogResult.value);
+            if (checkupResult.status === 'fulfilled') setCheckups(checkupResult.value);
+            if (contactResult.status === 'fulfilled') setContactInfo(contactResult.value);
+            if (statResult.status === 'fulfilled') setStats(statResult.value);
+
+            if (results.some((result) => result.status === 'rejected' && isBackendUnavailableError(result.reason))) {
+                setIsUnavailable(true);
             }
         }
 
-        void loadStats();
+        void loadHomeData();
 
         return () => {
             isCancelled = true;
         };
-    }, [refreshKey]);
+    }, [locale, refreshKey]);
 
-    const stats = useMemo(
-        () => statsTemplate.map((stat) => ({
-            icon: stat.icon,
-            label: stat.label,
-            value: statValues[stat.id] ?? stat.defaultValue,
-        })),
-        [statsTemplate, statValues],
-    );
+    const statValues = useMemo(() => {
+        const values = stats.reduce<Record<string, string>>((acc, item) => {
+            acc[item.id] = item.value;
+            return acc;
+        }, {});
+
+        return [
+            { value: values.patients ?? '15k+', label: 'Pasiyent' },
+            { value: values.doctors ?? '50+', label: 'Həkim' },
+            { value: '24/7', label: 'Xidmət' },
+        ];
+    }, [stats]);
+
+    const homeServices = displayed(services, fallbackServices, 8);
+    const homeDoctors = displayed(doctors, fallbackDoctors, 6);
+    const homeCheckups = displayed(checkups, fallbackCheckups, 3);
+    const homeBlogs = displayed(blogs, fallbackBlogs, 3);
+    const primaryPhone = contactInfo.phones.find((item) => !item.value.includes('wa.me'))?.value ?? contactInfo.phones[0]?.value ?? '';
+    const primaryEmail = contactInfo.emails[0]?.value ?? 'ultramedclinics@gmail.com';
 
     return (
-        <div className="flex flex-col min-h-screen">
-            {/* Hero Section */}
-            <section className="relative bg-brand-cream py-20 lg:py-32 overflow-hidden">
-                <div className="absolute inset-0 z-0 opacity-10 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-brand-blue via-transparent to-transparent"></div>
-                <div className="container mx-auto px-6 relative z-10">
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-                        <div className="space-y-8">
-                            <div className="inline-flex items-center space-x-2 bg-brand-blue-soft text-brand-blue font-medium px-4 py-2 rounded-full text-sm">
-                                <HeartPulse className="h-4 w-4" />
-                                <span>{t('heroBadge', { default: 'Sizin Sağlamlığınız Bizim Üçün Dəyərlidir' })}</span>
-                            </div>
-                            <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-slate-900 leading-tight">
-                                {t('heroTitle', { default: 'Müasir Tibb və İnsani Yanaşma' })}
-                            </h1>
-                            <p className="text-lg md:text-xl text-slate-600 max-w-lg leading-relaxed">
-                                {t('heroDescription', { default: 'Ultramed klinikası olaraq sağlamlığınız üçün ən qabaqcıl texnologiyalar və peşəkar komandamızla xidmətinizdəyik.' })}
-                            </p>
-                            <div className="flex flex-col sm:flex-row gap-4">
-                                <Button asChild size="lg" className="bg-brand-orange hover:bg-brand-orange-dark text-white px-8 h-14 text-lg rounded-full">
-                                    <Link href="/contact">
-                                        {t('bookAppointment', { default: 'Onlayn Qəbul' })}
-                                    </Link>
-                                </Button>
-                                <Button asChild size="lg" variant="outline" className="border-brand-blue text-brand-blue hover:bg-brand-blue-soft px-8 h-14 text-lg rounded-full">
-                                    <Link href="/services">
-                                        {t('ourServices', { default: 'Xidmətlərimiz' })} <ArrowRight className="ml-2 h-5 w-5" />
-                                    </Link>
-                                </Button>
-                            </div>
-                        </div>
-                        <div className="relative h-[320px] overflow-hidden rounded-3xl shadow-2xl sm:h-[420px] lg:h-[600px]">
+        <div className="min-h-screen bg-white text-slate-950">
+            {isUnavailable ? (
+                <div className="container mx-auto px-5 pt-6">
+                    <TemporaryUnavailable compact onRetry={() => setRefreshKey((key) => key + 1)} />
+                </div>
+            ) : null}
+
+            <section className="bg-white px-4 pb-14 pt-5 sm:px-6 lg:pb-20">
+                <div className="container mx-auto">
+                    <div className="relative overflow-hidden rounded-[1.75rem] bg-brand-blue-dark shadow-[0_28px_80px_rgba(16,55,114,0.18)]">
+                        <div className="absolute inset-0">
                             <Image
                                 src="/about_banner.JPG"
-                                alt={t('heroImageAlt')}
+                                alt="Ultramed Clinic"
                                 fill
                                 priority
-                                sizes="(max-width: 1024px) 100vw, 50vw"
-                                className="object-cover object-center"
+                                sizes="100vw"
+                                className="object-cover"
                             />
-                            <div className="absolute inset-0 bg-gradient-to-t from-brand-blue-dark/20 via-transparent to-white/5" />
+                            <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(16,55,114,0.88),rgba(16,55,114,0.62)_44%,rgba(16,55,114,0.18))]" />
+                        </div>
+
+                        <div className="relative grid min-h-[610px] gap-8 px-5 py-8 sm:px-8 lg:grid-cols-[minmax(0,1fr)_440px] lg:items-center lg:px-12 lg:py-14">
+                            <div className="max-w-2xl text-white">
+                                <div className="inline-flex items-center gap-2 rounded-full bg-white/95 px-4 py-2 text-sm font-bold text-brand-blue shadow-sm">
+                                    <HeartPulse className="h-4 w-4" />
+                                    Ultramed Clinic
+                                </div>
+                                <h1 className="mt-6 max-w-xl text-4xl font-black leading-tight tracking-tight sm:text-5xl lg:text-6xl">
+                                    İnsani qayğı ilə müasir təbabət
+                                </h1>
+                                <p className="mt-5 max-w-lg text-base font-medium leading-8 text-white/90 sm:text-lg">
+                                    Müasir diaqnostika, peşəkar həkim heyəti və pasiyent yönümlü xidmətlə sağlamlığınız üçün etibarlı tibbi mərkəz.
+                                </p>
+
+                                <div className="mt-7 grid max-w-lg grid-cols-3 gap-3">
+                                    {statValues.map((stat, index) => (
+                                        <div key={`${stat.label}-${index}`} className="rounded-2xl bg-white/12 px-3 py-3 backdrop-blur">
+                                            <div className="text-xl font-black">{stat.value}</div>
+                                            <div className="mt-1 text-xs font-semibold text-white/80">{stat.label}</div>
+                                        </div>
+                                    ))}
+                                </div>
+
+                                <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+                                    <Button asChild className="h-12 rounded-full bg-brand-orange px-6 text-white hover:bg-brand-orange-dark">
+                                        <Link href="/contact">
+                                            Qəbula yazıl
+                                            <ArrowRight className="ml-2 h-4 w-4" />
+                                        </Link>
+                                    </Button>
+                                    <Button asChild className="h-12 rounded-full bg-white px-6 text-brand-blue hover:bg-white/90">
+                                        <a href={`tel:${primaryPhone.replace(/[^\d+]/g, '')}`}>
+                                            <Phone className="mr-2 h-4 w-4" />
+                                            {primaryPhone}
+                                        </a>
+                                    </Button>
+                                </div>
+                            </div>
+
+                            <div className="relative mx-auto w-full max-w-[430px] lg:mx-0">
+                                <div className="rounded-[2rem] border border-white/70 bg-white/95 p-5 shadow-[0_24px_70px_rgba(15,23,42,0.22)] backdrop-blur-xl sm:p-7">
+                                    <div className="flex items-start justify-between gap-4">
+                                        <div>
+                                            <h2 className="text-2xl font-black tracking-tight text-slate-950">
+                                                Check-up Paketləri
+                                            </h2>
+                                            <p className="mt-2 text-sm font-medium text-slate-500">
+                                                Əlverişli qiymətlərlə sağlamlıq yoxlanışı
+                                            </p>
+                                        </div>
+                                        <ClipboardList className="h-8 w-8 text-brand-blue" />
+                                    </div>
+
+                                    <div className="mt-5 h-px bg-brand-blue-soft" />
+
+                                    <div className="mt-5 flex flex-col gap-3">
+                                        {homeCheckups.map((item) => (
+                                            <Link
+                                                key={item.id}
+                                                href="/contact"
+                                                className="group grid grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-3 rounded-2xl bg-white px-4 py-4 shadow-[0_12px_30px_rgba(21,72,158,0.12)] ring-1 ring-brand-blue-soft transition hover:-translate-y-0.5 hover:shadow-[0_16px_34px_rgba(21,72,158,0.18)]"
+                                            >
+                                                <div className="min-w-0">
+                                                    <h3 className="text-sm font-black leading-5 text-slate-950 sm:text-base">
+                                                        {item.title}
+                                                    </h3>
+                                                    <p className="mt-1 text-xs font-medium text-slate-500">
+                                                        {item.subtitle || 'Müddətli təklif'}
+                                                    </p>
+                                                </div>
+                                                <div className="rounded-full bg-brand-blue px-4 py-2 text-sm font-black text-white shadow-[0_10px_22px_rgba(21,72,158,0.32)]">
+                                                    {item.price} {item.currency}
+                                                </div>
+                                                <ArrowRight className="h-5 w-5 text-brand-blue transition group-hover:translate-x-1" />
+                                            </Link>
+                                        ))}
+                                    </div>
+
+                                    <div className="mt-6 border-t border-brand-blue-soft pt-5 text-center">
+                                        <Link href="/contact" className="inline-flex items-center gap-2 text-sm font-black text-brand-blue">
+                                            Bütün Check-up Paketləri
+                                            <ArrowRight className="h-4 w-4" />
+                                        </Link>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </section>
 
-            {/* Features Section */}
-            <section className="py-20 bg-white">
-                <div className="container mx-auto px-6">
-                    <div className="text-center max-w-3xl mx-auto mb-16">
-                        <h2 className="text-3xl font-bold text-slate-900 mb-4">{t('whyChooseUs', { default: 'Niyə Bizi Seçməlisiniz?' })}</h2>
-                        <p className="text-slate-600 text-lg">
-                            {t('whyChooseUsDesc', { default: 'Xəstələrimizin məmnuniyyəti və rahatlığı üçün ən yaxşı xidməti təqdim etməyə çalışırıq.' })}
+            <section className="bg-[#eefdff] px-4 py-16 sm:px-6 lg:py-20">
+                <div className="container mx-auto">
+                    <div className="mb-10 max-w-xl">
+                        <h2 className="text-3xl font-black leading-tight tracking-tight text-slate-950 sm:text-4xl">
+                            Müasir texnologiya və peşəkar xidmətlər
+                        </h2>
+                    </div>
+                    <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+                        {homeServices.map((service) => (
+                            <Link
+                                key={service.id}
+                                href={`/services/${service.id}`}
+                                className="group flex min-h-[150px] flex-col justify-between rounded-xl bg-white p-5 shadow-sm ring-1 ring-brand-blue-soft transition hover:-translate-y-1 hover:shadow-[0_18px_38px_rgba(21,72,158,0.13)]"
+                            >
+                                <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-blue-soft text-brand-blue">
+                                    {serviceIcon(service.iconKey)}
+                                </div>
+                                <div className="mt-7 flex items-end justify-between gap-4 border-t border-slate-100 pt-4">
+                                    <h3 className="text-base font-bold leading-6 text-slate-950">{service.title}</h3>
+                                    <ArrowRight className="h-4 w-4 shrink-0 text-slate-500 transition group-hover:translate-x-1 group-hover:text-brand-blue" />
+                                </div>
+                            </Link>
+                        ))}
+                    </div>
+                    <Button asChild variant="outline" className="mt-8 rounded-full border-brand-blue text-brand-blue hover:bg-white">
+                        <Link href="/services">
+                            Daha çox
+                            <ArrowRight className="ml-2 h-4 w-4" />
+                        </Link>
+                    </Button>
+                </div>
+            </section>
+
+            <section className="bg-white px-4 py-16 sm:px-6 lg:py-24">
+                <div className="container mx-auto grid gap-10 lg:grid-cols-[280px_minmax(0,1fr)] lg:items-center">
+                    <div>
+                        <h2 className="text-4xl font-black leading-tight tracking-tight text-slate-950">
+                            Həkim heyətimiz
+                        </h2>
+                        <p className="mt-5 text-sm leading-7 text-slate-500">
+                            Peşəkar və təcrübəli həkimlərimiz sağlamlığınız üçün yüksək səviyyəli tibbi xidmət göstərirlər.
                         </p>
+                        <div className="mt-7 flex gap-3">
+                            <button type="button" className="flex h-10 w-10 items-center justify-center rounded-full border border-brand-blue-soft text-brand-blue">
+                                <ArrowLeft className="h-4 w-4" />
+                            </button>
+                            <button type="button" className="flex h-10 w-10 items-center justify-center rounded-full bg-brand-blue text-white shadow-lg shadow-brand-blue/20">
+                                <ArrowRight className="h-4 w-4" />
+                            </button>
+                        </div>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                        {features.map((feature, idx) => (
-                            <Card key={idx} className="border-slate-100 shadow-sm hover:shadow-md transition-shadow">
-                                <CardHeader className="pb-4">
-                                    <div className="bg-brand-blue-soft w-16 h-16 rounded-2xl flex items-center justify-center mb-4">
-                                        {feature.icon}
+                    <div className="-mx-4 flex gap-5 overflow-x-auto px-4 pb-4 lg:mx-0 lg:px-0">
+                        {homeDoctors.map((doctor) => {
+                            const doctorImage = doctor.image || '/logo.png';
+                            return (
+                                <Link
+                                    key={doctor.id}
+                                    href={`/doctors/${doctor.id}`}
+                                    className="group relative h-[330px] w-[245px] shrink-0 overflow-hidden rounded-2xl bg-white shadow-[0_16px_42px_rgba(15,23,42,0.12)] ring-1 ring-slate-100"
+                                >
+                                    <Image
+                                        src={doctorImage}
+                                        alt={doctor.name}
+                                        fill
+                                        unoptimized={shouldBypassImageOptimization(doctorImage)}
+                                        sizes="245px"
+                                        className="object-cover object-top"
+                                    />
+                                    <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-brand-blue via-brand-blue/95 to-transparent p-5 pt-20 text-white">
+                                        <h3 className="text-lg font-black leading-6">{doctor.name}</h3>
+                                        <p className="mt-1 text-xs font-semibold text-white/80">{doctor.specialty}</p>
+                                        <span className="mt-4 inline-flex rounded-full bg-brand-orange px-4 py-2 text-xs font-black text-white">
+                                            Ətraflı
+                                        </span>
                                     </div>
-                                    <CardTitle className="text-xl">{feature.title}</CardTitle>
-                                </CardHeader>
-                                <CardContent>
-                                    <CardDescription className="text-base">{feature.description}</CardDescription>
-                                </CardContent>
-                            </Card>
+                                </Link>
+                            );
+                        })}
+                    </div>
+                </div>
+            </section>
+
+            <section className="bg-brand-cream px-4 py-14 sm:px-6 lg:py-20">
+                <div className="container mx-auto text-center">
+                    <h2 className="text-2xl font-black text-slate-950">Partnyorlar</h2>
+                    <div className="mx-auto mt-3 h-0.5 w-14 bg-brand-blue" />
+                    <div className="mt-12 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
+                        {partnerNames.map((name) => (
+                            <div key={name} className="flex h-20 items-center justify-center rounded-xl bg-white px-5 text-center text-sm font-bold text-slate-500 shadow-sm ring-1 ring-slate-100">
+                                {name}
+                            </div>
                         ))}
                     </div>
                 </div>
             </section>
 
-            {/* Statistics Section */}
-            <section className="py-16 bg-brand-blue">
-                <div className="container mx-auto px-6">
-                    {isStatsUnavailable ? (
-                        <TemporaryUnavailable
-                            compact
-                            className="border-white/10 bg-white/95"
-                            onRetry={() => setRefreshKey((key) => key + 1)}
-                        />
-                    ) : (
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center divide-x divide-white/20">
-                            {stats.map((stat, idx) => (
-                                <div key={idx} className="flex flex-col items-center justify-center space-y-2 text-white px-4">
-                                    <div className="bg-brand-orange/25 p-3 rounded-full mb-2">
-                                        {stat.icon}
-                                    </div>
-                                    {isStatsLoading ? (
-                                        <>
-                                            <Skeleton className="h-10 w-24 bg-white/25" />
-                                            <Skeleton className="h-5 w-36 bg-white/20" />
-                                        </>
-                                    ) : (
-                                        <>
-                                            <div className="text-4xl font-extrabold">{stat.value}</div>
-                                            <div className="text-white/90 font-medium">{stat.label}</div>
-                                        </>
-                                    )}
-                                </div>
-                            ))}
+            <section className="bg-white px-4 py-16 sm:px-6 lg:py-24">
+                <div className="container mx-auto">
+                    <div className="mb-10 flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
+                        <div>
+                            <h2 className="text-4xl font-black tracking-tight text-slate-950">
+                                Xəbərlər və Aksiyalar
+                            </h2>
+                            <p className="mt-4 max-w-xl text-sm leading-7 text-slate-500">
+                                Ən son xəbərlər, tibbi yeniliklər və xüsusi təkliflərimiz haqqında məlumat alın.
+                            </p>
                         </div>
-                    )}
+                        <Button asChild className="w-fit rounded-full bg-brand-blue px-6 text-white hover:bg-brand-blue-dark">
+                            <Link href="/blog">
+                                Hamısına bax
+                                <ArrowRight className="ml-2 h-4 w-4" />
+                            </Link>
+                        </Button>
+                    </div>
+
+                    <div className="grid gap-6 md:grid-cols-3">
+                        {homeBlogs.map((post, index) => {
+                            const image = post.image || '/about_banner.JPG';
+                            return (
+                                <Link
+                                    key={post.id}
+                                    href={`/blog/${post.id}`}
+                                    className="group overflow-hidden rounded-2xl bg-white shadow-[0_14px_36px_rgba(15,23,42,0.10)] ring-1 ring-slate-100 transition hover:-translate-y-1 hover:shadow-[0_18px_42px_rgba(21,72,158,0.16)]"
+                                >
+                                    <div className="relative h-48 bg-brand-blue-soft">
+                                        <Image
+                                            src={image}
+                                            alt={post.title}
+                                            fill
+                                            unoptimized={shouldBypassImageOptimization(image)}
+                                            sizes="(max-width: 768px) 100vw, 33vw"
+                                            className="object-cover"
+                                        />
+                                        <span className="absolute left-4 top-4 rounded-full bg-emerald-500 px-3 py-1 text-xs font-black text-white">
+                                            {index === 0 ? '64 ₼' : index === 1 ? '99 ₼' : '109 ₼'}
+                                        </span>
+                                        <span className="absolute right-4 top-4 rounded-full bg-white px-3 py-1 text-xs font-bold text-brand-blue">
+                                            {post.date}
+                                        </span>
+                                    </div>
+                                    <div className="p-5">
+                                        <h3 className="text-lg font-black leading-6 text-slate-950">{post.title}</h3>
+                                        <p className="mt-2 line-clamp-2 text-sm leading-6 text-slate-500">{post.excerpt}</p>
+                                        <span className="mt-5 inline-flex items-center gap-2 text-sm font-black text-brand-blue">
+                                            Ətraflı oxu
+                                            <ArrowRight className="h-4 w-4 transition group-hover:translate-x-1" />
+                                        </span>
+                                    </div>
+                                </Link>
+                            );
+                        })}
+                    </div>
                 </div>
             </section>
 
-            {/* CTA Section */}
-            <section className="py-24 bg-brand-cream">
-                <div className="container mx-auto px-6">
-                    <div className="bg-white rounded-3xl shadow-xl p-10 md:p-16 text-center max-w-4xl mx-auto border border-brand-orange/20">
-                        <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-6">
-                            {t('ctaTitle', { default: 'Sağlamlığınıza Bu Gün Qayğı Göstərin' })}
+            <section className="bg-white px-4 pb-20 sm:px-6 lg:pb-28">
+                <div className="container mx-auto grid gap-8 lg:grid-cols-[minmax(0,1fr)_430px] lg:items-center">
+                    <div>
+                        <h2 className="text-3xl font-black tracking-tight text-slate-950 sm:text-4xl">
+                            Peşəkar məsləhət alın
                         </h2>
-                        <p className="text-lg text-slate-600 mb-10 max-w-2xl mx-auto">
-                            {t('ctaDesc', { default: 'Vaxt itirmədən həkim qəbuluna yazılın və peşəkar komandamızın xidmətindən yararlanın.' })}
+                        <p className="mt-4 max-w-xl text-sm leading-7 text-slate-500">
+                            Bir dəqiqə ərzində qeydiyyatı tamamlayın və peşəkar həkim məsləhəti alın.
                         </p>
-                        <div className="flex flex-col sm:flex-row justify-center gap-4">
-                            <Button asChild size="lg" className="bg-brand-orange hover:bg-brand-orange-dark text-white px-8 h-14 text-lg rounded-full">
-                                <Link href="/contact">
-                                    {t('bookAppointment', { default: 'Qəbul yazılmaq' })}
-                                </Link>
+
+                        <form
+                            className="mt-8 grid gap-3 rounded-2xl bg-white p-5 shadow-[0_18px_48px_rgba(15,23,42,0.10)] ring-1 ring-slate-100"
+                            onSubmit={(event) => event.preventDefault()}
+                        >
+                            <div className="grid gap-3 sm:grid-cols-2">
+                                <input className="h-12 rounded-xl border border-slate-200 px-4 text-sm outline-none focus:border-brand-blue" placeholder="Ad və Soyad" />
+                                <input className="h-12 rounded-xl border border-slate-200 px-4 text-sm outline-none focus:border-brand-blue" placeholder="E-mail" />
+                            </div>
+                            <div className="grid gap-3 sm:grid-cols-2">
+                                <input className="h-12 rounded-xl border border-slate-200 px-4 text-sm outline-none focus:border-brand-blue" placeholder="Telefon nömrəsi" />
+                                <select className="h-12 rounded-xl border border-slate-200 px-4 text-sm text-slate-500 outline-none focus:border-brand-blue">
+                                    <option>Xidmət seçin</option>
+                                    {homeServices.slice(0, 5).map((service) => (
+                                        <option key={service.id}>{service.title}</option>
+                                    ))}
+                                </select>
+                            </div>
+                            <div className="grid gap-3 sm:grid-cols-2">
+                                <input className="h-12 rounded-xl border border-slate-200 px-4 text-sm outline-none focus:border-brand-blue" placeholder="Tarix seçin" />
+                                <input className="h-12 rounded-xl border border-slate-200 px-4 text-sm outline-none focus:border-brand-blue" placeholder="Saat seçin" />
+                            </div>
+                            <textarea className="min-h-28 rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-brand-blue" placeholder="Mesajınız (istəyə görə)" />
+                            <Button className="h-12 rounded-xl bg-slate-200 text-slate-500 hover:bg-brand-orange hover:text-white">
+                                Qəbula yazıl
+                                <ArrowRight className="ml-2 h-4 w-4" />
                             </Button>
-                            <Button asChild size="lg" variant="outline" className="border-brand-blue text-brand-blue hover:bg-brand-blue-soft px-8 h-14 text-lg rounded-full">
-                                <Link href="/contact">
-                                    {t('contactUs', { default: 'Bizimlə Əlaqə' })}
-                                </Link>
+                        </form>
+                    </div>
+
+                    <div className="rounded-2xl bg-brand-blue p-7 text-white shadow-[0_24px_60px_rgba(21,72,158,0.28)]">
+                        <div className="mb-8 flex justify-end">
+                            <span className="rounded-full border border-white/30 px-4 py-2 text-xs font-black">ULTRAMED CLINIC</span>
+                        </div>
+                        <div className="grid gap-5">
+                            <div className="flex gap-4 rounded-xl bg-white/10 p-4">
+                                <Clock className="h-6 w-6 shrink-0 text-white" />
+                                <div>
+                                    <h3 className="font-black">İş saatları</h3>
+                                    {contactInfo.workingHours.map((item) => (
+                                        <p key={`${item.label}-${item.value}`} className="mt-1 text-sm text-white/85">
+                                            {item.label}: {item.value}
+                                        </p>
+                                    ))}
+                                </div>
+                            </div>
+                            <div className="flex gap-4 rounded-xl bg-white/10 p-4">
+                                <Phone className="h-6 w-6 shrink-0 text-white" />
+                                <div>
+                                    <h3 className="font-black">Telefon</h3>
+                                    <p className="mt-1 text-sm text-white/85">{primaryPhone}</p>
+                                    <p className="mt-1 text-sm text-white/85">{primaryEmail}</p>
+                                </div>
+                            </div>
+                            <div className="flex gap-4 rounded-xl bg-white/10 p-4">
+                                <MapPin className="h-6 w-6 shrink-0 text-white" />
+                                <div>
+                                    <h3 className="font-black">Ünvan</h3>
+                                    <p className="mt-1 text-sm leading-6 text-white/85">{contactInfo.address}</p>
+                                </div>
+                            </div>
+                            <Button asChild className="mt-2 rounded-xl bg-white text-brand-blue hover:bg-white/90">
+                                <a href={contactInfo.map.embedUrl} target="_blank" rel="noreferrer">
+                                    Google Maps-də baxın
+                                    <ArrowRight className="ml-2 h-4 w-4" />
+                                </a>
                             </Button>
                         </div>
                     </div>

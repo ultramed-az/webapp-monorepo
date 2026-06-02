@@ -6,7 +6,12 @@ import { Link, useRouter, usePathname } from '@/i18n/routing';
 import { useParams } from 'next/navigation';
 import { Facebook, Instagram, Linkedin, MapPin, Menu, Phone } from 'lucide-react';
 import Image from 'next/image';
-import { getContactInfo, type ContactInfoResponse } from '@/lib/api';
+import {
+    getContactInfo,
+    getHomeAnnouncements,
+    type ContactInfoResponse,
+    type HomeAnnouncementItem,
+} from '@/lib/api';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -21,7 +26,7 @@ import {
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+} from "@/components/ui/dropdown-menu";
 
 function isWhatsAppValue(value: string): boolean {
     return value.toLowerCase().includes('wa.me');
@@ -93,6 +98,43 @@ function SocialLinks({
     );
 }
 
+function AnnouncementMarquee({ items }: { items: HomeAnnouncementItem[] }) {
+    if (items.length === 0) {
+        return null;
+    }
+
+    const marqueeItems = [...items, ...items];
+
+    return (
+        <div className="h-8 overflow-hidden bg-brand-blue text-white">
+            <div className="flex h-full w-max animate-ultramed-marquee items-center gap-10 whitespace-nowrap text-xs font-semibold sm:text-sm">
+                {marqueeItems.map((item, index) => {
+                    const content = (
+                        <>
+                            <span>{item.text}</span>
+                            <span className="ml-10 text-white/40">•</span>
+                        </>
+                    );
+
+                    return item.href ? (
+                        <a
+                            key={`${item.id}-${index}`}
+                            href={item.href}
+                            className="inline-flex items-center text-white hover:text-white/85"
+                        >
+                            {content}
+                        </a>
+                    ) : (
+                        <span key={`${item.id}-${index}`} className="inline-flex items-center">
+                            {content}
+                        </span>
+                    );
+                })}
+            </div>
+        </div>
+    );
+}
+
 export default function Navbar() {
     const t = useTranslations('Navigation');
     const pathname = usePathname();
@@ -118,7 +160,28 @@ export default function Navbar() {
         }),
         [t],
     );
+    const fallbackAnnouncements = useMemo<HomeAnnouncementItem[]>(
+        () => [
+            {
+                id: 'fallback-appointment',
+                text: 'Ultramed Clinic - sağlamlığınızın etibarlı ünvanı.',
+                href: null,
+            },
+            {
+                id: 'fallback-checkup',
+                text: 'Check-up paketləri ilə sağlamlığınızı vaxtında yoxlayın.',
+                href: `/${locale}/contact`,
+            },
+            {
+                id: 'fallback-offer',
+                text: 'Sayt vasitəsilə müraciət edən pasiyentlər üçün xüsusi təkliflər.',
+                href: `/${locale}/services`,
+            },
+        ],
+        [locale],
+    );
     const [contactInfo, setContactInfo] = useState<ContactInfoResponse>(fallbackContactInfo);
+    const [announcements, setAnnouncements] = useState<HomeAnnouncementItem[]>(fallbackAnnouncements);
 
     useEffect(() => {
         const handleScroll = () => {
@@ -154,6 +217,30 @@ export default function Navbar() {
             isCancelled = true;
         };
     }, [fallbackContactInfo, locale]);
+
+    useEffect(() => {
+        let isCancelled = false;
+
+        async function loadAnnouncements() {
+            setAnnouncements(fallbackAnnouncements);
+            try {
+                const data = await getHomeAnnouncements(locale);
+                if (!isCancelled) {
+                    setAnnouncements(data.length > 0 ? data : fallbackAnnouncements);
+                }
+            } catch {
+                if (!isCancelled) {
+                    setAnnouncements(fallbackAnnouncements);
+                }
+            }
+        }
+
+        void loadAnnouncements();
+
+        return () => {
+            isCancelled = true;
+        };
+    }, [fallbackAnnouncements, locale]);
 
     const languages = [
         { code: 'az', label: 'AZ' },
@@ -201,6 +288,8 @@ export default function Navbar() {
 
     return (
         <header className="fixed top-0 w-full z-50">
+            <AnnouncementMarquee items={announcements} />
+
             {/* Top Bar - Hidden on Mobile */}
             <div className="hidden lg:flex justify-between items-center bg-brand-blue-dark text-white/90 text-sm py-2 px-8">
                 <div className="flex items-center space-x-6">

@@ -20,7 +20,7 @@ export default function RouteFrame({ children }: RouteFrameProps) {
     return (
         <>
             <Navbar />
-            <main className="pt-[84px] lg:pt-[128px] min-h-screen bg-white">
+            <main className="pt-[116px] lg:pt-[160px] min-h-screen bg-white">
                 {children}
             </main>
             <Footer />

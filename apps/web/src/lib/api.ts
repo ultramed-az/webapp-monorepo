@@ -92,6 +92,20 @@ export type HomeStatItem = {
     value: string;
 };
 
+export type HomeAnnouncementItem = {
+    id: string;
+    text: string;
+    href: string | null;
+};
+
+export type CheckupPackageItem = {
+    id: string;
+    title: string;
+    subtitle: string;
+    price: string;
+    currency: string;
+};
+
 export type FaqItem = {
     id: string;
     question: string;
@@ -302,6 +316,14 @@ export async function getContactInfo(locale: string | undefined): Promise<Contac
 
 export async function getHomeStats(): Promise<HomeStatItem[]> {
     return request<HomeStatItem[]>('/home/stats');
+}
+
+export async function getHomeAnnouncements(locale: string | undefined): Promise<HomeAnnouncementItem[]> {
+    return request<HomeAnnouncementItem[]>('/home/announcements', { locale: toLocale(locale) });
+}
+
+export async function getCheckupPackages(locale: string | undefined): Promise<CheckupPackageItem[]> {
+    return request<CheckupPackageItem[]>('/home/checkup-packages', { locale: toLocale(locale) });
 }
 
 export async function getServices(locale: string | undefined): Promise<ServiceListItem[]> {

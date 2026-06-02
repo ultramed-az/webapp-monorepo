@@ -14,6 +14,8 @@ import {
     HelpCircle,
     Shield,
     ScrollText,
+    Bell,
+    ClipboardList,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -28,6 +30,8 @@ export default function Sidebar({ mobile = false, onNavigate }: SidebarProps) {
 
     const menuItems = [
         { icon: <LayoutDashboard className="w-5 h-5" />, label: t('dashboard', { default: 'Dashboard' }), href: '/admin/dashboard' },
+        { icon: <Bell className="w-5 h-5" />, label: t('announcements', { default: 'Announcements' }), href: '/admin/announcements' },
+        { icon: <ClipboardList className="w-5 h-5" />, label: t('checkupPackages', { default: 'Check-up Packages' }), href: '/admin/checkup-packages' },
         { icon: <Stethoscope className="w-5 h-5" />, label: t('services', { default: 'Services' }), href: '/admin/services' },
         { icon: <Users className="w-5 h-5" />, label: t('doctors', { default: 'Doctors' }), href: '/admin/doctors' },
         { icon: <FileText className="w-5 h-5" />, label: t('blog', { default: 'Blog' }), href: '/admin/blog' },

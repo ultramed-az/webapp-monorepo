@@ -195,6 +195,34 @@ export type AdminGalleryRecord = {
   updatedAt: string;
 };
 
+export type AdminAnnouncementRecord = {
+  id: string;
+  textAz: string;
+  textEn: string;
+  textRu: string;
+  href: string | null;
+  sortOrder: number;
+  isPublished: boolean;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type AdminCheckupPackageRecord = {
+  id: string;
+  titleAz: string;
+  titleEn: string;
+  titleRu: string;
+  subtitleAz: string | null;
+  subtitleEn: string | null;
+  subtitleRu: string | null;
+  price: string;
+  currency: string;
+  sortOrder: number;
+  isPublished: boolean;
+  createdAt: string;
+  updatedAt: string;
+};
+
 export type AdminMediaRecord = {
   id: string;
   originalName: string;
@@ -676,6 +704,64 @@ export async function cleanupAdminOrphanMedia(options?: {
 
   return request<AdminMediaCleanupResult>(path, {
     method: 'POST',
+  });
+}
+
+export async function getAdminAnnouncements(): Promise<AdminAnnouncementRecord[]> {
+  return request<AdminAnnouncementRecord[]>('/home/announcements/admin/all');
+}
+
+export async function createAdminAnnouncement(
+  data: Partial<AdminAnnouncementRecord>,
+): Promise<AdminAnnouncementRecord> {
+  return request<AdminAnnouncementRecord>('/home/announcements', {
+    method: 'POST',
+    body: data,
+  });
+}
+
+export async function updateAdminAnnouncement(
+  id: string,
+  data: Partial<AdminAnnouncementRecord>,
+): Promise<AdminAnnouncementRecord> {
+  return request<AdminAnnouncementRecord>(`/home/announcements/${id}`, {
+    method: 'PUT',
+    body: data,
+  });
+}
+
+export async function deleteAdminAnnouncement(id: string): Promise<AdminAnnouncementRecord> {
+  return request<AdminAnnouncementRecord>(`/home/announcements/${id}`, {
+    method: 'DELETE',
+  });
+}
+
+export async function getAdminCheckupPackages(): Promise<AdminCheckupPackageRecord[]> {
+  return request<AdminCheckupPackageRecord[]>('/home/checkup-packages/admin/all');
+}
+
+export async function createAdminCheckupPackage(
+  data: Partial<AdminCheckupPackageRecord>,
+): Promise<AdminCheckupPackageRecord> {
+  return request<AdminCheckupPackageRecord>('/home/checkup-packages', {
+    method: 'POST',
+    body: data,
+  });
+}
+
+export async function updateAdminCheckupPackage(
+  id: string,
+  data: Partial<AdminCheckupPackageRecord>,
+): Promise<AdminCheckupPackageRecord> {
+  return request<AdminCheckupPackageRecord>(`/home/checkup-packages/${id}`, {
+    method: 'PUT',
+    body: data,
+  });
+}
+
+export async function deleteAdminCheckupPackage(id: string): Promise<AdminCheckupPackageRecord> {
+  return request<AdminCheckupPackageRecord>(`/home/checkup-packages/${id}`, {
+    method: 'DELETE',
   });
 }
 

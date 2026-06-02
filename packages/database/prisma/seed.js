@@ -1068,6 +1068,78 @@ const homeStats = [
   { id: 'years', value: '15+', sortOrder: 4 },
 ];
 
+const announcements = [
+  {
+    id: 'announcement-brand',
+    textAz: 'Ultramed Clinic - sağlamlığınızın etibarlı ünvanı.',
+    textEn: 'Ultramed Clinic - your trusted address for health.',
+    textRu: 'Ultramed Clinic - надежный адрес вашего здоровья.',
+    href: null,
+    sortOrder: 1,
+    isPublished: true,
+  },
+  {
+    id: 'announcement-checkup',
+    textAz: 'Check-up paketləri ilə sağlamlığınızı vaxtında yoxlayın.',
+    textEn: 'Check your health on time with check-up packages.',
+    textRu: 'Проверьте здоровье вовремя с пакетами check-up.',
+    href: '/az/contact',
+    sortOrder: 2,
+    isPublished: true,
+  },
+  {
+    id: 'announcement-online',
+    textAz: 'Sayt vasitəsilə müraciət edən pasiyentlər üçün xüsusi təkliflər.',
+    textEn: 'Special offers for patients applying through the website.',
+    textRu: 'Специальные предложения для пациентов, обращающихся через сайт.',
+    href: '/az/services',
+    sortOrder: 3,
+    isPublished: true,
+  },
+];
+
+const checkupPackages = [
+  {
+    id: 'checkup-gynecology',
+    titleAz: 'Ginekoloji check up',
+    titleEn: 'Gynecological check-up',
+    titleRu: 'Гинекологический check-up',
+    subtitleAz: '4 May 2026',
+    subtitleEn: '4 May 2026',
+    subtitleRu: '4 мая 2026',
+    price: '64',
+    currency: '₼',
+    sortOrder: 1,
+    isPublished: true,
+  },
+  {
+    id: 'checkup-newlyweds',
+    titleAz: 'Yeni evlənənlər üçün check up',
+    titleEn: 'Check-up for newlyweds',
+    titleRu: 'Check-up для молодоженов',
+    subtitleAz: '12 Aprel 2026',
+    subtitleEn: '12 April 2026',
+    subtitleRu: '12 апреля 2026',
+    price: '99',
+    currency: '₼',
+    sortOrder: 2,
+    isPublished: true,
+  },
+  {
+    id: 'checkup-therapy',
+    titleAz: 'Terapevtik check up',
+    titleEn: 'Therapeutic check-up',
+    titleRu: 'Терапевтический check-up',
+    subtitleAz: '12 Aprel 2026',
+    subtitleEn: '12 April 2026',
+    subtitleRu: '12 апреля 2026',
+    price: '109',
+    currency: '₼',
+    sortOrder: 3,
+    isPublished: true,
+  },
+];
+
 function toSafeSegment(value) {
   return String(value)
     .toLowerCase()
@@ -1312,6 +1384,26 @@ async function seedHomeStats() {
   }
 }
 
+async function seedAnnouncements() {
+  for (const announcement of announcements) {
+    await prisma.announcement.upsert({
+      where: { id: announcement.id },
+      update: announcement,
+      create: announcement,
+    });
+  }
+}
+
+async function seedCheckupPackages() {
+  for (const item of checkupPackages) {
+    await prisma.checkupPackage.upsert({
+      where: { id: item.id },
+      update: item,
+      create: item,
+    });
+  }
+}
+
 async function main() {
   console.log('Seeding database...');
   await seedAdmin();
@@ -1324,6 +1416,8 @@ async function main() {
   await seedGallery();
   await seedContact();
   await seedHomeStats();
+  await seedAnnouncements();
+  await seedCheckupPackages();
   console.log('Database seeding complete.');
 }
 
