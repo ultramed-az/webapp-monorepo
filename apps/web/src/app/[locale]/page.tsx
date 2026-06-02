@@ -159,6 +159,47 @@ function displayed<T>(items: T[], fallback: T[], limit: number): T[] {
     return source.slice(0, limit);
 }
 
+function useScrollReveal(refreshKey: string) {
+    useEffect(() => {
+        const elements = Array.from(document.querySelectorAll<HTMLElement>('[data-reveal]'));
+
+        if (elements.length === 0) {
+            return;
+        }
+
+        const shouldReduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+        if (shouldReduceMotion || !('IntersectionObserver' in window)) {
+            elements.forEach((element) => {
+                element.dataset.revealed = 'true';
+            });
+            return;
+        }
+
+        const observer = new IntersectionObserver(
+            (entries) => {
+                entries.forEach((entry) => {
+                    if (!entry.isIntersecting) return;
+
+                    const element = entry.target as HTMLElement;
+                    element.dataset.revealed = 'true';
+                    observer.unobserve(element);
+                });
+            },
+            {
+                rootMargin: '0px 0px -12% 0px',
+                threshold: 0.14,
+            },
+        );
+
+        elements.forEach((element) => observer.observe(element));
+
+        return () => {
+            observer.disconnect();
+        };
+    }, [refreshKey]);
+}
+
 export default function HomePage() {
     const params = useParams<{ locale: string }>();
     const locale = normalizeLocale(params?.locale);
@@ -234,6 +275,9 @@ export default function HomePage() {
     const homeBlogs = displayed(blogs, fallbackBlogs, 3);
     const primaryPhone = contactInfo.phones.find((item) => !item.value.includes('wa.me'))?.value ?? contactInfo.phones[0]?.value ?? '';
     const primaryEmail = contactInfo.emails[0]?.value ?? 'ultramedclinics@gmail.com';
+    const revealRefreshKey = `${locale}-${homeServices.length}-${homeDoctors.length}-${homeCheckups.length}-${homeBlogs.length}`;
+
+    useScrollReveal(revealRefreshKey);
 
     const updateDoctorCarouselState = useCallback(() => {
         const track = doctorsTrackRef.current;
@@ -290,7 +334,7 @@ export default function HomePage() {
 
             <section className="bg-white px-4 pb-14 pt-5 sm:px-6 lg:pb-20">
                 <div className="container mx-auto">
-                    <div className="relative overflow-hidden rounded-[1.75rem] bg-brand-blue-dark shadow-[0_28px_80px_rgba(16,55,114,0.18)]">
+                    <div data-reveal="hero" className="relative overflow-hidden rounded-[1.75rem] bg-brand-blue-dark shadow-[0_28px_80px_rgba(16,55,114,0.18)]">
                         <div className="absolute inset-0">
                             <Image
                                 src="/about_banner.JPG"
@@ -305,27 +349,27 @@ export default function HomePage() {
 
                         <div className="relative grid min-h-[610px] gap-8 px-5 py-8 sm:px-8 lg:grid-cols-[minmax(0,1fr)_440px] lg:items-center lg:px-12 lg:py-14">
                             <div className="max-w-2xl text-white">
-                                <div className="inline-flex items-center gap-2 rounded-full bg-white/95 px-4 py-2 text-sm font-bold text-brand-blue shadow-sm">
+                                <div data-reveal="slide-up" style={{ transitionDelay: '80ms' }} className="inline-flex items-center gap-2 rounded-full bg-white/95 px-4 py-2 text-sm font-bold text-brand-blue shadow-sm">
                                     <HeartPulse className="h-4 w-4" />
                                     Ultramed Clinic
                                 </div>
-                                <h1 className="mt-6 max-w-xl text-4xl font-black leading-tight tracking-tight sm:text-5xl lg:text-6xl">
+                                <h1 data-reveal="slide-left" style={{ transitionDelay: '140ms' }} className="mt-6 max-w-xl text-4xl font-black leading-tight tracking-tight sm:text-5xl lg:text-6xl">
                                     İnsani qayğı ilə müasir təbabət
                                 </h1>
-                                <p className="mt-5 max-w-lg text-base font-medium leading-8 text-white/90 sm:text-lg">
+                                <p data-reveal="slide-left" style={{ transitionDelay: '210ms' }} className="mt-5 max-w-lg text-base font-medium leading-8 text-white/90 sm:text-lg">
                                     Müasir diaqnostika, peşəkar həkim heyəti və pasiyent yönümlü xidmətlə sağlamlığınız üçün etibarlı tibbi mərkəz.
                                 </p>
 
                                 <div className="mt-7 grid max-w-lg grid-cols-3 gap-3">
                                     {statValues.map((stat, index) => (
-                                        <div key={`${stat.label}-${index}`} className="rounded-2xl bg-white/12 px-3 py-3 backdrop-blur">
+                                        <div key={`${stat.label}-${index}`} data-reveal="pop" style={{ transitionDelay: `${260 + index * 70}ms` }} className="rounded-2xl bg-white/12 px-3 py-3 backdrop-blur">
                                             <div className="text-xl font-black">{stat.value}</div>
                                             <div className="mt-1 text-xs font-semibold text-white/80">{stat.label}</div>
                                         </div>
                                     ))}
                                 </div>
 
-                                <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+                                <div data-reveal="slide-up" style={{ transitionDelay: '480ms' }} className="mt-8 flex flex-col gap-3 sm:flex-row">
                                     <Button asChild className="h-12 rounded-full bg-brand-orange px-6 text-white hover:bg-brand-orange-dark">
                                         <Link href="/contact">
                                             Qəbula yazıl
@@ -341,7 +385,7 @@ export default function HomePage() {
                                 </div>
                             </div>
 
-                            <div className="relative mx-auto w-full max-w-[430px] lg:mx-0">
+                            <div data-reveal="slide-right" style={{ transitionDelay: '180ms' }} className="relative mx-auto w-full max-w-[430px] lg:mx-0">
                                 <div className="rounded-[2rem] border border-white/70 bg-white/95 p-5 shadow-[0_24px_70px_rgba(15,23,42,0.22)] backdrop-blur-xl sm:p-7">
                                     <div className="flex items-start justify-between gap-4">
                                         <div>
@@ -358,10 +402,12 @@ export default function HomePage() {
                                     <div className="mt-5 h-px bg-brand-blue-soft" />
 
                                     <div className="mt-5 flex flex-col gap-3">
-                                        {homeCheckups.map((item) => (
+                                        {homeCheckups.map((item, index) => (
                                             <Link
                                                 key={item.id}
                                                 href="/contact"
+                                                data-reveal="checkup-card"
+                                                style={{ transitionDelay: `${260 + index * 90}ms` }}
                                                 className="group grid grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-3 rounded-2xl bg-white px-4 py-4 shadow-[0_12px_30px_rgba(21,72,158,0.12)] ring-1 ring-brand-blue-soft transition hover:-translate-y-0.5 hover:shadow-[0_16px_34px_rgba(21,72,158,0.18)]"
                                             >
                                                 <div className="min-w-0">
@@ -395,15 +441,17 @@ export default function HomePage() {
 
             <section className="bg-[#eefdff] px-4 py-16 sm:px-6 lg:py-20">
                 <div className="container mx-auto">
-                    <div className="mb-10 max-w-xl">
+                    <div data-reveal="slide-left" className="mb-10 max-w-xl">
                         <h2 className="text-3xl font-black leading-tight tracking-tight text-slate-950 sm:text-4xl">
                             Müasir texnologiya və peşəkar xidmətlər
                         </h2>
                     </div>
                     <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-                        {homeServices.map((service) => (
+                        {homeServices.map((service, index) => (
                             <div
                                 key={service.id}
+                                data-reveal="service-card"
+                                style={{ transitionDelay: `${index * 70}ms` }}
                                 className="flex min-h-[150px] cursor-default flex-col justify-between rounded-xl bg-white p-5 shadow-sm ring-1 ring-brand-blue-soft"
                             >
                                 <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-blue-soft text-brand-blue">
@@ -420,7 +468,7 @@ export default function HomePage() {
 
             <section className="bg-white px-4 py-16 sm:px-6 lg:py-24">
                 <div className="container mx-auto grid gap-10 lg:grid-cols-[280px_minmax(0,1fr)] lg:items-center">
-                    <div>
+                    <div data-reveal="slide-left">
                         <h2 className="text-4xl font-black leading-tight tracking-tight text-slate-950">
                             Həkim heyətimiz
                         </h2>
@@ -452,13 +500,15 @@ export default function HomePage() {
                     </div>
 
                     <div ref={doctorsTrackRef} data-testid="home-doctors-track" className="scrollbar-hide -mx-4 flex scroll-px-4 gap-5 overflow-x-auto px-4 pb-4 lg:mx-0 lg:px-0">
-                        {homeDoctors.map((doctor) => {
+                        {homeDoctors.map((doctor, index) => {
                             const doctorImage = doctor.image || '/logo.png';
                             return (
                                 <Link
                                     key={doctor.id}
                                     href={`/doctors/${doctor.id}`}
                                     data-doctor-card
+                                    data-reveal="doctor-card"
+                                    style={{ transitionDelay: `${index * 90}ms` }}
                                     className="group relative h-[330px] w-[245px] shrink-0 overflow-hidden rounded-2xl bg-white shadow-[0_16px_42px_rgba(15,23,42,0.12)] ring-1 ring-slate-100"
                                 >
                                     <Image
@@ -486,7 +536,7 @@ export default function HomePage() {
             <section className="bg-white px-4 py-16 sm:px-6 lg:py-24">
                 <div className="container mx-auto">
                     <div className="mb-10 flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
-                        <div>
+                        <div data-reveal="slide-left">
                             <h2 className="text-4xl font-black tracking-tight text-slate-950">
                                 Xəbərlər və Aksiyalar
                             </h2>
@@ -494,7 +544,7 @@ export default function HomePage() {
                                 Ən son xəbərlər, tibbi yeniliklər və xüsusi təkliflərimiz haqqında məlumat alın.
                             </p>
                         </div>
-                        <Button asChild className="w-fit rounded-full bg-brand-blue px-6 text-white hover:bg-brand-blue-dark">
+                        <Button asChild data-reveal="slide-right" className="w-fit rounded-full bg-brand-blue px-6 text-white hover:bg-brand-blue-dark">
                             <Link href="/blog">
                                 Hamısına bax
                                 <ArrowRight className="ml-2 h-4 w-4" />
@@ -509,6 +559,8 @@ export default function HomePage() {
                                 <Link
                                     key={post.id}
                                     href={`/blog/${post.id}`}
+                                    data-reveal="news-card"
+                                    style={{ transitionDelay: `${index * 110}ms` }}
                                     className="group overflow-hidden rounded-2xl bg-white shadow-[0_14px_36px_rgba(15,23,42,0.10)] ring-1 ring-slate-100 transition hover:-translate-y-1 hover:shadow-[0_18px_42px_rgba(21,72,158,0.16)]"
                                 >
                                     <div className="relative h-48 bg-brand-blue-soft">
@@ -544,7 +596,7 @@ export default function HomePage() {
 
             <section className="bg-white px-4 pb-20 sm:px-6 lg:pb-28">
                 <div className="container mx-auto grid gap-8 lg:grid-cols-[minmax(0,1fr)_430px] lg:items-center">
-                    <div>
+                    <div data-reveal="slide-left">
                         <h2 className="text-3xl font-black tracking-tight text-slate-950 sm:text-4xl">
                             Peşəkar məsləhət alın
                         </h2>
@@ -553,6 +605,8 @@ export default function HomePage() {
                         </p>
 
                         <form
+                            data-reveal="form-rise"
+                            style={{ transitionDelay: '140ms' }}
                             className="mt-8 grid gap-3 rounded-2xl bg-white p-5 shadow-[0_18px_48px_rgba(15,23,42,0.10)] ring-1 ring-slate-100"
                             onSubmit={(event) => event.preventDefault()}
                         >
@@ -581,7 +635,7 @@ export default function HomePage() {
                         </form>
                     </div>
 
-                    <div className="rounded-2xl bg-brand-blue p-7 text-white shadow-[0_24px_60px_rgba(21,72,158,0.28)]">
+                    <div data-reveal="contact-card" className="rounded-2xl bg-brand-blue p-7 text-white shadow-[0_24px_60px_rgba(21,72,158,0.28)]">
                         <div className="mb-8 flex justify-end">
                             <span className="rounded-full border border-white/30 px-4 py-2 text-xs font-black">ULTRAMED CLINIC</span>
                         </div>
