@@ -153,6 +153,15 @@
   animation: ultramed-marquee 28s linear infinite;
 }
 
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .animate-ultramed-marquee {
     animation: none;

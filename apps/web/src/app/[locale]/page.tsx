@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Image from 'next/image';
 import { useParams } from 'next/navigation';
 import {
@@ -44,17 +44,6 @@ function normalizeLocale(localeRaw: string | undefined): Locale {
     if (localeRaw === 'en' || localeRaw === 'ru') return localeRaw;
     return 'az';
 }
-
-const fallbackServices: ServiceListItem[] = [
-    { id: 'fallback-surgery', title: 'Ümumi cərrahiyyə', summary: 'Planlı və təcili cərrahi xidmətlər.', iconKey: 'activity', image: null },
-    { id: 'fallback-dentistry', title: 'Stomatologiya', summary: 'Terapevtik və estetik stomatoloji xidmətlər.', iconKey: 'shieldCheck', image: null },
-    { id: 'fallback-urology', title: 'Urologiya-andrologiya', summary: 'Diaqnostika və fərdi müalicə planı.', iconKey: 'stethoscope', image: null },
-    { id: 'fallback-trauma', title: 'Travmatologiya', summary: 'Sümük və oynaq problemlərinin müalicəsi.', iconKey: 'activity', image: null },
-    { id: 'fallback-lor', title: 'Lor', summary: 'Qulaq, burun və boğaz müayinələri.', iconKey: 'microscope', image: null },
-    { id: 'fallback-derma', title: 'Dermatologiya', summary: 'Dəri sağlamlığı üzrə konsultasiya.', iconKey: 'userRound', image: null },
-    { id: 'fallback-physio', title: 'Fizioterapiya', summary: 'Bərpa və reabilitasiya proqramları.', iconKey: 'heartPulse', image: null },
-    { id: 'fallback-pediatrics', title: 'Pediatriya', summary: 'Uşaqlar üçün profilaktik və müalicəvi xidmətlər.', iconKey: 'baby', image: null },
-];
 
 const fallbackDoctors: DoctorListItem[] = [
     {
@@ -152,8 +141,6 @@ const fallbackContact: ContactInfoResponse = {
     ],
 };
 
-const partnerNames = ['Azsığorta', 'Bakı Sığorta', 'Mega Sığorta', 'A-Qroup', 'Aztibb', 'Paşa Sığorta'];
-
 function serviceIcon(iconKey: string | null) {
     const className = 'h-8 w-8';
     const normalized = iconKey?.toLowerCase() ?? '';
@@ -184,6 +171,12 @@ export default function HomePage() {
     const [stats, setStats] = useState<HomeStatItem[]>([]);
     const [isUnavailable, setIsUnavailable] = useState(false);
     const [refreshKey, setRefreshKey] = useState(0);
+    const doctorsTrackRef = useRef<HTMLDivElement | null>(null);
+    const [doctorCarouselState, setDoctorCarouselState] = useState({
+        atStart: true,
+        atEnd: false,
+        canScroll: false,
+    });
 
     useEffect(() => {
         let isCancelled = false;
@@ -235,12 +228,57 @@ export default function HomePage() {
         ];
     }, [stats]);
 
-    const homeServices = displayed(services, fallbackServices, 8);
+    const homeServices = services.slice(0, 8);
     const homeDoctors = displayed(doctors, fallbackDoctors, 6);
     const homeCheckups = displayed(checkups, fallbackCheckups, 3);
     const homeBlogs = displayed(blogs, fallbackBlogs, 3);
     const primaryPhone = contactInfo.phones.find((item) => !item.value.includes('wa.me'))?.value ?? contactInfo.phones[0]?.value ?? '';
     const primaryEmail = contactInfo.emails[0]?.value ?? 'ultramedclinics@gmail.com';
+
+    const updateDoctorCarouselState = useCallback(() => {
+        const track = doctorsTrackRef.current;
+        if (!track) return;
+
+        const maxScroll = Math.max(track.scrollWidth - track.clientWidth, 0);
+        const currentScroll = track.scrollLeft;
+
+        setDoctorCarouselState({
+            atStart: currentScroll <= 4,
+            atEnd: currentScroll >= maxScroll - 4,
+            canScroll: maxScroll > 4,
+        });
+    }, []);
+
+    const scrollDoctors = useCallback((direction: 'previous' | 'next') => {
+        const track = doctorsTrackRef.current;
+        if (!track) return;
+
+        const firstCard = track.querySelector<HTMLElement>('[data-doctor-card]');
+        const styles = window.getComputedStyle(track);
+        const gap = Number.parseFloat(styles.columnGap || styles.gap || '20') || 20;
+        const step = firstCard ? firstCard.offsetWidth + gap : Math.min(track.clientWidth * 0.85, 320);
+
+        track.scrollBy({
+            left: direction === 'next' ? step : -step,
+            behavior: 'smooth',
+        });
+
+        window.setTimeout(updateDoctorCarouselState, 350);
+    }, [updateDoctorCarouselState]);
+
+    useEffect(() => {
+        const track = doctorsTrackRef.current;
+        if (!track) return;
+
+        updateDoctorCarouselState();
+        track.addEventListener('scroll', updateDoctorCarouselState, { passive: true });
+        window.addEventListener('resize', updateDoctorCarouselState);
+
+        return () => {
+            track.removeEventListener('scroll', updateDoctorCarouselState);
+            window.removeEventListener('resize', updateDoctorCarouselState);
+        };
+    }, [homeDoctors.length, updateDoctorCarouselState]);
 
     return (
         <div className="min-h-screen bg-white text-slate-950">
@@ -364,27 +402,19 @@ export default function HomePage() {
                     </div>
                     <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
                         {homeServices.map((service) => (
-                            <Link
+                            <div
                                 key={service.id}
-                                href={`/services/${service.id}`}
-                                className="group flex min-h-[150px] flex-col justify-between rounded-xl bg-white p-5 shadow-sm ring-1 ring-brand-blue-soft transition hover:-translate-y-1 hover:shadow-[0_18px_38px_rgba(21,72,158,0.13)]"
+                                className="flex min-h-[150px] cursor-default flex-col justify-between rounded-xl bg-white p-5 shadow-sm ring-1 ring-brand-blue-soft"
                             >
                                 <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-blue-soft text-brand-blue">
                                     {serviceIcon(service.iconKey)}
                                 </div>
                                 <div className="mt-7 flex items-end justify-between gap-4 border-t border-slate-100 pt-4">
                                     <h3 className="text-base font-bold leading-6 text-slate-950">{service.title}</h3>
-                                    <ArrowRight className="h-4 w-4 shrink-0 text-slate-500 transition group-hover:translate-x-1 group-hover:text-brand-blue" />
                                 </div>
-                            </Link>
+                            </div>
                         ))}
                     </div>
-                    <Button asChild variant="outline" className="mt-8 rounded-full border-brand-blue text-brand-blue hover:bg-white">
-                        <Link href="/services">
-                            Daha çox
-                            <ArrowRight className="ml-2 h-4 w-4" />
-                        </Link>
-                    </Button>
                 </div>
             </section>
 
@@ -398,22 +428,37 @@ export default function HomePage() {
                             Peşəkar və təcrübəli həkimlərimiz sağlamlığınız üçün yüksək səviyyəli tibbi xidmət göstərirlər.
                         </p>
                         <div className="mt-7 flex gap-3">
-                            <button type="button" className="flex h-10 w-10 items-center justify-center rounded-full border border-brand-blue-soft text-brand-blue">
+                            <button
+                                type="button"
+                                data-testid="home-doctors-prev"
+                                aria-label="Əvvəlki həkimləri göstər"
+                                disabled={!doctorCarouselState.canScroll || doctorCarouselState.atStart}
+                                onClick={() => scrollDoctors('previous')}
+                                className="flex h-10 w-10 items-center justify-center rounded-full border border-brand-blue-soft text-brand-blue transition hover:border-brand-blue hover:bg-brand-blue-soft disabled:cursor-not-allowed disabled:opacity-40"
+                            >
                                 <ArrowLeft className="h-4 w-4" />
                             </button>
-                            <button type="button" className="flex h-10 w-10 items-center justify-center rounded-full bg-brand-blue text-white shadow-lg shadow-brand-blue/20">
+                            <button
+                                type="button"
+                                data-testid="home-doctors-next"
+                                aria-label="Növbəti həkimləri göstər"
+                                disabled={!doctorCarouselState.canScroll || doctorCarouselState.atEnd}
+                                onClick={() => scrollDoctors('next')}
+                                className="flex h-10 w-10 items-center justify-center rounded-full bg-brand-blue text-white shadow-lg shadow-brand-blue/20 transition hover:bg-brand-blue-dark disabled:cursor-not-allowed disabled:opacity-40"
+                            >
                                 <ArrowRight className="h-4 w-4" />
                             </button>
                         </div>
                     </div>
 
-                    <div className="-mx-4 flex gap-5 overflow-x-auto px-4 pb-4 lg:mx-0 lg:px-0">
+                    <div ref={doctorsTrackRef} data-testid="home-doctors-track" className="scrollbar-hide -mx-4 flex scroll-px-4 gap-5 overflow-x-auto px-4 pb-4 lg:mx-0 lg:px-0">
                         {homeDoctors.map((doctor) => {
                             const doctorImage = doctor.image || '/logo.png';
                             return (
                                 <Link
                                     key={doctor.id}
                                     href={`/doctors/${doctor.id}`}
+                                    data-doctor-card
                                     className="group relative h-[330px] w-[245px] shrink-0 overflow-hidden rounded-2xl bg-white shadow-[0_16px_42px_rgba(15,23,42,0.12)] ring-1 ring-slate-100"
                                 >
                                     <Image
@@ -434,20 +479,6 @@ export default function HomePage() {
                                 </Link>
                             );
                         })}
-                    </div>
-                </div>
-            </section>
-
-            <section className="bg-brand-cream px-4 py-14 sm:px-6 lg:py-20">
-                <div className="container mx-auto text-center">
-                    <h2 className="text-2xl font-black text-slate-950">Partnyorlar</h2>
-                    <div className="mx-auto mt-3 h-0.5 w-14 bg-brand-blue" />
-                    <div className="mt-12 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
-                        {partnerNames.map((name) => (
-                            <div key={name} className="flex h-20 items-center justify-center rounded-xl bg-white px-5 text-center text-sm font-bold text-slate-500 shadow-sm ring-1 ring-slate-100">
-                                {name}
-                            </div>
-                        ))}
                     </div>
                 </div>
             </section>
