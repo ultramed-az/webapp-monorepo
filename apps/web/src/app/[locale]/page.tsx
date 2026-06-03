@@ -337,7 +337,7 @@ export default function HomePage() {
                     <div data-reveal="hero" className="relative overflow-hidden rounded-[1.75rem] bg-brand-blue-dark shadow-[0_28px_80px_rgba(16,55,114,0.18)]">
                         <div className="absolute inset-0">
                             <Image
-                                src="/about_banner.JPG"
+                                src="/main_banner.png"
                                 alt="Ultramed Clinic"
                                 fill
                                 priority
@@ -554,7 +554,7 @@ export default function HomePage() {
 
                     <div className="grid gap-6 md:grid-cols-3">
                         {homeBlogs.map((post, index) => {
-                            const image = post.image || '/about_banner.JPG';
+                            const image = post.image || '/main_banner.png';
                             return (
                                 <Link
                                     key={post.id}
