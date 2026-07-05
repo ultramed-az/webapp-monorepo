@@ -223,6 +223,29 @@ export type AdminCheckupPackageRecord = {
   updatedAt: string;
 };
 
+export type AdminContactLocalizedItem = {
+  labelAz: string;
+  labelEn: string;
+  labelRu: string;
+  value: string;
+};
+
+export type AdminContactInfoRecord = {
+  id: string;
+  slug: string;
+  addressAz: string;
+  addressEn: string;
+  addressRu: string;
+  mapLatitude: number;
+  mapLongitude: number;
+  mapEmbedUrl: string;
+  phones: AdminContactLocalizedItem[];
+  emails: AdminContactLocalizedItem[];
+  workingHours: AdminContactLocalizedItem[];
+  createdAt: string;
+  updatedAt: string;
+};
+
 export type AdminMediaRecord = {
   id: string;
   originalName: string;
@@ -761,6 +784,35 @@ export async function updateAdminCheckupPackage(
 
 export async function deleteAdminCheckupPackage(id: string): Promise<AdminCheckupPackageRecord> {
   return request<AdminCheckupPackageRecord>(`/home/checkup-packages/${id}`, {
+    method: 'DELETE',
+  });
+}
+
+export async function getAdminContactInfos(): Promise<AdminContactInfoRecord[]> {
+  return request<AdminContactInfoRecord[]>('/contact/admin/all');
+}
+
+export async function createAdminContactInfo(
+  data: Partial<AdminContactInfoRecord>,
+): Promise<AdminContactInfoRecord> {
+  return request<AdminContactInfoRecord>('/contact', {
+    method: 'POST',
+    body: data,
+  });
+}
+
+export async function updateAdminContactInfo(
+  slug: string,
+  data: Partial<AdminContactInfoRecord>,
+): Promise<AdminContactInfoRecord> {
+  return request<AdminContactInfoRecord>(`/contact/${slug}`, {
+    method: 'PUT',
+    body: data,
+  });
+}
+
+export async function deleteAdminContactInfo(slug: string): Promise<AdminContactInfoRecord> {
+  return request<AdminContactInfoRecord>(`/contact/${slug}`, {
     method: 'DELETE',
   });
 }

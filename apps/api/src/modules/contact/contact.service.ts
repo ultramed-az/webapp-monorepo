@@ -8,6 +8,14 @@ type SupportedLocale = 'az' | 'en' | 'ru';
 export class ContactService {
     constructor(private readonly prisma: PrismaService) { }
 
+    async getAdminContacts() {
+        const contacts = await this.prisma.contactInfo.findMany({
+            orderBy: [{ slug: 'asc' }],
+        });
+
+        return contacts.map((contact) => this.toAdminResponse(contact));
+    }
+
     async getContact(localeRaw: string, slug = 'main') {
         const locale = this.normalizeLocale(localeRaw);
         const contact = await this.prisma.contactInfo.findUnique({
@@ -36,20 +44,76 @@ export class ContactService {
     }
 
     async create(data: CreateContactInfoDto) {
-        return this.prisma.contactInfo.create({ data });
+        const contact = await this.prisma.contactInfo.create({ data });
+        return this.toAdminResponse(contact);
     }
 
     async update(slug: string, data: UpdateContactInfoDto) {
-        return this.prisma.contactInfo.update({
+        const contact = await this.prisma.contactInfo.update({
             where: { slug },
             data,
         });
+        return this.toAdminResponse(contact);
     }
 
     async remove(slug: string) {
-        return this.prisma.contactInfo.delete({
+        const contact = await this.prisma.contactInfo.delete({
             where: { slug },
         });
+        return this.toAdminResponse(contact);
+    }
+
+    private toAdminResponse(contact: {
+        id: string;
+        slug: string;
+        addressAz: string;
+        addressEn: string;
+        addressRu: string;
+        mapLatitude: number;
+        mapLongitude: number;
+        mapEmbedUrl: string;
+        phones: unknown;
+        emails: unknown;
+        workingHours: unknown;
+        createdAt: Date;
+        updatedAt: Date;
+    }) {
+        return {
+            id: contact.id,
+            slug: contact.slug,
+            addressAz: contact.addressAz,
+            addressEn: contact.addressEn,
+            addressRu: contact.addressRu,
+            mapLatitude: contact.mapLatitude,
+            mapLongitude: contact.mapLongitude,
+            mapEmbedUrl: contact.mapEmbedUrl,
+            phones: this.normalizeAdminItems(contact.phones),
+            emails: this.normalizeAdminItems(contact.emails),
+            workingHours: this.normalizeAdminItems(contact.workingHours),
+            createdAt: contact.createdAt.toISOString(),
+            updatedAt: contact.updatedAt.toISOString(),
+        };
+    }
+
+    private normalizeAdminItems(rawItems: unknown) {
+        if (!Array.isArray(rawItems)) {
+            return [];
+        }
+
+        return rawItems
+            .map((item) => {
+                if (!item || typeof item !== 'object') {
+                    return null;
+                }
+
+                return {
+                    labelAz: this.getStringField(item, 'labelAz'),
+                    labelEn: this.getStringField(item, 'labelEn'),
+                    labelRu: this.getStringField(item, 'labelRu'),
+                    value: this.getStringField(item, 'value'),
+                };
+            })
+            .filter((item): item is { labelAz: string; labelEn: string; labelRu: string; value: string } => item !== null);
     }
 
     private normalizeLocale(locale: string): SupportedLocale {

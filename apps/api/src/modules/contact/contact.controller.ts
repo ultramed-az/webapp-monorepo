@@ -17,6 +17,12 @@ import { parseCreateContactInfoDto, parseUpdateContactInfoDto } from './dto/cont
 export class ContactController {
     constructor(private readonly contactService: ContactService) { }
 
+  @UseGuards(AdminAuthGuard)
+  @Get('admin/all')
+  getAdminContacts() {
+    return this.contactService.getAdminContacts();
+  }
+
   @Get()
   getContact(
     @Query('locale') locale = 'az',
