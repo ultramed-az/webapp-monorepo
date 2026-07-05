@@ -270,7 +270,7 @@ export default function HomePage() {
     }, [stats]);
 
     const homeServices = services.slice(0, 8);
-    const homeDoctors = displayed(doctors, fallbackDoctors, 6);
+    const homeDoctors = doctors.length > 0 ? doctors : fallbackDoctors;
     const homeCheckups = displayed(checkups, fallbackCheckups, 3);
     const homeBlogs = displayed(blogs, fallbackBlogs, 3);
     const primaryPhone = contactInfo.phones.find((item) => !item.value.includes('wa.me'))?.value ?? contactInfo.phones[0]?.value ?? '';
@@ -314,11 +314,18 @@ export default function HomePage() {
         const track = doctorsTrackRef.current;
         if (!track) return;
 
-        updateDoctorCarouselState();
+        const refreshState = () => updateDoctorCarouselState();
+        const animationFrame = window.requestAnimationFrame(refreshState);
+        const resizeObserver = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(refreshState) : null;
+
+        refreshState();
+        resizeObserver?.observe(track);
         track.addEventListener('scroll', updateDoctorCarouselState, { passive: true });
         window.addEventListener('resize', updateDoctorCarouselState);
 
         return () => {
+            window.cancelAnimationFrame(animationFrame);
+            resizeObserver?.disconnect();
             track.removeEventListener('scroll', updateDoctorCarouselState);
             window.removeEventListener('resize', updateDoctorCarouselState);
         };
@@ -491,7 +498,7 @@ export default function HomePage() {
                                 aria-label="Əvvəlki həkimləri göstər"
                                 disabled={!doctorCarouselState.canScroll || doctorCarouselState.atStart}
                                 onClick={() => scrollDoctors('previous')}
-                                className="flex h-10 w-10 items-center justify-center rounded-full border border-brand-blue-soft text-brand-blue transition hover:border-brand-blue hover:bg-brand-blue-soft disabled:cursor-not-allowed disabled:opacity-40"
+                                className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border border-brand-blue-soft text-brand-blue transition hover:border-brand-blue hover:bg-brand-blue-soft disabled:cursor-default disabled:opacity-40"
                             >
                                 <ArrowLeft className="h-4 w-4" />
                             </button>
@@ -501,7 +508,7 @@ export default function HomePage() {
                                 aria-label="Növbəti həkimləri göstər"
                                 disabled={!doctorCarouselState.canScroll || doctorCarouselState.atEnd}
                                 onClick={() => scrollDoctors('next')}
-                                className="flex h-10 w-10 items-center justify-center rounded-full bg-brand-blue text-white shadow-lg shadow-brand-blue/20 transition hover:bg-brand-blue-dark disabled:cursor-not-allowed disabled:opacity-40"
+                                className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-brand-blue text-white shadow-lg shadow-brand-blue/20 transition hover:bg-brand-blue-dark disabled:cursor-default disabled:opacity-40"
                             >
                                 <ArrowRight className="h-4 w-4" />
                             </button>
@@ -528,7 +535,7 @@ export default function HomePage() {
                                         sizes="245px"
                                         className="object-cover object-top"
                                     />
-                                    <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-brand-blue via-brand-blue/95 to-transparent p-5 pt-20 text-white">
+                                    <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-brand-blue/90 via-brand-blue/40 to-transparent p-5 pt-16 text-white">
                                         <h3 className="text-lg font-black leading-6">{doctor.name}</h3>
                                         <p className="mt-1 text-xs font-semibold text-white/80">{doctor.specialty}</p>
                                         <span className="mt-4 inline-flex rounded-full bg-brand-orange px-4 py-2 text-xs font-black text-white">
