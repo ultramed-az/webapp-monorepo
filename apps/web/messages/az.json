@@ -32,7 +32,7 @@
     "services": "Xidmətlər",
     "doctors": "Həkimlər",
     "contact": "Əlaqə",
-    "blog": "Bloq",
+    "blog": "Check up",
     "gallery": "Qalereya",
     "testimonials": "Rəylər",
     "faq": "Sual-Cavab",
@@ -230,19 +230,19 @@
     "ctaDescription": "Həkimlə görüş üçün əvvəlcədən qəbula yazılın və komandamız sizin üçün uyğun vaxt təşkil etsin."
   },
   "BlogPage": {
-    "badge": "Tibbi Bloq",
-    "heroTitle": "Faydalı Məlumatlar",
-    "heroDescription": "Həkimlərimizdən praktiki tövsiyələr, ən son tibbi yeniliklər və sağlam həyat üçün maarifləndirici məzmunlar oxuyun.",
-    "allCategories": "Bütün Kateqoriyalar",
-    "loadingTitle": "Məqalələr yüklənir...",
-    "fetchFailedTitle": "Məqalələri yükləmək mümkün olmadı",
+    "badge": "Check up",
+    "heroTitle": "Check-up Paketləri",
+    "heroDescription": "Sağlamlığınızı vaxtında yoxlamaq üçün uyğun check-up paketləri ilə tanış olun.",
+    "allCategories": "Hamısı",
+    "loadingTitle": "Paketlər yüklənir...",
+    "fetchFailedTitle": "Paketləri yükləmək mümkün olmadı",
     "fetchFailedDescription": "Zəhmət olmasa, yenidən cəhd edin.",
     "retry": "Yenidən cəhd et",
-    "emptyByCategory": "Bu kateqoriya üzrə məqalə tapılmadı",
-    "featuredBadge": "GÜNÜN MƏQALƏSİ",
+    "emptyByCategory": "Bu kateqoriya üzrə paket tapılmadı",
+    "featuredBadge": "Check up",
     "readFeatured": "Oxu",
-    "readMore": "Ətraflı",
-    "loadMore": "Daha çox yüklə"
+    "readMore": "Ətraflı oxu",
+    "loadMore": "Daha çox"
   },
   "ContactPage": {
     "heroTitle": "Bizimlə Əlaqə",

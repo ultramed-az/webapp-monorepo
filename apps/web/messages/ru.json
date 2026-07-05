@@ -32,7 +32,7 @@
     "services": "Услуги",
     "doctors": "Врачи",
     "contact": "Контакты",
-    "blog": "Блог",
+    "blog": "Check up",
     "gallery": "Галерея",
     "testimonials": "Отзывы",
     "faq": "FAQ",
@@ -230,19 +230,19 @@
     "ctaDescription": "Запишитесь заранее, и наша команда поможет подобрать наиболее удобное время для визита."
   },
   "BlogPage": {
-    "badge": "Медицинский блог",
-    "heroTitle": "Полезные материалы",
-    "heroDescription": "Читайте рекомендации наших врачей, актуальные медицинские новости и статьи для здорового образа жизни.",
-    "allCategories": "Все категории",
-    "loadingTitle": "Загрузка статей...",
-    "fetchFailedTitle": "Не удалось загрузить статьи",
+    "badge": "Check up",
+    "heroTitle": "Пакеты Check-up",
+    "heroDescription": "Выберите подходящие check-up пакеты для своевременной проверки здоровья.",
+    "allCategories": "Все",
+    "loadingTitle": "Загрузка пакетов...",
+    "fetchFailedTitle": "Не удалось загрузить пакеты",
     "fetchFailedDescription": "Пожалуйста, попробуйте снова.",
     "retry": "Повторить",
-    "emptyByCategory": "По этой категории статьи не найдены",
-    "featuredBadge": "СТАТЬЯ ДНЯ",
+    "emptyByCategory": "По этой категории пакеты не найдены",
+    "featuredBadge": "Check up",
     "readFeatured": "Читать",
     "readMore": "Подробнее",
-    "loadMore": "Загрузить еще"
+    "loadMore": "Показать еще"
   },
   "ContactPage": {
     "heroTitle": "Свяжитесь с нами",

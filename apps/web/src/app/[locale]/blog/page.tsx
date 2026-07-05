@@ -3,17 +3,32 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
-import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Link } from '@/i18n/routing';
-import { Calendar, User, Tag, ArrowRight, BookOpen } from 'lucide-react';
+import { ArrowRight, Calendar } from 'lucide-react';
 import Image from 'next/image';
 import TemporaryUnavailable from '@/components/feedback/TemporaryUnavailable';
 import { getBlogPosts, isBackendUnavailableError, type BlogListItem } from '@/lib/api';
 import { shouldBypassImageOptimization } from '@/lib/image';
 
 const ALL_CATEGORIES = '__all__';
+const MONTH_NAMES: Record<string, string[]> = {
+    az: ['Yanvar', 'Fevral', 'Mart', 'Aprel', 'May', 'İyun', 'İyul', 'Avqust', 'Sentyabr', 'Oktyabr', 'Noyabr', 'Dekabr'],
+    en: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+    ru: ['Января', 'Февраля', 'Марта', 'Апреля', 'Мая', 'Июня', 'Июля', 'Августа', 'Сентября', 'Октября', 'Ноября', 'Декабря'],
+};
+
+function extractPrice(post: BlogListItem): string | null {
+    const source = [post.title, post.excerpt, post.content].filter(Boolean).join(' ');
+    const matches = Array.from(source.matchAll(/(\d{1,4}(?:[.,]\d{1,2})?)\s*(?:AZN|₼|manat)/giu));
+
+    if (matches.length === 0) {
+        return null;
+    }
+
+    return `${matches[matches.length - 1][1].replace('.', ',')} ₼`;
+}
 
 export default function BlogPage() {
     const params = useParams<{ locale: string }>();
@@ -64,11 +79,28 @@ export default function BlogPage() {
         };
     }, [locale, refreshKey, t]);
 
-    const allLabel = t('allCategories');
-
     const categories = useMemo(
-        () => [ALL_CATEGORIES, ...Array.from(new Set(posts.map((post) => post.category).filter(Boolean)))],
-        [posts],
+        () => {
+            const categoryCounts = new Map<string, number>();
+
+            posts.forEach((post) => {
+                if (!post.category) {
+                    return;
+                }
+
+                categoryCounts.set(post.category, (categoryCounts.get(post.category) ?? 0) + 1);
+            });
+
+            return [
+                { key: ALL_CATEGORIES, label: t('allCategories'), count: posts.length },
+                ...Array.from(categoryCounts.entries()).map(([category, count]) => ({
+                    key: category,
+                    label: category,
+                    count,
+                })),
+            ];
+        },
+        [posts, t],
     );
 
     const filteredPosts = useMemo(() => {
@@ -78,22 +110,22 @@ export default function BlogPage() {
         return posts.filter((post) => post.category === selectedCategory);
     }, [posts, selectedCategory]);
 
-    const featuredPost = filteredPosts.find((post) => post.featured) || filteredPosts[0];
-    const featuredImageSrc = featuredPost?.image || '/logo.png';
-    const normalPosts = filteredPosts.filter((post) => post.id !== featuredPost?.id);
-    const visiblePosts = normalPosts.slice(0, visibleCount);
+    const visiblePosts = filteredPosts.slice(0, visibleCount);
 
     useEffect(() => {
         setVisibleCount(6);
     }, [selectedCategory, locale]);
 
     const formattedDate = (isoDate: string) => {
-        const dateLocale = locale === 'en' ? 'en-US' : locale === 'ru' ? 'ru-RU' : 'az-AZ';
-        return new Intl.DateTimeFormat(dateLocale, {
-            day: '2-digit',
-            month: 'long',
-            year: 'numeric',
-        }).format(new Date(isoDate));
+        const date = new Date(isoDate);
+        const monthNames = MONTH_NAMES[locale] ?? MONTH_NAMES.az;
+        const month = monthNames[date.getMonth()];
+
+        if (Number.isNaN(date.getTime()) || !month) {
+            return '';
+        }
+
+        return `${date.getDate()} ${month} ${date.getFullYear()}`;
     };
 
     if (isUnavailable && posts.length === 0) {
@@ -108,39 +140,22 @@ export default function BlogPage() {
 
     return (
         <div className="flex flex-col min-h-screen">
-            {/* Header */}
-            <section className="bg-brand-cream py-16 lg:py-24 relative overflow-hidden">
-                <div className="absolute inset-0 z-0 opacity-10 bg-[radial-gradient(circle_at_bottom_left,_var(--tw-gradient-stops))] from-brand-blue via-transparent to-transparent"></div>
-                <div className="container mx-auto px-6 relative z-10 text-center">
-                    <div className="inline-flex items-center space-x-2 bg-brand-blue-soft/80 backdrop-blur border border-brand-blue-soft text-brand-blue font-medium px-4 py-2 rounded-full text-sm mb-6 shadow-sm">
-                        <BookOpen className="h-4 w-4" />
-                        <span>{t('badge')}</span>
-                    </div>
-                    <h1 className="text-4xl md:text-5xl font-extrabold text-slate-900 mb-6 tracking-tight">
-                        {t('heroTitle')}
-                    </h1>
-                    <p className="text-lg md:text-xl text-slate-600 max-w-2xl mx-auto leading-relaxed">
-                        {t('heroDescription')}
-                    </p>
-                </div>
-            </section>
-
             {/* Category Filter */}
-            <section className="py-8 bg-white border-b border-slate-100 sticky top-[72px] z-40">
-                <div className="container mx-auto px-6 overflow-x-auto pb-4 sm:pb-0 scrollbar-hide">
+            <section className="bg-white pt-8 pb-4 lg:pt-12">
+                <div className="container mx-auto px-6 overflow-x-auto pb-3 scrollbar-hide">
                     <div className="flex items-center gap-3 w-max mx-auto">
                         {categories.map((category) => {
-                            const isSelected = selectedCategory === category;
+                            const isSelected = selectedCategory === category.key;
                             return (
                                 <button
-                                    key={category}
-                                    onClick={() => setSelectedCategory(category)}
-                                    className={`px-5 py-2.5 rounded-full text-sm font-medium transition-all duration-300 ${isSelected
+                                    key={category.key}
+                                    onClick={() => setSelectedCategory(category.key)}
+                                    className={`px-5 py-2.5 rounded-full text-sm font-bold transition-all duration-300 ${isSelected
                                         ? 'bg-brand-blue text-white shadow-md shadow-brand-blue/20'
-                                        : 'bg-slate-50 text-slate-600 hover:bg-slate-100 border border-slate-200'
+                                        : 'bg-white text-slate-700 hover:border-brand-blue/40 border border-slate-200 shadow-sm'
                                         }`}
                                 >
-                                    {category === ALL_CATEGORIES ? allLabel : category}
+                                    {category.label} <span className="text-current/70">({category.count})</span>
                                 </button>
                             );
                         })}
@@ -149,35 +164,21 @@ export default function BlogPage() {
             </section>
 
             {/* Main Content Area */}
-            <section className="py-16 bg-white flex-grow">
+            <section className="bg-white pt-6 pb-16 lg:pb-24 flex-grow">
                 <div className="container mx-auto px-6">
                     {isLoading && posts.length === 0 ? (
-                        <div className="space-y-10">
-                            <div className="grid grid-cols-1 gap-8 rounded-[2rem] border border-slate-100 bg-slate-50 p-6 lg:grid-cols-2 lg:p-10">
-                                <Skeleton className="h-[320px] w-full rounded-3xl" />
-                                <div className="space-y-4">
-                                    <Skeleton className="h-5 w-1/3" />
-                                    <Skeleton className="h-10 w-full" />
-                                    <Skeleton className="h-10 w-4/5" />
-                                    <Skeleton className="h-4 w-full" />
-                                    <Skeleton className="h-4 w-11/12" />
-                                    <Skeleton className="h-10 w-40" />
+                        <div className="grid grid-cols-1 gap-8 md:grid-cols-2 xl:grid-cols-3">
+                            {Array.from({ length: 6 }).map((_, index) => (
+                                <div key={index} className="overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm">
+                                    <Skeleton className="aspect-video w-full rounded-none" />
+                                    <div className="space-y-4 p-5">
+                                        <Skeleton className="h-4 w-2/5" />
+                                        <Skeleton className="h-6 w-full" />
+                                        <Skeleton className="h-4 w-1/2" />
+                                        <Skeleton className="h-4 w-28" />
+                                    </div>
                                 </div>
-                            </div>
-                            <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
-                                {Array.from({ length: 6 }).map((_, index) => (
-                                    <Card key={index} className="overflow-hidden border-slate-100">
-                                        <Skeleton className="h-56 w-full rounded-none" />
-                                        <CardContent className="space-y-3 p-6">
-                                            <Skeleton className="h-4 w-2/3" />
-                                            <Skeleton className="h-5 w-full" />
-                                            <Skeleton className="h-5 w-5/6" />
-                                            <Skeleton className="h-4 w-full" />
-                                            <Skeleton className="h-4 w-4/5" />
-                                        </CardContent>
-                                    </Card>
-                                ))}
-                            </div>
+                            ))}
                         </div>
                     ) : error && posts.length === 0 ? (
                         <div className="text-center py-20 bg-slate-50 rounded-2xl border border-slate-100">
@@ -195,98 +196,62 @@ export default function BlogPage() {
                         <div className="text-center py-20 bg-slate-50 rounded-2xl border border-slate-100">
                             <h3 className="text-xl font-semibold text-slate-900 mb-2">{t('emptyByCategory')}</h3>
                             <button onClick={() => setSelectedCategory(ALL_CATEGORIES)} className="text-brand-blue font-medium mt-4">
-                                {allLabel}
+                                {t('allCategories')}
                             </button>
                         </div>
                     ) : (
-                        <div className="space-y-16">
-                            {featuredPost && (
-                                <Link href={`/blog/${featuredPost.id}`} className="block group">
-                                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center bg-slate-50 rounded-[2rem] p-6 sm:p-8 lg:p-12 transition-all hover:shadow-xl border border-slate-100">
-                                        <div className="relative h-[300px] lg:h-[400px] rounded-3xl overflow-hidden order-2 lg:order-1 shadow-md">
-                                            <Image
-                                                src={featuredImageSrc}
-                                                alt={featuredPost.title}
-                                                fill
-                                                unoptimized={shouldBypassImageOptimization(featuredImageSrc)}
-                                                className="object-cover group-hover:scale-105 transition-transform duration-700"
-                                            />
-                                            <div className="absolute top-4 left-4 bg-white/90 backdrop-blur text-brand-blue font-bold text-xs px-3 py-1.5 rounded-full shadow-sm">
-                                                {t('featuredBadge')}
-                                            </div>
-                                        </div>
-                                        <div className="order-1 lg:order-2 lg:pl-6">
-                                            <div className="flex items-center gap-4 text-sm font-medium text-slate-500 mb-4">
-                                                <span className="flex items-center"><Tag className="w-4 h-4 mr-1.5" />{featuredPost.category}</span>
-                                                <span className="flex items-center"><Calendar className="w-4 h-4 mr-1.5" />{formattedDate(featuredPost.date)}</span>
-                                            </div>
-                                            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-6 group-hover:text-brand-blue transition-colors leading-tight">
-                                                {featuredPost.title}
-                                            </h2>
-                                            <p className="text-lg text-slate-600 leading-relaxed mb-8">
-                                                {featuredPost.excerpt}
-                                            </p>
-                                            <div className="flex items-center justify-between">
-                                                <div className="flex items-center text-slate-900 font-medium">
-                                                    <div className="w-10 h-10 bg-brand-blue-soft rounded-full flex items-center justify-center mr-3 text-brand-blue">
-                                                        <User className="w-5 h-5" />
-                                                    </div>
-                                                    {featuredPost.author}
-                                                </div>
-                                                <div className="inline-flex items-center text-brand-orange font-bold group-hover:translate-x-2 transition-transform">
-                                                    {t('readFeatured')} <ArrowRight className="ml-2 w-5 h-5" />
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </Link>
-                            )}
-
-                            {/* Normal Posts Grid */}
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                                {visiblePosts.map((post) => {
+                        <div className="space-y-12">
+                            <div className="grid grid-cols-1 gap-8 md:grid-cols-2 xl:grid-cols-3">
+                                {visiblePosts.map((post, index) => {
                                     const postImageSrc = post.image || '/logo.png';
+                                    const price = extractPrice(post);
+
                                     return (
-                                    <Link href={`/blog/${post.id}`} key={post.id} className="group flex flex-col h-full">
-                                        <Card className="flex flex-col h-full bg-white border-slate-100 hover:shadow-xl transition-all duration-300 rounded-2xl overflow-hidden group-hover:-translate-y-1">
-                                            <div className="relative h-56 w-full overflow-hidden bg-slate-100">
-                                                <Image
-                                                    src={postImageSrc}
-                                                    alt={post.title}
-                                                    fill
-                                                    unoptimized={shouldBypassImageOptimization(postImageSrc)}
-                                                    className="object-cover group-hover:scale-110 transition-transform duration-700"
-                                                />
-                                                <div className="absolute top-4 left-4 bg-brand-blue text-white font-semibold text-xs px-3 py-1.5 rounded-full shadow-md">
-                                                    {post.category}
+                                        <Link href={`/blog/${post.id}`} key={post.id} className="group flex h-full flex-col">
+                                            <article className="flex h-full flex-col overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm transition-all duration-300 group-hover:-translate-y-1 group-hover:shadow-xl">
+                                                <div className="relative aspect-video w-full overflow-hidden bg-slate-100">
+                                                    <Image
+                                                        src={postImageSrc}
+                                                        alt={post.title}
+                                                        fill
+                                                        sizes="(min-width: 1280px) 33vw, (min-width: 768px) 50vw, 100vw"
+                                                        priority={index < 3}
+                                                        unoptimized={shouldBypassImageOptimization(postImageSrc)}
+                                                        className="object-cover transition-transform duration-700 group-hover:scale-105"
+                                                    />
+                                                    {price ? (
+                                                        <span className="absolute left-4 top-4 rounded-full bg-brand-orange px-4 py-2 text-sm font-extrabold text-white shadow-lg shadow-brand-orange/25">
+                                                            {price}
+                                                        </span>
+                                                    ) : null}
                                                 </div>
-                                            </div>
-                                            <CardContent className="flex flex-col flex-grow p-6">
-                                                <div className="flex items-center text-xs font-medium text-slate-500 mb-4 space-x-4">
-                                                    <span className="flex items-center"><Calendar className="w-3.5 h-3.5 mr-1" />{formattedDate(post.date)}</span>
-                                                    <span className="flex items-center"><User className="w-3.5 h-3.5 mr-1" />{post.author}</span>
+                                                <div className="flex min-h-[170px] flex-1 flex-col p-5">
+                                                    <div className="mb-3 flex items-center text-sm font-medium text-slate-500">
+                                                        <Calendar className="mr-2 h-4 w-4 text-brand-blue" />
+                                                        {formattedDate(post.date)}
+                                                    </div>
+                                                    <h2 className="text-xl font-extrabold leading-snug text-slate-950 transition-colors line-clamp-2 group-hover:text-brand-blue">
+                                                        {post.title}
+                                                    </h2>
+                                                    <p className="mt-3 text-sm font-medium text-slate-500 line-clamp-1">
+                                                        {post.author || 'Ultramed Clinic'}
+                                                    </p>
+                                                    <span className="mt-auto inline-flex items-center gap-2 pt-5 text-sm font-bold text-brand-blue transition-transform group-hover:translate-x-1">
+                                                        {t('readMore')}
+                                                        <ArrowRight className="h-4 w-4" />
+                                                    </span>
                                                 </div>
-                                                <h3 className="text-xl font-bold text-slate-900 mb-3 group-hover:text-brand-blue transition-colors line-clamp-2">
-                                                    {post.title}
-                                                </h3>
-                                                <p className="text-slate-600 text-sm leading-relaxed mb-6 line-clamp-3">
-                                                    {post.excerpt}
-                                                </p>
-                                                <div className="mt-auto pt-4 border-t border-slate-50 flex items-center text-brand-orange font-semibold text-sm group-hover:translate-x-1 transition-transform">
-                                                    {t('readMore')} <ArrowRight className="ml-1 w-4 h-4" />
-                                                </div>
-                                            </CardContent>
-                                        </Card>
-                                    </Link>
+                                            </article>
+                                        </Link>
                                     );
                                 })}
                             </div>
 
-                            {normalPosts.length > visibleCount && (
+                            {filteredPosts.length > visibleCount && (
                                 <div className="text-center pt-8">
                                     <Button
                                         variant="outline"
-                                        className="border-slate-300 text-slate-700 px-8 rounded-full h-12"
+                                        className="h-12 rounded-full border-brand-blue px-8 font-bold text-brand-blue hover:bg-brand-blue hover:text-white"
                                         onClick={() => setVisibleCount((count) => count + 6)}
                                     >
                                         {t('loadMore')}

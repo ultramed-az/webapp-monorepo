@@ -32,7 +32,7 @@
     "services": "Services",
     "doctors": "Doctors",
     "contact": "Contact",
-    "blog": "Blog",
+    "blog": "Check up",
     "gallery": "Gallery",
     "testimonials": "Testimonials",
     "faq": "FAQ",
@@ -230,19 +230,19 @@
     "ctaDescription": "Schedule your visit in advance and our team will help arrange the most suitable time."
   },
   "BlogPage": {
-    "badge": "Medical Blog",
-    "heroTitle": "Useful Insights",
-    "heroDescription": "Read practical recommendations from our doctors, latest medical updates, and educational content for a healthier life.",
-    "allCategories": "All Categories",
-    "loadingTitle": "Loading articles...",
-    "fetchFailedTitle": "Failed to load articles",
+    "badge": "Check up",
+    "heroTitle": "Check-up Packages",
+    "heroDescription": "Explore suitable check-up packages to monitor your health on time.",
+    "allCategories": "All",
+    "loadingTitle": "Loading packages...",
+    "fetchFailedTitle": "Failed to load packages",
     "fetchFailedDescription": "Please try again.",
     "retry": "Retry",
-    "emptyByCategory": "No articles found for this category",
-    "featuredBadge": "ARTICLE OF THE DAY",
+    "emptyByCategory": "No packages found for this category",
+    "featuredBadge": "Check up",
     "readFeatured": "Read",
-    "readMore": "Details",
-    "loadMore": "Load More"
+    "readMore": "Read more",
+    "loadMore": "Load more"
   },
   "ContactPage": {
     "heroTitle": "Contact Us",
