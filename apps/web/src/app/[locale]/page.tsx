@@ -342,7 +342,7 @@ export default function HomePage() {
                                 fill
                                 priority
                                 sizes="100vw"
-                                className="object-cover"
+                                className="object-cover object-[center_27%]"
                             />
                             <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(16,55,114,0.88),rgba(16,55,114,0.62)_44%,rgba(16,55,114,0.18))]" />
                         </div>
@@ -405,7 +405,7 @@ export default function HomePage() {
                                         {homeCheckups.map((item, index) => (
                                             <Link
                                                 key={item.id}
-                                                href="/contact"
+                                                href="/blog"
                                                 data-reveal="checkup-card"
                                                 style={{ transitionDelay: `${260 + index * 90}ms` }}
                                                 className="group grid grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-3 rounded-2xl bg-white px-4 py-4 shadow-[0_12px_30px_rgba(21,72,158,0.12)] ring-1 ring-brand-blue-soft transition hover:-translate-y-0.5 hover:shadow-[0_16px_34px_rgba(21,72,158,0.18)]"
@@ -427,7 +427,7 @@ export default function HomePage() {
                                     </div>
 
                                     <div className="mt-6 border-t border-brand-blue-soft pt-5 text-center">
-                                        <Link href="/contact" className="inline-flex items-center gap-2 text-sm font-black text-brand-blue">
+                                        <Link href="/blog" className="inline-flex items-center gap-2 text-sm font-black text-brand-blue">
                                             Bütün Check-up Paketləri
                                             <ArrowRight className="h-4 w-4" />
                                         </Link>
