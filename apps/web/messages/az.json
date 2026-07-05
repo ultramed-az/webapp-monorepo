@@ -75,8 +75,11 @@
   "Admin": {
     "menu": "Menyu",
     "dashboard": "İdarəetmə paneli",
+    "announcements": "Elanlar",
+    "checkupPackages": "Check-up paketləri",
     "services": "Xidmətlər",
     "doctors": "Həkimlər",
+    "contact": "Əlaqə",
     "blog": "Bloq",
     "gallery": "Qalereya",
     "media": "Media",

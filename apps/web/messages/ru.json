@@ -75,8 +75,11 @@
   "Admin": {
     "menu": "Меню",
     "dashboard": "Панель",
+    "announcements": "Объявления",
+    "checkupPackages": "Check-up пакеты",
     "services": "Услуги",
     "doctors": "Врачи",
+    "contact": "Контакты",
     "blog": "Блог",
     "gallery": "Галерея",
     "media": "Медиа",
