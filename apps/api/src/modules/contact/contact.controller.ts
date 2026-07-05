@@ -23,6 +23,12 @@ export class ContactController {
     return this.contactService.getAdminContacts();
   }
 
+  @UseGuards(AdminAuthGuard)
+  @Get('messages/admin/all')
+  getAdminMessages(@Query('limit') limit?: string) {
+    return this.contactService.getAdminMessages(limit);
+  }
+
   @Get()
   getContact(
     @Query('locale') locale = 'az',

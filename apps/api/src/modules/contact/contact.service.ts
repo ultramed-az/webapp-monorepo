@@ -16,6 +16,28 @@ export class ContactService {
         return contacts.map((contact) => this.toAdminResponse(contact));
     }
 
+    async getAdminMessages(limitRaw?: string) {
+        const messages = await this.prisma.contactMessage.findMany({
+            orderBy: { createdAt: 'desc' },
+            take: this.normalizeLimit(limitRaw),
+        });
+
+        return messages.map((message) => ({
+            id: message.id,
+            firstName: message.firstName,
+            lastName: message.lastName,
+            email: message.email,
+            phone: message.phone,
+            subject: message.subject,
+            message: message.message,
+            locale: message.locale,
+            source: message.source,
+            status: message.status,
+            createdAt: message.createdAt.toISOString(),
+            updatedAt: message.updatedAt.toISOString(),
+        }));
+    }
+
     async getContact(localeRaw: string, slug = 'main') {
         const locale = this.normalizeLocale(localeRaw);
         const contact = await this.prisma.contactInfo.findUnique({
@@ -184,5 +206,13 @@ export class ContactService {
 
         const fieldValue = (value as Record<string, unknown>)[fieldName];
         return typeof fieldValue === 'string' ? fieldValue : '';
+    }
+
+    private normalizeLimit(limitRaw?: string): number {
+        const parsed = Number.parseInt(limitRaw ?? '', 10);
+        if (!Number.isFinite(parsed) || parsed <= 0) {
+            return 200;
+        }
+        return Math.min(parsed, 500);
     }
 }

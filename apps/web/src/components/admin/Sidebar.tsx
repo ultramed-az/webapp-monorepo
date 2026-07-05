@@ -16,6 +16,8 @@ import {
     ScrollText,
     Bell,
     ClipboardList,
+    CalendarCheck,
+    Inbox,
     MapPin,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -33,6 +35,8 @@ export default function Sidebar({ mobile = false, onNavigate }: SidebarProps) {
         { icon: <LayoutDashboard className="w-5 h-5" />, label: t('dashboard', { default: 'Dashboard' }), href: '/admin/dashboard' },
         { icon: <Bell className="w-5 h-5" />, label: t('announcements', { default: 'Announcements' }), href: '/admin/announcements' },
         { icon: <ClipboardList className="w-5 h-5" />, label: t('checkupPackages', { default: 'Check-up Packages' }), href: '/admin/checkup-packages' },
+        { icon: <CalendarCheck className="w-5 h-5" />, label: t('appointments', { default: 'Qəbullar' }), href: '/admin/appointments' },
+        { icon: <Inbox className="w-5 h-5" />, label: t('contactMessages', { default: 'Mesajlar' }), href: '/admin/messages' },
         { icon: <Stethoscope className="w-5 h-5" />, label: t('services', { default: 'Services' }), href: '/admin/services' },
         { icon: <Users className="w-5 h-5" />, label: t('doctors', { default: 'Doctors' }), href: '/admin/doctors' },
         { icon: <MapPin className="w-5 h-5" />, label: t('contact', { default: 'Əlaqə' }), href: '/admin/contact' },

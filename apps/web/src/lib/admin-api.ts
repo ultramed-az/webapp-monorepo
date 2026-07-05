@@ -246,6 +246,38 @@ export type AdminContactInfoRecord = {
   updatedAt: string;
 };
 
+export type AdminAppointmentRequestRecord = {
+  id: string;
+  fullName: string;
+  email: string;
+  phone: string;
+  serviceId: string | null;
+  serviceTitle: string;
+  preferredDate: string;
+  preferredTime: string;
+  message: string | null;
+  locale: string;
+  source: string;
+  status: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type AdminContactMessageRecord = {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  subject: string;
+  message: string;
+  locale: string;
+  source: string;
+  status: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
 export type AdminMediaRecord = {
   id: string;
   originalName: string;
@@ -815,6 +847,14 @@ export async function deleteAdminContactInfo(slug: string): Promise<AdminContact
   return request<AdminContactInfoRecord>(`/contact/${slug}`, {
     method: 'DELETE',
   });
+}
+
+export async function getAdminAppointmentRequests(limit = 200): Promise<AdminAppointmentRequestRecord[]> {
+  return request<AdminAppointmentRequestRecord[]>(`/appointments/admin/all?limit=${limit}`);
+}
+
+export async function getAdminContactMessages(limit = 200): Promise<AdminContactMessageRecord[]> {
+  return request<AdminContactMessageRecord[]>(`/contact/messages/admin/all?limit=${limit}`);
 }
 
 export async function getAdminServices(): Promise<AdminServiceRecord[]> {
