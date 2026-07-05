@@ -213,6 +213,24 @@ model ContactInfo {
   updatedAt    DateTime @updatedAt
 }
 
+model ContactMessage {
+  id        String   @id @default(cuid())
+  firstName String
+  lastName  String
+  email     String
+  phone     String
+  subject   String
+  message   String   @db.Text
+  locale    String   @default("az")
+  source    String   @default("contact")
+  status    String   @default("new")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([createdAt])
+  @@index([status])
+}
+
 model ContentPage {
   id            String   @id @default(cuid())
   slug          String   @unique

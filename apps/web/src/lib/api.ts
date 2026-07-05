@@ -155,6 +155,23 @@ export type AppointmentRequestResponse = {
     createdAt: string;
 };
 
+export type ContactMessagePayload = {
+    firstName: string;
+    lastName: string;
+    email: string;
+    phone: string;
+    subject: string;
+    message: string;
+    locale: SupportedLocale;
+    source: 'contact';
+};
+
+export type ContactMessageResponse = {
+    id: string;
+    status: string;
+    createdAt: string;
+};
+
 function resolveApiBaseUrl(): string {
     if (typeof window === 'undefined') {
         return (
@@ -356,6 +373,16 @@ export async function getServiceById(id: string, locale: string | undefined): Pr
 
 export async function submitAppointmentRequest(data: AppointmentRequestPayload): Promise<AppointmentRequestResponse> {
     return request<AppointmentRequestResponse>('/appointments', undefined, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+    });
+}
+
+export async function submitContactMessage(data: ContactMessagePayload): Promise<ContactMessageResponse> {
+    return request<ContactMessageResponse>('/contact/messages', undefined, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',

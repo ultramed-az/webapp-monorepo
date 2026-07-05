@@ -66,9 +66,6 @@ const emptyAppointmentForm: AppointmentFormState = {
     message: '',
 };
 
-const appointmentDatePattern = /^\d{4}-\d{2}-\d{2}$/;
-const appointmentTimePattern = /^(?:[01]\d|2[0-3]):[0-5]\d$/;
-
 function normalizeLocale(localeRaw: string | undefined): Locale {
     if (localeRaw === 'en' || localeRaw === 'ru') return localeRaw;
     return 'az';
@@ -314,8 +311,8 @@ export default function HomePage() {
         /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(appointmentForm.email.trim()) &&
         appointmentForm.phone.trim().length >= 7 &&
         appointmentForm.serviceTitle.trim().length > 0 &&
-        appointmentDatePattern.test(appointmentForm.preferredDate.trim()) &&
-        appointmentTimePattern.test(appointmentForm.preferredTime.trim());
+        appointmentForm.preferredDate.trim().length > 0 &&
+        appointmentForm.preferredTime.trim().length > 0;
 
     useScrollReveal(revealRefreshKey);
 
@@ -345,8 +342,8 @@ export default function HomePage() {
                 phone: appointmentForm.phone.trim(),
                 serviceId: appointmentForm.serviceId || null,
                 serviceTitle: appointmentForm.serviceTitle.trim(),
-                preferredDate: appointmentForm.preferredDate,
-                preferredTime: appointmentForm.preferredTime,
+                preferredDate: appointmentForm.preferredDate.trim(),
+                preferredTime: appointmentForm.preferredTime.trim(),
                 message: appointmentForm.message.trim() || null,
                 locale,
                 source: 'homepage',
@@ -762,9 +759,7 @@ export default function HomePage() {
                                 <input
                                     aria-label="Tarix seçin"
                                     className="h-12 rounded-xl border border-slate-200 px-4 text-sm text-slate-500 outline-none focus:border-brand-blue"
-                                    placeholder="Tarix seçin (YYYY-MM-DD)"
-                                    inputMode="numeric"
-                                    pattern="\d{4}-\d{2}-\d{2}"
+                                    placeholder="Tarix seçin"
                                     value={appointmentForm.preferredDate}
                                     onChange={(event) => updateAppointmentForm({ preferredDate: event.target.value })}
                                     required
@@ -772,9 +767,7 @@ export default function HomePage() {
                                 <input
                                     aria-label="Saat seçin"
                                     className="h-12 rounded-xl border border-slate-200 px-4 text-sm text-slate-500 outline-none focus:border-brand-blue"
-                                    placeholder="Saat seçin (HH:MM)"
-                                    inputMode="numeric"
-                                    pattern="(?:[01]\d|2[0-3]):[0-5]\d"
+                                    placeholder="Saat seçin"
                                     value={appointmentForm.preferredTime}
                                     onChange={(event) => updateAppointmentForm({ preferredTime: event.target.value })}
                                     required

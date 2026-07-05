@@ -259,6 +259,8 @@
     "loadingInfo": "Əlaqə məlumatları serverdən yenilənir...",
     "formTitle": "Bizə Yazın",
     "submitSuccess": "Mesajınız uğurla göndərildi. Ən qısa zamanda sizinlə əlaqə saxlayacağıq.",
+    "submitError": "Mesaj göndərilmədi. Zəhmət olmasa bir az sonra yenidən cəhd edin.",
+    "submitPending": "Göndərilir",
     "firstNameLabel": "Ad",
     "firstNamePlaceholder": "Adınızı daxil edin",
     "lastNameLabel": "Soyad",

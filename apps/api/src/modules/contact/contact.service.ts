@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
-import { CreateContactInfoDto, UpdateContactInfoDto } from './dto/contact.dto';
+import { CreateContactInfoDto, CreateContactMessageDto, UpdateContactInfoDto } from './dto/contact.dto';
 
 type SupportedLocale = 'az' | 'en' | 'ru';
 
@@ -46,6 +46,16 @@ export class ContactService {
     async create(data: CreateContactInfoDto) {
         const contact = await this.prisma.contactInfo.create({ data });
         return this.toAdminResponse(contact);
+    }
+
+    async createMessage(data: CreateContactMessageDto) {
+        const message = await this.prisma.contactMessage.create({ data });
+
+        return {
+            id: message.id,
+            status: message.status,
+            createdAt: message.createdAt.toISOString(),
+        };
     }
 
     async update(slug: string, data: UpdateContactInfoDto) {

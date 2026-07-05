@@ -11,7 +11,7 @@ import {
 } from '@nestjs/common';
 import { AdminAuthGuard } from '../admin/admin-auth.guard';
 import { ContactService } from './contact.service';
-import { parseCreateContactInfoDto, parseUpdateContactInfoDto } from './dto/contact.dto';
+import { parseCreateContactInfoDto, parseCreateContactMessageDto, parseUpdateContactInfoDto } from './dto/contact.dto';
 
 @Controller('contact')
 export class ContactController {
@@ -29,6 +29,12 @@ export class ContactController {
     @Query('slug') slug = 'main',
   ) {
     return this.contactService.getContact(locale, slug);
+  }
+
+  @Post('messages')
+  createMessage(@Body() body: unknown) {
+    const data = parseCreateContactMessageDto(body);
+    return this.contactService.createMessage(data);
   }
 
   @UseGuards(AdminAuthGuard)

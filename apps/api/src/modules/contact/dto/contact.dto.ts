@@ -3,6 +3,7 @@ import {
   ensureAtLeastOneField,
   ensureNoUnknownKeys,
   ensureObject,
+  readEmail,
   readNumber,
   readObjectArray,
   readString,
@@ -35,6 +36,17 @@ const CONTACT_UPDATE_KEYS = [
   'workingHours',
 ] as const;
 
+const CONTACT_MESSAGE_CREATE_KEYS = [
+  'firstName',
+  'lastName',
+  'email',
+  'phone',
+  'subject',
+  'message',
+  'locale',
+  'source',
+] as const;
+
 type ContactItemKey = 'phones' | 'emails' | 'workingHours';
 
 export type ContactLocalizedItemDto = {
@@ -58,6 +70,17 @@ export type CreateContactInfoDto = {
 };
 
 export type UpdateContactInfoDto = Partial<Omit<CreateContactInfoDto, 'slug'>>;
+
+export type CreateContactMessageDto = {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  subject: string;
+  message: string;
+  locale: string;
+  source: string;
+};
 
 function parseLocalizedItems(
   record: Record<string, unknown>,
@@ -117,5 +140,51 @@ export function parseUpdateContactInfoDto(body: unknown): UpdateContactInfoDto {
     phones: parseLocalizedItems(record, 'phones'),
     emails: parseLocalizedItems(record, 'emails'),
     workingHours: parseLocalizedItems(record, 'workingHours'),
+  };
+}
+
+function normalizeLocale(value: string | null | undefined): string {
+  if (value === 'en' || value === 'ru') {
+    return value;
+  }
+  return 'az';
+}
+
+export function parseCreateContactMessageDto(body: unknown): CreateContactMessageDto {
+  const record = ensureObject(body, 'contact message payload');
+  ensureNoUnknownKeys(record, CONTACT_MESSAGE_CREATE_KEYS, 'contact message payload');
+
+  return {
+    firstName: readString(record, 'firstName', {
+      required: true,
+      minLength: 2,
+      maxLength: 120,
+    })!,
+    lastName: readString(record, 'lastName', {
+      required: true,
+      minLength: 2,
+      maxLength: 120,
+    })!,
+    email: readEmail(record, 'email', {
+      required: true,
+      maxLength: 255,
+    })!,
+    phone: readString(record, 'phone', {
+      required: true,
+      minLength: 7,
+      maxLength: 50,
+    })!,
+    subject: readString(record, 'subject', {
+      required: true,
+      minLength: 2,
+      maxLength: 255,
+    })!,
+    message: readString(record, 'message', {
+      required: true,
+      minLength: 2,
+      maxLength: 3000,
+    })!,
+    locale: normalizeLocale(readString(record, 'locale', { maxLength: 2 })),
+    source: readString(record, 'source', { maxLength: 100 }) || 'contact',
   };
 }

@@ -259,6 +259,8 @@
     "loadingInfo": "Refreshing contact details from server...",
     "formTitle": "Write to Us",
     "submitSuccess": "Your message was sent successfully. We will contact you as soon as possible.",
+    "submitError": "Message could not be sent. Please try again in a moment.",
+    "submitPending": "Sending",
     "firstNameLabel": "First Name",
     "firstNamePlaceholder": "Enter your first name",
     "lastNameLabel": "Last Name",

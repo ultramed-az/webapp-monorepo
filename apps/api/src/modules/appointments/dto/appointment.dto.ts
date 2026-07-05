@@ -1,4 +1,3 @@
-import { BadRequestException } from '@nestjs/common';
 import {
   ensureNoUnknownKeys,
   ensureObject,
@@ -33,33 +32,11 @@ export type CreateAppointmentRequestDto = {
   source: string;
 };
 
-function fail(message: string): never {
-  throw new BadRequestException({
-    code: 'VALIDATION_ERROR',
-    message: `Validation failed: ${message}`,
-    details: null,
-  });
-}
-
 function normalizeLocale(value: string | null | undefined): string {
   if (value === 'en' || value === 'ru') {
     return value;
   }
   return 'az';
-}
-
-function assertDate(value: string): string {
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(value) || Number.isNaN(Date.parse(`${value}T00:00:00.000Z`))) {
-    fail('"preferredDate" must be a valid date in YYYY-MM-DD format');
-  }
-  return value;
-}
-
-function assertTime(value: string): string {
-  if (!/^(?:[01]\d|2[0-3]):[0-5]\d$/.test(value)) {
-    fail('"preferredTime" must be a valid time in HH:MM format');
-  }
-  return value;
 }
 
 export function parseCreateAppointmentRequestDto(body: unknown): CreateAppointmentRequestDto {
@@ -85,20 +62,16 @@ export function parseCreateAppointmentRequestDto(body: unknown): CreateAppointme
     minLength: 1,
     maxLength: 255,
   })!;
-  const preferredDate = assertDate(
-    readString(record, 'preferredDate', {
-      required: true,
-      minLength: 10,
-      maxLength: 10,
-    })!,
-  );
-  const preferredTime = assertTime(
-    readString(record, 'preferredTime', {
-      required: true,
-      minLength: 5,
-      maxLength: 5,
-    })!,
-  );
+  const preferredDate = readString(record, 'preferredDate', {
+    required: true,
+    minLength: 1,
+    maxLength: 120,
+  })!;
+  const preferredTime = readString(record, 'preferredTime', {
+    required: true,
+    minLength: 1,
+    maxLength: 120,
+  })!;
 
   return {
     fullName,

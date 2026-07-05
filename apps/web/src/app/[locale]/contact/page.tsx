@@ -9,9 +9,9 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Skeleton } from '@/components/ui/skeleton';
-import { MapPin, Phone, Mail, Clock, Send, MessageSquare } from 'lucide-react';
+import { MapPin, Phone, Mail, Clock, Send, MessageSquare, Loader2 } from 'lucide-react';
 import TemporaryUnavailable from '@/components/feedback/TemporaryUnavailable';
-import { getContactInfo, isBackendUnavailableError, type ContactInfoResponse } from '@/lib/api';
+import { getContactInfo, isBackendUnavailableError, submitContactMessage, type ContactInfoResponse, type SupportedLocale } from '@/lib/api';
 
 function isWhatsAppValue(value: string): boolean {
     return value.toLowerCase().includes('wa.me');
@@ -47,6 +47,8 @@ export default function ContactPage() {
     const t = useTranslations('ContactPage');
 
     const [isSubmitted, setIsSubmitted] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [submitError, setSubmitError] = useState<string | null>(null);
     const [formValues, setFormValues] = useState<ContactFormValues>({
         firstName: '',
         lastName: '',
@@ -152,6 +154,9 @@ export default function ContactPage() {
         if (isSubmitted) {
             setIsSubmitted(false);
         }
+        if (submitError) {
+            setSubmitError(null);
+        }
     };
 
     const validateForm = () => {
@@ -182,26 +187,54 @@ export default function ContactPage() {
         return errors;
     };
 
-    const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
         const errors = validateForm();
         if (Object.keys(errors).length > 0) {
             setFormErrors(errors);
             setIsSubmitted(false);
+            setSubmitError(null);
             return;
         }
 
+        const normalizedLocale: SupportedLocale = locale === 'en' || locale === 'ru' ? locale : 'az';
+        const trimmedValues = {
+            firstName: formValues.firstName.trim(),
+            lastName: formValues.lastName.trim(),
+            email: formValues.email.trim(),
+            phone: formValues.phone.trim(),
+            subject: formValues.subject.trim(),
+            message: formValues.message.trim(),
+        };
+
         setFormErrors({});
-        setIsSubmitted(true);
-        setFormValues({
-            firstName: '',
-            lastName: '',
-            email: '',
-            phone: '',
-            subject: '',
-            message: '',
-        });
+        setIsSubmitted(false);
+        setSubmitError(null);
+        setIsSubmitting(true);
+
+        try {
+            await submitContactMessage({
+                ...trimmedValues,
+                locale: normalizedLocale,
+                source: 'contact',
+            });
+
+            setIsSubmitted(true);
+            setFormValues({
+                firstName: '',
+                lastName: '',
+                email: '',
+                phone: '',
+                subject: '',
+                message: '',
+            });
+        } catch (submitErrorValue) {
+            const message = submitErrorValue instanceof Error ? submitErrorValue.message : t('submitError');
+            setSubmitError(message || t('submitError'));
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     if (isUnavailable) {
@@ -397,6 +430,12 @@ export default function ContactPage() {
                                         </div>
                                     )}
 
+                                    {submitError && (
+                                        <div className="mb-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-red-700">
+                                            {submitError}
+                                        </div>
+                                    )}
+
                                     <form onSubmit={handleFormSubmit} noValidate className="space-y-6">
                                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                                             <div className="space-y-2">
@@ -482,8 +521,20 @@ export default function ContactPage() {
                                             {formErrors.message && <p className="text-sm text-red-600">{formErrors.message}</p>}
                                         </div>
 
-                                        <Button type="submit" className="w-full h-14 bg-brand-orange hover:bg-brand-orange-dark text-white font-medium text-lg rounded-xl">
-                                            {t('submitButton')} <Send className="ml-2 w-5 h-5" />
+                                        <Button
+                                            type="submit"
+                                            disabled={isSubmitting}
+                                            className="w-full h-14 bg-brand-orange hover:bg-brand-orange-dark text-white font-medium text-lg rounded-xl disabled:cursor-not-allowed disabled:bg-slate-300"
+                                        >
+                                            {isSubmitting ? (
+                                                <>
+                                                    {t('submitPending')} <Loader2 className="ml-2 w-5 h-5 animate-spin" />
+                                                </>
+                                            ) : (
+                                                <>
+                                                    {t('submitButton')} <Send className="ml-2 w-5 h-5" />
+                                                </>
+                                            )}
                                         </Button>
                                     </form>
                                 </CardContent>
