@@ -448,20 +448,29 @@ export default function HomePage() {
                     </div>
                     <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
                         {homeServices.map((service, index) => (
-                            <div
+                            <Link
                                 key={service.id}
+                                href="/services"
                                 data-reveal="service-card"
                                 style={{ transitionDelay: `${index * 70}ms` }}
-                                className="flex min-h-[150px] cursor-default flex-col justify-between rounded-xl bg-white p-5 shadow-sm ring-1 ring-brand-blue-soft"
+                                className="group flex min-h-[150px] cursor-pointer flex-col justify-between rounded-xl bg-white p-5 shadow-sm ring-1 ring-brand-blue-soft transition hover:-translate-y-1 hover:shadow-[0_16px_34px_rgba(21,72,158,0.14)]"
                             >
                                 <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-blue-soft text-brand-blue">
                                     {serviceIcon(service.iconKey)}
                                 </div>
                                 <div className="mt-7 flex items-end justify-between gap-4 border-t border-slate-100 pt-4">
-                                    <h3 className="text-base font-bold leading-6 text-slate-950">{service.title}</h3>
+                                    <h3 className="text-base font-bold leading-6 text-slate-950 transition group-hover:text-brand-blue">{service.title}</h3>
                                 </div>
-                            </div>
+                            </Link>
                         ))}
+                    </div>
+                    <div data-reveal="slide-up" className="mt-8">
+                        <Button asChild variant="outline" className="h-11 rounded-full border-brand-blue px-6 font-bold text-brand-blue hover:bg-brand-blue hover:text-white">
+                            <Link href="/services">
+                                Daha çox
+                                <ArrowRight className="ml-2 h-4 w-4" />
+                            </Link>
+                        </Button>
                     </div>
                 </div>
             </section>
@@ -538,10 +547,10 @@ export default function HomePage() {
                     <div className="mb-10 flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
                         <div data-reveal="slide-left">
                             <h2 className="text-4xl font-black tracking-tight text-slate-950">
-                                Xəbərlər və Aksiyalar
+                                Check up xidmətləri
                             </h2>
                             <p className="mt-4 max-w-xl text-sm leading-7 text-slate-500">
-                                Ən son xəbərlər, tibbi yeniliklər və xüsusi təkliflərimiz haqqında məlumat alın.
+                                Əlverişli qiymətlərlə tam və profilaktik sağlamlıq yoxlanışları.
                             </p>
                         </div>
                         <Button asChild data-reveal="slide-right" className="w-fit rounded-full bg-brand-blue px-6 text-white hover:bg-brand-blue-dark">
