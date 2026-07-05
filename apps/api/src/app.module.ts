@@ -11,6 +11,7 @@ import { HomeModule } from './modules/home/home.module';
 import { ContentModule } from './modules/content/content.module';
 import { FaqModule } from './modules/faq/faq.module';
 import { GalleryModule } from './modules/gallery/gallery.module';
+import { AppointmentsModule } from './modules/appointments/appointments.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { GalleryModule } from './modules/gallery/gallery.module';
     ContentModule,
     FaqModule,
     GalleryModule,
+    AppointmentsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

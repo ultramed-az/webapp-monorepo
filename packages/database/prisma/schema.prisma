@@ -257,6 +257,26 @@ model CheckupPackage {
   updatedAt   DateTime @updatedAt
 }
 
+model AppointmentRequest {
+  id            String   @id @default(cuid())
+  fullName      String
+  email         String
+  phone         String
+  serviceId     String?
+  serviceTitle  String
+  preferredDate String
+  preferredTime String
+  message       String?  @db.Text
+  locale        String   @default("az")
+  source        String   @default("homepage")
+  status        String   @default("new")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([createdAt])
+  @@index([status])
+}
+
 model HomeStat {
   id        String   @id
   value     String

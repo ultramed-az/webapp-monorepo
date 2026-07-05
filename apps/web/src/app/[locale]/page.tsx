@@ -1,16 +1,19 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { type FormEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Image from 'next/image';
 import { useParams } from 'next/navigation';
 import {
     ArrowLeft,
     ArrowRight,
+    AlertCircle,
     Baby,
     Brain,
+    CheckCircle2,
     ClipboardList,
     Clock,
     HeartPulse,
+    Loader2,
     MapPin,
     Microscope,
     Phone,
@@ -29,6 +32,7 @@ import {
     getHomeStats,
     getServices,
     isBackendUnavailableError,
+    submitAppointmentRequest,
     type BlogListItem,
     type CheckupPackageItem,
     type ContactInfoResponse,
@@ -39,6 +43,31 @@ import {
 import { shouldBypassImageOptimization } from '@/lib/image';
 
 type Locale = 'az' | 'en' | 'ru';
+
+type AppointmentFormState = {
+    fullName: string;
+    email: string;
+    phone: string;
+    serviceId: string;
+    serviceTitle: string;
+    preferredDate: string;
+    preferredTime: string;
+    message: string;
+};
+
+const emptyAppointmentForm: AppointmentFormState = {
+    fullName: '',
+    email: '',
+    phone: '',
+    serviceId: '',
+    serviceTitle: '',
+    preferredDate: '',
+    preferredTime: '',
+    message: '',
+};
+
+const appointmentDatePattern = /^\d{4}-\d{2}-\d{2}$/;
+const appointmentTimePattern = /^(?:[01]\d|2[0-3]):[0-5]\d$/;
 
 function normalizeLocale(localeRaw: string | undefined): Locale {
     if (localeRaw === 'en' || localeRaw === 'ru') return localeRaw;
@@ -212,6 +241,10 @@ export default function HomePage() {
     const [stats, setStats] = useState<HomeStatItem[]>([]);
     const [isUnavailable, setIsUnavailable] = useState(false);
     const [refreshKey, setRefreshKey] = useState(0);
+    const [appointmentForm, setAppointmentForm] = useState<AppointmentFormState>(emptyAppointmentForm);
+    const [appointmentSubmitting, setAppointmentSubmitting] = useState(false);
+    const [appointmentStatus, setAppointmentStatus] = useState<'idle' | 'success' | 'error'>('idle');
+    const [appointmentMessage, setAppointmentMessage] = useState('');
     const doctorsTrackRef = useRef<HTMLDivElement | null>(null);
     const [doctorCarouselState, setDoctorCarouselState] = useState({
         atStart: true,
@@ -276,8 +309,59 @@ export default function HomePage() {
     const primaryPhone = contactInfo.phones.find((item) => !item.value.includes('wa.me'))?.value ?? contactInfo.phones[0]?.value ?? '';
     const primaryEmail = contactInfo.emails[0]?.value ?? 'ultramedclinics@gmail.com';
     const revealRefreshKey = `${locale}-${homeServices.length}-${homeDoctors.length}-${homeCheckups.length}-${homeBlogs.length}`;
+    const isAppointmentFormValid =
+        appointmentForm.fullName.trim().length >= 2 &&
+        /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(appointmentForm.email.trim()) &&
+        appointmentForm.phone.trim().length >= 7 &&
+        appointmentForm.serviceTitle.trim().length > 0 &&
+        appointmentDatePattern.test(appointmentForm.preferredDate.trim()) &&
+        appointmentTimePattern.test(appointmentForm.preferredTime.trim());
 
     useScrollReveal(revealRefreshKey);
+
+    const updateAppointmentForm = useCallback((patch: Partial<AppointmentFormState>) => {
+        setAppointmentForm((current) => ({ ...current, ...patch }));
+        setAppointmentStatus('idle');
+        setAppointmentMessage('');
+    }, []);
+
+    const handleAppointmentSubmit = useCallback(async (event: FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+
+        if (!isAppointmentFormValid) {
+            setAppointmentStatus('error');
+            setAppointmentMessage('Zəhmət olmasa bütün məcburi xanaları düzgün doldurun.');
+            return;
+        }
+
+        setAppointmentSubmitting(true);
+        setAppointmentStatus('idle');
+        setAppointmentMessage('');
+
+        try {
+            await submitAppointmentRequest({
+                fullName: appointmentForm.fullName.trim(),
+                email: appointmentForm.email.trim(),
+                phone: appointmentForm.phone.trim(),
+                serviceId: appointmentForm.serviceId || null,
+                serviceTitle: appointmentForm.serviceTitle.trim(),
+                preferredDate: appointmentForm.preferredDate,
+                preferredTime: appointmentForm.preferredTime,
+                message: appointmentForm.message.trim() || null,
+                locale,
+                source: 'homepage',
+            });
+
+            setAppointmentForm(emptyAppointmentForm);
+            setAppointmentStatus('success');
+            setAppointmentMessage('Müraciətiniz qəbul olundu.');
+        } catch {
+            setAppointmentStatus('error');
+            setAppointmentMessage('Müraciət göndərilmədi. Zəhmət olmasa bir az sonra yenidən cəhd edin.');
+        } finally {
+            setAppointmentSubmitting(false);
+        }
+    }, [appointmentForm, isAppointmentFormValid, locale]);
 
     const updateDoctorCarouselState = useCallback(() => {
         const track = doctorsTrackRef.current;
@@ -624,29 +708,111 @@ export default function HomePage() {
                             data-reveal="form-rise"
                             style={{ transitionDelay: '140ms' }}
                             className="mt-8 grid gap-3 rounded-2xl bg-white p-5 shadow-[0_18px_48px_rgba(15,23,42,0.10)] ring-1 ring-slate-100"
-                            onSubmit={(event) => event.preventDefault()}
+                            onSubmit={handleAppointmentSubmit}
                         >
                             <div className="grid gap-3 sm:grid-cols-2">
-                                <input className="h-12 rounded-xl border border-slate-200 px-4 text-sm outline-none focus:border-brand-blue" placeholder="Ad və Soyad" />
-                                <input className="h-12 rounded-xl border border-slate-200 px-4 text-sm outline-none focus:border-brand-blue" placeholder="E-mail" />
+                                <input
+                                    aria-label="Ad və Soyad"
+                                    className="h-12 rounded-xl border border-slate-200 px-4 text-sm outline-none focus:border-brand-blue"
+                                    placeholder="Ad və Soyad"
+                                    value={appointmentForm.fullName}
+                                    onChange={(event) => updateAppointmentForm({ fullName: event.target.value })}
+                                    required
+                                />
+                                <input
+                                    aria-label="E-mail"
+                                    className="h-12 rounded-xl border border-slate-200 px-4 text-sm outline-none focus:border-brand-blue"
+                                    placeholder="E-mail"
+                                    type="email"
+                                    value={appointmentForm.email}
+                                    onChange={(event) => updateAppointmentForm({ email: event.target.value })}
+                                    required
+                                />
                             </div>
                             <div className="grid gap-3 sm:grid-cols-2">
-                                <input className="h-12 rounded-xl border border-slate-200 px-4 text-sm outline-none focus:border-brand-blue" placeholder="Telefon nömrəsi" />
-                                <select className="h-12 rounded-xl border border-slate-200 px-4 text-sm text-slate-500 outline-none focus:border-brand-blue">
-                                    <option>Xidmət seçin</option>
+                                <input
+                                    aria-label="Telefon nömrəsi"
+                                    className="h-12 rounded-xl border border-slate-200 px-4 text-sm outline-none focus:border-brand-blue"
+                                    placeholder="Telefon nömrəsi"
+                                    type="tel"
+                                    value={appointmentForm.phone}
+                                    onChange={(event) => updateAppointmentForm({ phone: event.target.value })}
+                                    required
+                                />
+                                <select
+                                    aria-label="Xidmət seçin"
+                                    className="h-12 rounded-xl border border-slate-200 px-4 text-sm text-slate-500 outline-none focus:border-brand-blue"
+                                    value={appointmentForm.serviceId}
+                                    onChange={(event) => {
+                                        const service = homeServices.find((item) => item.id === event.target.value);
+                                        updateAppointmentForm({
+                                            serviceId: service?.id ?? '',
+                                            serviceTitle: service?.title ?? '',
+                                        });
+                                    }}
+                                    required
+                                >
+                                    <option value="" disabled>Xidmət seçin</option>
                                     {homeServices.slice(0, 5).map((service) => (
-                                        <option key={service.id}>{service.title}</option>
+                                        <option key={service.id} value={service.id}>{service.title}</option>
                                     ))}
                                 </select>
                             </div>
                             <div className="grid gap-3 sm:grid-cols-2">
-                                <input className="h-12 rounded-xl border border-slate-200 px-4 text-sm outline-none focus:border-brand-blue" placeholder="Tarix seçin" />
-                                <input className="h-12 rounded-xl border border-slate-200 px-4 text-sm outline-none focus:border-brand-blue" placeholder="Saat seçin" />
+                                <input
+                                    aria-label="Tarix seçin"
+                                    className="h-12 rounded-xl border border-slate-200 px-4 text-sm text-slate-500 outline-none focus:border-brand-blue"
+                                    placeholder="Tarix seçin (YYYY-MM-DD)"
+                                    inputMode="numeric"
+                                    pattern="\d{4}-\d{2}-\d{2}"
+                                    value={appointmentForm.preferredDate}
+                                    onChange={(event) => updateAppointmentForm({ preferredDate: event.target.value })}
+                                    required
+                                />
+                                <input
+                                    aria-label="Saat seçin"
+                                    className="h-12 rounded-xl border border-slate-200 px-4 text-sm text-slate-500 outline-none focus:border-brand-blue"
+                                    placeholder="Saat seçin (HH:MM)"
+                                    inputMode="numeric"
+                                    pattern="(?:[01]\d|2[0-3]):[0-5]\d"
+                                    value={appointmentForm.preferredTime}
+                                    onChange={(event) => updateAppointmentForm({ preferredTime: event.target.value })}
+                                    required
+                                />
                             </div>
-                            <textarea className="min-h-28 rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-brand-blue" placeholder="Mesajınız (istəyə görə)" />
-                            <Button className="h-12 rounded-xl bg-slate-200 text-slate-500 hover:bg-brand-orange hover:text-white">
-                                Qəbula yazıl
-                                <ArrowRight className="ml-2 h-4 w-4" />
+                            <textarea
+                                aria-label="Mesajınız"
+                                className="min-h-28 rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-brand-blue"
+                                placeholder="Mesajınız (istəyə görə)"
+                                value={appointmentForm.message}
+                                onChange={(event) => updateAppointmentForm({ message: event.target.value })}
+                            />
+                            {appointmentMessage ? (
+                                <div
+                                    role={appointmentStatus === 'error' ? 'alert' : 'status'}
+                                    className={`flex items-center gap-2 rounded-xl px-4 py-3 text-sm font-semibold ${appointmentStatus === 'success'
+                                        ? 'bg-emerald-50 text-emerald-700 ring-1 ring-emerald-100'
+                                        : 'bg-red-50 text-red-700 ring-1 ring-red-100'
+                                        }`}
+                                >
+                                    {appointmentStatus === 'success' ? (
+                                        <CheckCircle2 className="h-4 w-4" />
+                                    ) : (
+                                        <AlertCircle className="h-4 w-4" />
+                                    )}
+                                    {appointmentMessage}
+                                </div>
+                            ) : null}
+                            <Button
+                                type="submit"
+                                disabled={!isAppointmentFormValid || appointmentSubmitting}
+                                className="h-12 rounded-xl bg-brand-orange text-white hover:bg-brand-orange-dark disabled:bg-slate-200 disabled:text-slate-500"
+                            >
+                                {appointmentSubmitting ? (
+                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                ) : null}
+                                {appointmentSubmitting ? 'Göndərilir...' : 'Qəbula yazıl'}
+                                {!appointmentSubmitting ? <ArrowRight className="ml-2 h-4 w-4" /> : null}
                             </Button>
                         </form>
                     </div>

@@ -136,6 +136,25 @@ export type ServiceDetailItem = {
     image: string | null;
 };
 
+export type AppointmentRequestPayload = {
+    fullName: string;
+    email: string;
+    phone: string;
+    serviceId: string | null;
+    serviceTitle: string;
+    preferredDate: string;
+    preferredTime: string;
+    message: string | null;
+    locale: SupportedLocale;
+    source: 'homepage';
+};
+
+export type AppointmentRequestResponse = {
+    id: string;
+    status: string;
+    createdAt: string;
+};
+
 function resolveApiBaseUrl(): string {
     if (typeof window === 'undefined') {
         return (
@@ -176,12 +195,13 @@ function isUnavailableStatus(status: number): boolean {
     return status === 502 || status === 503 || status === 504;
 }
 
-async function fetchWithTimeout(url: string): Promise<Response> {
+async function fetchWithTimeout(url: string, init?: RequestInit): Promise<Response> {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
 
     try {
         return await fetch(url, {
+            ...init,
             cache: 'no-store',
             signal: controller.signal,
         });
@@ -243,7 +263,7 @@ function toLocale(locale: string | undefined): SupportedLocale {
     return 'az';
 }
 
-async function request<T>(path: string, query?: Record<string, string | undefined>): Promise<T> {
+async function request<T>(path: string, query?: Record<string, string | undefined>, init?: RequestInit): Promise<T> {
     const params = new URLSearchParams();
     if (query) {
         for (const [key, value] of Object.entries(query)) {
@@ -258,7 +278,7 @@ async function request<T>(path: string, query?: Record<string, string | undefine
 
     await checkBackendHealth();
 
-    const response = await fetchWithTimeout(url);
+    const response = await fetchWithTimeout(url, init);
     if (!response.ok) {
         let payload: unknown = null;
         try {
@@ -332,6 +352,16 @@ export async function getServices(locale: string | undefined): Promise<ServiceLi
 
 export async function getServiceById(id: string, locale: string | undefined): Promise<ServiceDetailItem | null> {
     return request<ServiceDetailItem | null>(`/services/${id}`, { locale: toLocale(locale) });
+}
+
+export async function submitAppointmentRequest(data: AppointmentRequestPayload): Promise<AppointmentRequestResponse> {
+    return request<AppointmentRequestResponse>('/appointments', undefined, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+    });
 }
 
 export async function getFaqItems(locale: string | undefined): Promise<FaqItem[]> {
