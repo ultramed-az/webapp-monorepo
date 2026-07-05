@@ -183,18 +183,6 @@ export type AdminFaqRecord = {
   updatedAt: string;
 };
 
-export type AdminGalleryRecord = {
-  id: string;
-  imageUrl: string;
-  mediaId: string | null;
-  media: AdminMediaSummary | null;
-  captionAz: string | null;
-  captionEn: string | null;
-  captionRu: string | null;
-  createdAt: string;
-  updatedAt: string;
-};
-
 export type AdminAnnouncementRecord = {
   id: string;
   textAz: string;
@@ -853,8 +841,34 @@ export async function getAdminAppointmentRequests(limit = 200): Promise<AdminApp
   return request<AdminAppointmentRequestRecord[]>(`/appointments/admin/all?limit=${limit}`);
 }
 
+export async function deleteAdminAppointmentRequest(id: string): Promise<{ id: string }> {
+  return request<{ id: string }>(`/appointments/admin/${id}`, {
+    method: 'DELETE',
+  });
+}
+
+export async function deleteAdminAppointmentRequests(ids: string[]): Promise<{ deletedCount: number }> {
+  return request<{ deletedCount: number }>('/appointments/admin/delete-many', {
+    method: 'POST',
+    body: { ids },
+  });
+}
+
 export async function getAdminContactMessages(limit = 200): Promise<AdminContactMessageRecord[]> {
   return request<AdminContactMessageRecord[]>(`/contact/messages/admin/all?limit=${limit}`);
+}
+
+export async function deleteAdminContactMessage(id: string): Promise<{ id: string }> {
+  return request<{ id: string }>(`/contact/messages/admin/${id}`, {
+    method: 'DELETE',
+  });
+}
+
+export async function deleteAdminContactMessages(ids: string[]): Promise<{ deletedCount: number }> {
+  return request<{ deletedCount: number }>('/contact/messages/admin/delete-many', {
+    method: 'POST',
+    body: { ids },
+  });
 }
 
 export async function getAdminServices(): Promise<AdminServiceRecord[]> {
@@ -992,35 +1006,6 @@ export async function updateAdminFaq(id: string, data: Partial<AdminFaqRecord>):
 
 export async function deleteAdminFaq(id: string): Promise<AdminFaqRecord> {
   return request<AdminFaqRecord>(`/faq/${id}`, {
-    method: 'DELETE',
-  });
-}
-
-export async function getAdminGalleryItems(): Promise<AdminGalleryRecord[]> {
-  return request<AdminGalleryRecord[]>('/gallery/admin/all');
-}
-
-export async function createAdminGalleryItem(
-  data: Partial<AdminGalleryRecord>,
-): Promise<AdminGalleryRecord> {
-  return request<AdminGalleryRecord>('/gallery', {
-    method: 'POST',
-    body: data,
-  });
-}
-
-export async function updateAdminGalleryItem(
-  id: string,
-  data: Partial<AdminGalleryRecord>,
-): Promise<AdminGalleryRecord> {
-  return request<AdminGalleryRecord>(`/gallery/${id}`, {
-    method: 'PUT',
-    body: data,
-  });
-}
-
-export async function deleteAdminGalleryItem(id: string): Promise<AdminGalleryRecord> {
-  return request<AdminGalleryRecord>(`/gallery/${id}`, {
     method: 'DELETE',
   });
 }

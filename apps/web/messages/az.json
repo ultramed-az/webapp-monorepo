@@ -83,7 +83,6 @@
     "doctors": "Həkimlər",
     "contact": "Əlaqə",
     "blog": "Bloq",
-    "gallery": "Qalereya",
     "media": "Media",
     "testimonials": "Rəylər",
     "faq": "TVS",
@@ -93,14 +92,7 @@
     "logoutAll": "Bütün sessiyalardan çıxış",
     "search": "Axtar...",
     "openMenu": "Menyunu aç",
-    "profile": "Profil",
-    "notifications": "Bildirişlər",
-    "notificationsDescription": "Son yeniləmələr və faydalı xatırlatmalar burada görünür.",
-    "notificationsEmpty": "Hazırda yeni bildiriş yoxdur.",
-    "notificationSecurityTitle": "Sessiya təhlükəsizliyi aktivdir",
-    "notificationSecurityDescription": "Profil menyusundan bütün aktiv sessiyaları istənilən vaxt sonlandıra bilərsiniz.",
-    "notificationMediaTitle": "Media idarəetməsi aktivdir",
-    "notificationMediaDescription": "Yüklənən şəkil və faylları Media bölməsindən izləyə bilərsiniz."
+    "profile": "Profil"
   },
   "AboutPage": {
     "heroTitle": "Biz Kimik?",

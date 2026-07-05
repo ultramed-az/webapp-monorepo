@@ -83,7 +83,6 @@
     "doctors": "Врачи",
     "contact": "Контакты",
     "blog": "Блог",
-    "gallery": "Галерея",
     "media": "Медиа",
     "testimonials": "Отзывы",
     "faq": "FAQ",
@@ -93,14 +92,7 @@
     "logoutAll": "Выйти из всех сессий",
     "search": "Поиск...",
     "openMenu": "Открыть меню",
-    "profile": "Профиль",
-    "notifications": "Уведомления",
-    "notificationsDescription": "Здесь отображаются последние обновления и полезные напоминания.",
-    "notificationsEmpty": "Сейчас новых уведомлений нет.",
-    "notificationSecurityTitle": "Защита сессий активна",
-    "notificationSecurityDescription": "Вы можете завершить все активные сессии через меню профиля в любой момент.",
-    "notificationMediaTitle": "Управление медиа активно",
-    "notificationMediaDescription": "Загруженные изображения и файлы можно просматривать в разделе Media."
+    "profile": "Профиль"
   },
   "AboutPage": {
     "heroTitle": "Кто мы?",

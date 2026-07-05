@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { CreateContactInfoDto, CreateContactMessageDto, UpdateContactInfoDto } from './dto/contact.dto';
 
@@ -78,6 +78,32 @@ export class ContactService {
             status: message.status,
             createdAt: message.createdAt.toISOString(),
         };
+    }
+
+    async removeAdminMessage(id: string) {
+        const message = await this.prisma.contactMessage.findUnique({
+            where: { id },
+            select: { id: true },
+        });
+
+        if (!message) {
+            throw new NotFoundException('Contact message not found');
+        }
+
+        await this.prisma.contactMessage.delete({
+            where: { id },
+        });
+
+        return { id };
+    }
+
+    async removeAdminMessages(body: unknown) {
+        const ids = this.normalizeIdsPayload(body);
+        const result = await this.prisma.contactMessage.deleteMany({
+            where: { id: { in: ids } },
+        });
+
+        return { deletedCount: result.count };
     }
 
     async update(slug: string, data: UpdateContactInfoDto) {
@@ -214,5 +240,26 @@ export class ContactService {
             return 200;
         }
         return Math.min(parsed, 500);
+    }
+
+    private normalizeIdsPayload(body: unknown): string[] {
+        if (!body || typeof body !== 'object' || !Array.isArray((body as { ids?: unknown }).ids)) {
+            throw new BadRequestException('ids array is required');
+        }
+
+        const ids = Array.from(
+            new Set(
+                (body as { ids: unknown[] }).ids
+                    .filter((id): id is string => typeof id === 'string')
+                    .map((id) => id.trim())
+                    .filter(Boolean),
+            ),
+        );
+
+        if (ids.length === 0) {
+            throw new BadRequestException('ids array cannot be empty');
+        }
+
+        return ids;
     }
 }

@@ -29,6 +29,18 @@ export class ContactController {
     return this.contactService.getAdminMessages(limit);
   }
 
+  @UseGuards(AdminAuthGuard)
+  @Post('messages/admin/delete-many')
+  removeAdminMessages(@Body() body: unknown) {
+    return this.contactService.removeAdminMessages(body);
+  }
+
+  @UseGuards(AdminAuthGuard)
+  @Delete('messages/admin/:id')
+  removeAdminMessage(@Param('id') id: string) {
+    return this.contactService.removeAdminMessage(id);
+  }
+
   @Get()
   getContact(
     @Query('locale') locale = 'az',

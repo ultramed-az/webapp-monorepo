@@ -83,7 +83,6 @@
     "doctors": "Doctors",
     "contact": "Contact",
     "blog": "Blog",
-    "gallery": "Gallery",
     "media": "Media",
     "testimonials": "Testimonials",
     "faq": "FAQ",
@@ -93,14 +92,7 @@
     "logoutAll": "Logout all sessions",
     "search": "Search...",
     "openMenu": "Open menu",
-    "profile": "Profile",
-    "notifications": "Notifications",
-    "notificationsDescription": "Recent updates and helpful reminders appear here.",
-    "notificationsEmpty": "There are no new notifications right now.",
-    "notificationSecurityTitle": "Session security is active",
-    "notificationSecurityDescription": "You can end all active sessions from the profile menu at any time.",
-    "notificationMediaTitle": "Media management is enabled",
-    "notificationMediaDescription": "Uploaded images and files can be reviewed from the Media section."
+    "profile": "Profile"
   },
   "AboutPage": {
     "heroTitle": "Who Are We?",
